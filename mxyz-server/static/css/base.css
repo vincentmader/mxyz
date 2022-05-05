@@ -1,0 +1,80 @@
+@import url("canvas.css");
+@import url("section.css");
+
+body {
+  /* color definitions */
+  --main-bg-color: #111111;
+  --main-section-color: #222222;
+  --main-border-color: #555555;
+  --main-text-color: #dddddd;
+  --main-font-family: Arial, Helvetica, sans-serif;
+  --main-border: 2px solid var(--main-border-color);
+  --debug-border: 1px solid green;
+  --main-margin: 10px;
+
+  /* geometry */
+  width: 100%;
+  margin: 0px;
+  padding: 0px;
+  /* fonts */
+  font-family: var(--main-font-family);
+  /* color */
+  background-color: var(--main-bg-color);
+  color: var(--main-text-color);
+  /* various */
+  overflow-x: hidden;
+}
+
+/* HEADER ====================================== */
+
+#page_header {
+  outline: var(--debug-border);
+  /* width: calc(100% - 14px); */
+  text-align: right;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  /* margin-bottom: 13px; */
+}
+
+#home {
+  border: var(--debug-border);
+  cursor: pointer;
+  background-color: black;
+  color: var(--main-text-color);
+  font-size: 18px;
+  font-weight: 690;
+  text-decoration: none;
+  outline: none;
+  /* no effect */
+  /*     margin: auto; */
+  /*     padding: auto; */
+  /*     height: 100%; */
+}
+
+/* CONTENT ====================================== */
+
+#page_content {
+  outline: var(--debug-border);
+  width: 60%;
+  padding-left: 20%;
+  padding-right: 20%;
+}
+@media only screen and (max-width: 1201px) {
+  #page_content {
+    width: 65%;
+    padding-left: 17.5%;
+    padding-right: 17.5%;
+  }
+}
+@media only screen and (max-width: 751px) {
+  #page_content {
+    width: 96%;
+    padding-left: 2%;
+    padding-right: 2%;
+  }
+}
+
+/* ========================================================================= */
+/* slider { */
+/*   outline: none; */
+/* } */
