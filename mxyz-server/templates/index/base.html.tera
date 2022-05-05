@@ -7,5 +7,5 @@
 
 {% block content %}
     {{ super() }}
-    {% include "tera/index/navgrid" %}
+    {% include "index/navgrid" %}
 {% endblock content %}
