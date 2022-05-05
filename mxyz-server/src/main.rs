@@ -17,7 +17,7 @@ mod views;
 pub async fn main() -> Result<(), rocket::Error> {
     let routes = routes![
         views::index::route,
-        // views::simulation::route,
+        views::simulation::route,
         // views::chronos::route,
     ];
     let file_server = FileServer::from(relative!("static"));
