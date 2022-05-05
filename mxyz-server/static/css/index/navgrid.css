@@ -1,0 +1,16 @@
+#navgrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin-bottom: 45px;
+  margin-top: 15px;
+}
+@media only screen and (max-width: 1201px) {
+  #navgrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media only screen and (max-width: 751px) {
+  #navgrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

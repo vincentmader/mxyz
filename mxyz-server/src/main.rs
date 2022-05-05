@@ -10,13 +10,13 @@ use rocket_dyn_templates::Template;
 // use mxyz_server::events;
 // use mxyz_server::views;
 // use mxyz_server;
-// mod views;
+mod views;
 // use mxyz_server::run_server;
 
 #[rocket::main]
 pub async fn main() -> Result<(), rocket::Error> {
     let routes = routes![
-        // views::index::route,
+        views::index::route,
         // views::simulation::route,
         // views::chronos::route,
     ];

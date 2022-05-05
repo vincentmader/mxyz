@@ -1,0 +1,11 @@
+{% extends "base" %}
+
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" type="text/css" href="/static/css/index/base.css">
+{% endblock head %}
+
+{% block content %}
+    {{ super() }}
+    {% include "tera/index/navgrid" %}
+{% endblock content %}

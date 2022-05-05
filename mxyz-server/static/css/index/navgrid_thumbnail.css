@@ -1,0 +1,58 @@
+.navgrid_thumbnail-inactive {
+  width: 86%; /* make square (with :after) */
+  border: 2px solid #555555;
+  border-radius: 30px;
+  box-shadow: inset 0px 0px 0px 0px black;
+  box-sizing: border-box;
+
+  /* center */
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 7%; /* left & right done autom. through align */
+  margin-bottom: 7%;
+
+  /* grayscale */
+  filter: grayscale(100%);
+  -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
+}
+
+.navgrid_thumbnail {
+  width: 86%; /* make square (with :after) */
+  border: 2px solid #555555;
+  border-radius: 30px;
+  box-shadow: inset 0px 0px 0px 0px black;
+  box-sizing: border-box;
+
+  /* center */
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 7%; /* left & right done autom. through align */
+  margin-bottom: 7%;
+
+  outline: none;
+
+  /* transition (with :hover) */
+  transition: border 0.35s, filter 0.35s, transform 0.35s ease-in-out;
+  /* grayscale */
+  filter: grayscale(100%);
+  -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
+}
+@media only screen and (max-width: 551px) {
+  .navgrid_thumbnail {
+    filter: grayscale(0%);
+  }
+}
+.navgrid_thumbnail:after {
+  content: "";
+  display: block;
+  padding-bottom: 100%;
+}
+.navgrid_thumbnail:hover {
+  border: 2px solid #555555;
+  transform: scale(1.1);
+  -webkit-filter: grayscale(0%); /* Safari 6.0 - 9.0 */
+  filter: grayscale(0%);
+  cursor: pointer;
+}

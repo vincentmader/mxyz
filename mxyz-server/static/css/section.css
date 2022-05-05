@@ -1,0 +1,16 @@
+.section {
+  background-color: var(--main-section-color);
+  border-radius: 20px; /* if changed: also change for navgrid_section? */
+  border: var(--main-border);
+  margin-bottom: 25px;
+  text-align: center;
+  padding: 10px;
+}
+
+.section_title {
+  width: 100%;
+  text-align: center;
+  font-weight: 690;
+  margin-bottom: 8px;
+  height: 1em; /* needed for smooth reload  (semi, text "blinks") */
+}

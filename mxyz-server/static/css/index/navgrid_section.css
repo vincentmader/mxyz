@@ -1,0 +1,13 @@
+.navgrid_section_title {
+  width: 100%;
+  text-align: center;
+  font-weight: 690;
+}
+
+#section_navgrid {
+  width: 100%;
+  /* margin-bottom: 30px; /1* if changed: also change for .section *1/ */
+  /* border: 2px solid #555555; */
+  /* border-radius: 20px; /1* if changed: also change for #canvas/#section? *1/ */
+  /* background-color: #111111; */
+}
