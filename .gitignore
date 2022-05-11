@@ -1,3 +1,5 @@
 .DS_Store
-/target
+/.git
 Cargo.lock
+pkg
+target
