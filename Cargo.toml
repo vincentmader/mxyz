@@ -7,4 +7,5 @@
         "mxyz-client",
         "mxyz-engine",
         "mxyz-server",
+        "mxyz-utils",
     ]
