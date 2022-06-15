@@ -1,0 +1,6125 @@
+.DS_Store
+/.git
+Cargo.lock
+pkg
+target
+[submodule "mxyz-engine"]
+	path = mxyz-engine
+	url = https://github.com/vincentmader/mxyz-engine
+[workspace]
+    default-members=[
+        "mxyz-engine",  
+        # "mxyz-server",
+    ]
+    members = [
+        "mxyz-client",
+        "mxyz-engine",
+        "mxyz-server",
+    ]
+engine:
+	cargo run -p mxyz-engine # --release
+server:
+	cargo run -p mxyz-server # --release
+client:
+	cd ./mxyz-client && cargo build --target wasm32-unknown-unknown # --release
+	wasm-bindgen --target web --out-dir "./mxyz-server/static/pkg" "./target/wasm32-unknown-unknown/debug/mxyz_client.wasm"
+
+* mader.xyz
+[global]
+    template_dir ="mxyz-server/templates"
+[package]
+    name = "mxyz-client"
+    version = "0.1.0"
+    authors = ["Vincent C. Mader <vincent@mader.xyz>"]
+    edition = "2018"
+
+[lib]           
+    crate-type = [
+        "cdylib",  # for wasm
+        "rlib"     # for wasm-testing
+    ]  
+
+[dependencies]
+    # mxyz-engine = { path = "../mxyz-engine" }
+    console_error_panic_hook = { version = "0.1.6", optional = true }
+    wee_alloc = { version = "0.4.2", optional = true }
+    js-sys = "0.3.51"
+    wasm-bindgen = { version = "^0.2", features = ["nightly", "serde-serialize"] }
+
+[dependencies.web-sys]
+    version = "0.3.55"
+    features = [
+        'CanvasRenderingContext2d',
+        # 'CssStyleDeclaration',
+        'Document',
+        'Element',
+        # 'EventListener',
+        # 'EventTarget',
+        # 'HtmlButtonElement',
+        'HtmlCanvasElement',
+        'HtmlElement',
+        # 'HtmlOptionElement',
+        # 'HtmlParagraphElement',
+        # 'MouseEvent',
+        'Node',
+        'Window',
+        'console',
+    ]
+
+[features]
+    default = ["console_error_panic_hook"]
+use crate::utils::dom::console;
+use std::cell::RefCell;
+use std::rc::Rc;
+use wasm_bindgen::prelude::*;
+
+use crate::utils::dom::body;
+use crate::utils::dom::request_animation_frame;
+
+// This function is automatically invoked after the wasm module is instantiated.
+#[wasm_bindgen(start)]
+pub fn run() -> Result<(), JsValue> {
+    // Here we want to call `requestAnimationFrame` in a loop,
+    // but only a fixed number of times.
+    // After it's done we want all our resources cleaned up.
+    // To achieve this we're using an `Rc`.
+    // The `Rc` will eventually store the closure we want to execute on
+    // each frame, but to start out it contains `None`.
+    //
+    // After the `Rc` is made we'll actually create the closure,
+    // and the closure will reference one of the `Rc` instances.
+    // The other `Rc` reference is used to store the closure,
+    // request the first frame, and then is dropped by this function.
+    //
+    // Inside the closure we've got a persistent `Rc` reference,
+    // which we use for all future iterations of the loop
+    let f = Rc::new(RefCell::new(None));
+    let g = f.clone();
+
+    let mut i = 0;
+    *g.borrow_mut() = Some(Closure::wrap(Box::new(move || {
+        if i > 300 {
+            body().set_text_content(Some("All done!"));
+            // Drop handle to this closure -> will get cleaned up on return.
+            let _ = f.borrow_mut().take();
+            return;
+        }
+
+        // Set the body's text content to how many times this
+        // requestAnimationFrame callback has fired.
+        i += 1;
+        // body().set_text_content(Some(&text));
+        let text = format!("requestAnimationFrame has been called {} times.", i);
+        // console::log(&text);
+
+        // Schedule ourself for another requestAnimationFrame callback.
+        request_animation_frame(f.borrow().as_ref().unwrap());
+    }) as Box<dyn FnMut()>));
+
+    request_animation_frame(g.borrow().as_ref().unwrap());
+    Ok(())
+}
+use super::renderer::Renderer;
+use super::utils::dom;
+use super::utils::dom::console;
+use wasm_bindgen::prelude::*;
+
+// ----------------------------------------------------------------------------
+
+#[wasm_bindgen]
+/// Simulation Client: Renderer
+pub struct SimulationRendererClient {
+    renderer: Renderer,
+    // TODO server -> bytestream -> client
+}
+#[wasm_bindgen]
+impl SimulationRendererClient {
+    /// Create new Simulation Renderer Client
+    pub fn new() -> Self {
+        let renderer = Renderer::new();
+        SimulationRendererClient { renderer }
+    }
+    /// Initialize Renderer Client
+    pub fn init(&mut self) {
+        dom::set_panic_hook();
+        self.renderer.init();
+    }
+    /// Run Renderer Client
+    pub fn run(&mut self) {}
+}
+
+// ----------------------------------------------------------------------------
+// use mxyz_engine::state::preset::SimulationId;
+// use mxyz_engine::system::System;
+// use mxyz_engine::Engine;
+
+#[wasm_bindgen]
+/// Simulation Client: Compute + Renderer
+pub struct SimulationComputeClient {
+    // engine: Engine,
+    renderer: Renderer,
+}
+#[wasm_bindgen]
+impl SimulationComputeClient {
+    /// Create new Simulation Compute Client
+    pub fn new() -> Self {
+        let renderer = Renderer::new();
+        // let engine = Engine::new();
+        SimulationComputeClient {
+            renderer,
+            // engine
+        }
+    }
+    /// Initialize Compute Client
+    pub fn init(&mut self) {
+        // dom::set_panic_hook();
+        // let sim_id = SimulationId::Foo;
+        // self.engine.init(&Some(sim_id));
+        // self.renderer.init();
+    }
+    /// Run Compute Client
+    pub fn run(&mut self) {
+        for _ in 0..13000 {
+            // self.engine.step();
+            // self.render();
+            // crate::animation_loop::run();
+        }
+    }
+    pub fn render(&mut self) {
+        // let canvas = &mut self.renderer.canvases[0];
+        // canvas.clear();
+
+        // let config = &self.engine.config;
+        // let states = &self.engine.states;
+        // let step_id = config.step_id;
+        // let current_state = &states[step_id];
+        // for system in current_state.systems.iter() {
+        //     match system {
+        //         System::PhysicalBodies(sys) => {
+        //             for body in sys.entities.iter() {
+        //                 let mass = body.mass;
+        //                 let pos = body.position;
+        //                 let vel = body.velocity;
+        //                 // let a = format!("{:?}", pos);
+        //                 // console::log(&a);
+
+        //                 canvas.set_stroke_style("white");
+        //                 canvas.set_fill_style("white");
+        //                 let r = 0.01;
+        //                 canvas.draw_circle((pos[0], pos[1]), r, true);
+        //             }
+        //         }
+        //         System::ForceField(sys) => {}
+        //         _ => {}
+        //     }
+        // }
+        // let a = format!("{}", config.step_id);
+        // crate::utils::dom::console::log(&a);
+    }
+}
+use wasm_bindgen::{JsCast, JsValue};
+use web_sys::HtmlCanvasElement;
+
+use crate::utils::dom;
+use crate::utils::dom::HTMLObject;
+
+const TAU: f64 = 2.0 * std::f64::consts::PI;
+
+/// Canvas
+pub struct Canvas {
+    // pub context: web_sys::CanvasRenderingContext2d,
+    id: Option<u8>,
+    dimensions: (f64, f64),
+
+    element: HtmlCanvasElement,
+    context: web_sys::CanvasRenderingContext2d,
+    scale: f64,
+    pub zoom: f64,
+}
+impl HTMLObject for Canvas {
+    fn update(&mut self) {
+        let from = (0., 0.);
+        let to = (1000., 1000.);
+        self.set_stroke_style("white");
+        self.draw_line(from, to);
+    }
+}
+impl Canvas {
+    pub fn new(id: u8) -> Self {
+        let canvas_id = format!("canvas_{}", id);
+
+        let id = Option::Some(id);
+        let dimensions = (0., 0.); // TODO
+
+        let element = dom::document()
+            .get_element_by_id(&canvas_id)
+            .unwrap()
+            .dyn_into::<web_sys::HtmlCanvasElement>()
+            .map_err(|_| ())
+            .unwrap();
+        let context = element
+            .get_context("2d")
+            .unwrap()
+            .unwrap()
+            .dyn_into::<web_sys::CanvasRenderingContext2d>()
+            .unwrap();
+
+        let scale = 1.;
+        let canvas_width = scale * f64::from(element.width());
+        let canvas_height = scale * f64::from(element.height());
+        let dimensions = (canvas_width, canvas_height);
+        // let zoom = match centered { true => 0.5, _ => 1.}; // TODO make changeable
+        let zoom = 0.5;
+
+        Canvas {
+            id,
+            dimensions,
+            zoom,
+            scale,
+            element,
+            context,
+        }
+    }
+    pub fn clear(&mut self) {
+        let w = self.dimensions.0;
+        let h = self.dimensions.1;
+        self.context.clear_rect(0., 0., w, h);
+    }
+    pub fn set_font(&mut self, font: &str) {
+        self.context.set_font(&font);
+    }
+    pub fn fill_text(&mut self, text: &str, x: f64, y: f64) {
+        self.context.fill_text(&text, x, y).unwrap();
+    }
+    pub fn reset_line_width(&mut self) {
+        self.context.set_line_width(1.);
+    }
+    pub fn set_line_width(&mut self, width: f64) {
+        self.context.set_line_width(width);
+    }
+    pub fn set_stroke_style(&mut self, color: &str) {
+        self.context.set_stroke_style(&JsValue::from_str(&color));
+    }
+    pub fn set_fill_style(&mut self, color: &str) {
+        self.context.set_fill_style(&JsValue::from_str(&color));
+    }
+    pub fn rescale_vec(&self, vec: (f64, f64)) -> (f64, f64) {
+        // re-scale to canvas dimensions [px]   // TODO include scale
+        let mut vec = vec;
+        vec.0 *= self.zoom * self.dimensions.0 / self.scale;
+        vec.1 *= self.zoom * self.dimensions.1 / self.scale;
+        // center
+        vec.0 += 0.5 * self.dimensions.0;
+        vec.1 += 0.5 * self.dimensions.1;
+        vec
+    }
+    pub fn rescale_dist(&self, dist: f64) -> f64 {
+        dist * self.dimensions.1 * self.zoom / self.scale // only works for square
+    }
+    pub fn draw_line(&mut self, mut from: (f64, f64), mut to: (f64, f64)) {
+        from = self.rescale_vec(from);
+        to = self.rescale_vec(to);
+        self.context.begin_path();
+        self.context.move_to(from.0, from.1);
+        self.context.line_to(to.0, to.1);
+        self.context.stroke();
+    }
+    pub fn draw_triangle(
+        &mut self,
+        mut first: (f64, f64),
+        mut second: (f64, f64),
+        mut third: (f64, f64),
+    ) {
+        first = self.rescale_vec(first);
+        second = self.rescale_vec(second);
+        third = self.rescale_vec(third);
+        self.context.begin_path();
+        self.context.move_to(first.0, first.1);
+        self.context.line_to(second.0, second.1);
+        self.context.line_to(third.0, third.1);
+        self.context.stroke();
+        self.context.fill()
+    }
+    pub fn draw_circle(&mut self, center: (f64, f64), radius: f64, fill: bool) {
+        let center = self.rescale_vec(center);
+        let radius = self.rescale_dist(radius);
+        self.context.begin_path();
+        self.context
+            .arc(center.0, center.1, radius, 0.0, TAU)
+            .unwrap();
+        self.context.stroke();
+        if fill {
+            self.context.fill();
+        }
+    }
+    pub fn fill_rect(&mut self, center: (f64, f64), width: f64, height: f64) {
+        let center = self.rescale_vec(center);
+        let width = self.rescale_dist(width);
+        let height = self.rescale_dist(height);
+        self.context.begin_path();
+        self.context.fill_rect(center.0, center.1, width, height)
+    }
+}
+pub mod canvas;
+pub struct EventHandler {}
+impl EventHandler {
+    pub fn new() -> Self {
+        EventHandler {}
+    }
+}
+// pub mod animation_loop;
+pub mod client;
+pub mod components;
+pub mod renderer;
+pub mod utils;
+// pub mod event_handler;
+
+// pub use client::SimulationComputeClient;
+pub use client::SimulationRendererClient;
+// use super::components;
+use super::components::canvas::Canvas;
+use super::utils::dom;
+use super::utils::dom::HTMLObject;
+
+const canvas_id: u8 = 0; // TODO
+
+/// Renderer
+pub struct Renderer {
+    pub canvases: Vec<Canvas>,
+    entities: Vec<Box<dyn HTMLObject>>,
+}
+
+impl Renderer {
+    /// Create new Renderer
+    pub fn new() -> Self {
+        let canvases = vec![];
+        let entities = vec![];
+        Renderer { canvases, entities }
+    }
+
+    /// Initialize Renderer
+    pub fn init(&mut self) {
+        let cnv = Canvas::new(canvas_id);
+        self.canvases.push(cnv);
+        // self.entities.push(Box::new(cnv));
+    }
+
+    /// Draw Components
+    pub fn draw(&mut self) {
+        let _: Vec<()> = self.entities.iter_mut().map(|e| e.update()).collect();
+
+        self.test();
+    }
+
+    fn test(&self) {
+        // for system in current_state.systems {
+        //     match system {}
+        // }
+    }
+}
+use wasm_bindgen::JsCast;
+use wasm_bindgen::JsValue;
+
+use crate::utils::dom::document;
+
+pub fn canvas(canvas_id: &str) -> web_sys::HtmlCanvasElement {
+    document()
+        .get_element_by_id(canvas_id)
+        .unwrap()
+        .dyn_into::<web_sys::HtmlCanvasElement>()
+        .map_err(|_| ())
+        .unwrap()
+}
+
+pub fn ctx(canvas: &web_sys::HtmlCanvasElement) -> web_sys::CanvasRenderingContext2d {
+    canvas
+        .get_context("2d")
+        .unwrap()
+        .unwrap()
+        .dyn_into::<web_sys::CanvasRenderingContext2d>()
+        .unwrap()
+}
+
+pub struct Canvas {
+    pub context: web_sys::CanvasRenderingContext2d,
+    pub dimensions: (f64, f64),
+    scale: f64,
+    pub zoom: f64,
+}
+impl Canvas {
+    pub fn new(canvas_id: &str) -> Self {
+        let element = canvas(canvas_id);
+        let context = ctx(&element);
+        let scale = 1.;
+        let canvas_width = scale * f64::from(element.width());
+        let canvas_height = scale * f64::from(element.height());
+        let dimensions = (canvas_width, canvas_height);
+        // let zoom = match centered { true => 0.5, _ => 1.}; // TODO make changeable
+        let zoom = 0.5;
+        Canvas {
+            // element,
+            context,
+            dimensions,
+            scale,
+            zoom,
+        }
+    }
+    pub fn clear(&mut self) {
+        let w = self.dimensions.0;
+        let h = self.dimensions.1;
+        self.context.clear_rect(0., 0., w, h);
+    }
+    pub fn set_font(&mut self, font: &str) {
+        self.context.set_font(&font);
+    }
+    pub fn fill_text(&mut self, text: &str, x: f64, y: f64) {
+        self.context.fill_text(&text, x, y).unwrap();
+    }
+    pub fn reset_line_width(&mut self) {
+        self.context.set_line_width(1.);
+    }
+    pub fn set_line_width(&mut self, width: f64) {
+        self.context.set_line_width(width);
+    }
+    pub fn set_stroke_style(&mut self, color: &str) {
+        self.context.set_stroke_style(&JsValue::from_str(&color));
+    }
+    pub fn set_fill_style(&mut self, color: &str) {
+        self.context.set_fill_style(&JsValue::from_str(&color));
+    }
+    pub fn rescale_vec(&self, vec: (f64, f64)) -> (f64, f64) {
+        // re-scale to canvas dimensions [px]   // TODO include scale
+        let mut vec = vec;
+        vec.0 *= self.zoom * self.dimensions.0 / self.scale;
+        vec.1 *= self.zoom * self.dimensions.1 / self.scale;
+        // center
+        vec.0 += 0.5 * self.dimensions.0;
+        vec.1 += 0.5 * self.dimensions.1;
+        vec
+    }
+    pub fn rescale_dist(&self, dist: f64) -> f64 {
+        dist * self.dimensions.1 * self.zoom / self.scale // only works for square
+    }
+    pub fn draw_line(&mut self, mut from: (f64, f64), mut to: (f64, f64)) {
+        from = self.rescale_vec(from);
+        to = self.rescale_vec(to);
+        // draw
+        self.context.begin_path();
+        self.context.move_to(from.0, from.1);
+        self.context.line_to(to.0, to.1);
+        self.context.stroke();
+    }
+    pub fn draw_triangle(
+        &mut self,
+        mut first: (f64, f64),
+        mut second: (f64, f64),
+        mut third: (f64, f64),
+    ) {
+        first = self.rescale_vec(first);
+        second = self.rescale_vec(second);
+        third = self.rescale_vec(third);
+        // draw
+        self.context.begin_path();
+        self.context.move_to(first.0, first.1);
+        self.context.line_to(second.0, second.1);
+        self.context.line_to(third.0, third.1);
+        self.context.stroke();
+        self.context.fill()
+    }
+    pub fn draw_circle(&mut self, center: (f64, f64), radius: f64, fill: bool) {
+        const TAU: f64 = 2.0 * std::f64::consts::PI;
+
+        let center = self.rescale_vec(center);
+        let radius = self.rescale_dist(radius);
+
+        // draw
+        self.context.begin_path();
+        self.context
+            .arc(center.0, center.1, radius, 0.0, TAU)
+            .unwrap();
+        self.context.stroke();
+        if fill {
+            self.context.fill();
+        }
+    }
+    pub fn fill_rect(&mut self, center: (f64, f64), width: f64, height: f64) {
+        let center = self.rescale_vec(center);
+        let width = self.rescale_dist(width);
+        let height = self.rescale_dist(height);
+        // draw
+        self.context.begin_path();
+        self.context.fill_rect(center.0, center.1, width, height)
+    }
+}
+
+pub fn log(x: &str) {
+    let array = js_sys::Array::new();
+    array.push(&x.into());
+    web_sys::console::log(&array);
+}
+
+// DOM
+// ============================================================================
+
+pub struct DocumentObjectModel {}
+impl DocumentObjectModel {
+    /// Create new DOM Object
+    pub fn new() -> Self {
+        DocumentObjectModel {}
+    }
+
+    /// get Window from DOM
+    pub fn window(&self) -> web_sys::Window {
+        web_sys::window().expect("no global `window` exists")
+    }
+
+    /// get Document from DOM
+    pub fn document(&self) -> web_sys::Document {
+        self.window()
+            .document()
+            .expect("should have a document on window")
+    }
+
+    /// get Page Body from Document
+    pub fn body(&self) -> web_sys::HtmlElement {
+        self.document()
+            .body()
+            .expect("document expect to have have a body")
+    }
+}
+
+// ============================================================================
+
+/// get Window from DOM
+pub fn window() -> web_sys::Window {
+    web_sys::window().expect("no global `window` exists")
+}
+
+/// get Document from DOM
+pub fn document() -> web_sys::Document {
+    window()
+        .document()
+        .expect("should have a document on window")
+}
+
+/// get Page Body from Document
+pub fn body() -> web_sys::HtmlElement {
+    document()
+        .body()
+        .expect("document expect to have have a body")
+}
+
+/// Enable Panic Hook to console
+///
+/// When the `console_error_panic_hook` feature is enabled,
+/// we can call the `set_panic_hook` function at least
+/// once during initialization, and then we will get better
+/// error messages if our code ever panics (-> sent to console).
+///
+/// For more details see
+///     https://github.com/rustwasm/console_error_panic_hook#readme
+pub fn set_panic_hook() {
+    #[cfg(feature = "console_error_panic_hook")]
+    console_error_panic_hook::set_once();
+}
+
+pub trait HTMLObject {
+    fn update(&mut self);
+}
+
+pub mod canvas;
+pub mod console;
+
+use wasm_bindgen::prelude::*;
+use wasm_bindgen::JsCast;
+
+pub fn request_animation_frame(f: &Closure<dyn FnMut()>) {
+    window()
+        .request_animation_frame(f.as_ref().unchecked_ref())
+        .expect("should register `requestAnimationFrame` OK");
+}
+
+//use gloo::events::EventListener;
+//use wasm_bindgen::JsCast;
+
+//pub fn window() -> web_sys::Window {
+//    web_sys::window().expect("no global `window` exists")
+//}
+
+//pub fn document() -> web_sys::Document {
+//    window()
+//        .document()
+//        .expect("should have a document on window")
+//}
+
+//pub fn body() -> web_sys::HtmlElement {
+//    document()
+//        .body()
+//        .expect("document expect to have have a body")
+//}
+
+//// pub fn request_animation_frame(f: &Closure<dyn FnMut()>) {
+////     window()
+////         .request_animation_frame(f.as_ref().unchecked_ref())
+////         .expect("should register 'requestAnimationFrame' OK");
+//// }
+
+//// pub fn body() -> web_sys::HtmlElement {
+////     document()
+////         .body()
+////         .expect("document should have a body")
+//// }
+
+//pub fn eventlistener_new_p_mousedown() {
+//    let window = web_sys::window().expect("global window does not exists");
+//    let document = window.document().expect("expecting a document on window");
+//    let body = document
+//        .body()
+//        .expect("document expect to have have a body");
+
+//    let paragraph = document
+//        .create_element("p")
+//        .unwrap()
+//        .dyn_into::<web_sys::HtmlParagraphElement>()
+//        .map_err(|_| ())
+//        .unwrap();
+//    paragraph.set_align("center");
+//    paragraph.set_inner_html("<br />Click within this boundary to test the mousedown event. <br />Check the results in your web console.<br /><br />");
+//    paragraph
+//        .style()
+//        .set_property("border", "solid")
+//        .map_err(|_| ())
+//        .unwrap();
+
+//    let on_down = EventListener::new(&paragraph, "mousedown", move |_event| {
+//        web_sys::console::log_1(&"Paragraph mousedown".into());
+//    });
+//    on_down.forget();
+//    body.append_child(&paragraph).unwrap();
+//}
+//pub fn eventlistener_new_p_mousemove() {
+//    let window = web_sys::window().expect("global window does not exists");
+//    let document = window.document().expect("expecting a document on window");
+//    let body = document
+//        .body()
+//        .expect("document expect to have have a body");
+
+//    let paragraph = document
+//        .create_element("p")
+//        .unwrap()
+//        .dyn_into::<web_sys::HtmlParagraphElement>()
+//        .map_err(|_| ())
+//        .unwrap();
+
+//    paragraph.set_align("center");
+//    paragraph.set_inner_html("<br />Move within this boundary to test the mousemove event. <br />Check the results in your web console.<br /><br />");
+
+//    paragraph
+//        .style()
+//        .set_property("border", "solid")
+//        .map_err(|_| ())
+//        .unwrap();
+
+//    let on_move = EventListener::new(&paragraph, "mousemove", move |_event| {
+//        web_sys::console::log_1(&"Paragrapah mousemove".into());
+//    });
+//    on_move.forget();
+//    body.append_child(&paragraph).unwrap();
+//}
+
+//pub fn eventlistener_new_p_mouseup() {
+//    let window = web_sys::window().expect("global window does not exists");
+//    let document = window.document().expect("expecting a document on window");
+//    let body = document
+//        .body()
+//        .expect("document expect to have have a body");
+
+//    let paragraph = document
+//        .create_element("p")
+//        .unwrap()
+//        .dyn_into::<web_sys::HtmlParagraphElement>()
+//        .map_err(|_| ())
+//        .unwrap();
+
+//    paragraph.set_align("center");
+//    paragraph.set_inner_html("<br />Move within this boundary to test the mouseup event. <br />Check the results in your web console.<br /><br />");
+
+//    paragraph
+//        .style()
+//        .set_property("border", "solid")
+//        .map_err(|_| ())
+//        .unwrap();
+
+//    let on_up = EventListener::new(&paragraph, "mouseup", move |_event| {
+//        web_sys::console::log_1(&"Paragrapah mouseup".into());
+//    });
+//    on_up.forget();
+//    body.append_child(&paragraph).unwrap();
+//}
+
+//pub fn set_panic_hook() {
+//    // When the `console_error_panic_hook` feature is enabled,
+//    // we can call the `set_panic_hook` function at least
+//    // once during initialization, and then we will get
+//    // better error messages if our code ever panics.
+//    //
+//    // For more details see
+//    // https://github.com/rustwasm/console_error_panic_hook#readme
+//    #[cfg(feature = "console_error_panic_hook")]
+//    console_error_panic_hook::set_once();
+//}
+
+//use wasm_bindgen::prelude::*;
+
+//#[wasm_bindgen]
+//extern "C" {
+//    pub fn alert(s: &str);
+//}
+
+//pub fn add_button_to_menu<F>(
+//    text: &str,
+//    // callback: &mut Box<F() -> ()>,
+//    // callback: Fn() -> (),
+//    // simulation: &'static mut Simulation,
+//    // callback: &'static mut F,
+//    callback: &'static mut Box<F>,
+//    // callback: FnMut (),
+//    // callback: fn(&mut Simulation),
+//) where
+//    F: FnMut(),
+//{
+//    let document = document();
+//    let section = document.get_element_by_id("button_menu-0").unwrap();
+
+//    let button = document
+//        .create_element("button")
+//        .unwrap()
+//        .dyn_into::<web_sys::HtmlButtonElement>()
+//        .unwrap();
+//    // button.set_id("button");
+//    button.set_text_content(Some(text));
+
+//    // let paragraph = document.create_element("p").unwrap()
+//    // 	.dyn_into::<web_sys::HtmlParagraphElement>().unwrap();
+//    // section.append_child(&paragraph).unwrap();
+
+//    // use js_sys::Function;
+//    // fn f() {}
+//    // let f = || {}
+//    // let f = Function::from(f);
+//    // let optionn = Option::from(&f);
+//    // button.set_onclick(optionn);
+
+//    let on_click = EventListener::new(&button, "click", move |_event| {
+//        // web_sys::console::log_2(
+//        // &"Hello World Gloo :%s".into(),
+//        // &"WebAssemblyMan".into()
+//        // );
+//        // paragraph.set_text_content(Some("Gloo: Hello World"));
+//        // let a = (*callback);
+//        callback();
+//    });
+//    on_click.forget();
+//    section.append_child(&button).unwrap();
+//}
+
+//pub fn set_inner_html(id: &str, inner: &str) {
+//    let document = document();
+//    document
+//        .get_element_by_id(id)
+//        .unwrap()
+//        .set_inner_html(inner);
+//}
+pub mod dom;
+/.git
+/target
+Cargo.lock
+[package]
+    name = "mxyz-engine"
+    authors = ["Vincent C. Mader <vincent@mader.xyz>"]
+    edition = "2018"
+    version = "0.1.0"
+
+[dependencies]
+    # mxyz-utils = { path="../mxyz-utils" }
+    serde_json = "1.0"
+
+[dependencies.serde]
+    version = "1.0"
+    features = ["derive"]
+* mxyz-engine
+
+This project's goal is the creation of a generalized physics simulation engine. 
+Ideally, the engine should be able to construct numerical models for a wide 
+variety of physical systems, and approximate their evolution numerically without 
+sacrificing too much performance for generality.
+
+Keywords:
+- n-body simulations
+- cellular automata
+- interactions between particles & fields
+- simulations in 2D, 3D, & eventually ND
+- gravity, electro-statics, Lennard-Jones, ...
+- hierarchical quad- or oct-trees
+- fluid dynamics simulations
+- multi-threaded computes
+- GPU computes
+- problems from classical physics, astronomy, fluid dynamics, thermodynamics, quantum mechanics, mathematics
+* Basic Project Layout
+* Interaction-Integrator
+** Setups
+*** IDEA
+for sys_1 in systems.iter_mut():
+    for sys_2 in systems.iter():
+        interactions = get(sys_1, sys_2)
+        for interaction in interactions:
+            ...
+*** IDEA Favorite
+#+begin_src
+for sys_1 in systems.iter_mut():
+    for integrator in get_integrators(system)
+        for sys_2 in systems.iter():
+            interactions = get(sys_1, sys_2)
+            for interaction in interactions:
+                ...
+
+fn get_integrators(system):
+#+end_src
+* JEDE INTERACTION HAT EINEN INTEGRATOR
+* c
+- for system
+  - for integrator
+    - for other system
+      - for interaction
+* b
+Integrator
+- interactions: Vec(Interaction)
+- fn step()
+
+for (sys, other)
+    integrators = get_integrators(sys, other)
+    for integrator
+        integrator.step()  // sys, other (?)
+
+
+Interaction
+- active: bool
+
+* Once again, Interactions
+- multiple interactions
+- each can be implemented (in theory) by various integrators
+- for each sys-pair, each interaction should
+  only be applied once, with one specific integrator
+
+- for interaction
+  - matrix[id][jd] = IntegratorVariant
+
+- for integrator
+  interactions = interactions.filter(
+    matrix[id][jd] == integrator.variant
+  )
+
+_Config_
+- Vec<Interaction>
+  /all interactions present in the World/
+- Vec<Integrator>
+  /integrators, shouldn't be duplicates/
+
+Interaction
+- InteractionMatrix
+- active: bool
+- integrator: IntegratorVariant
+
+InteractionMatrix
+           objects  field
+|        | sys-id   | sys-jd |
+| sys-id | EulerExp | false  |
+| sys-id | None     | None   |
+
+get_interactions(system, other) {   (?)
+    config.interactions.filter(|i| i.matrix[system][other])
+}
+get_integrators(system, other, interaction) {
+    config.integrators
+}
+
+_Stepper_
+for (system, other) in systems {
+    interactions = get_interactions(system, other) (?)
+    for integrator in config.integrators {
+        for interaction in interactions {
+            if interaction.
+        }
+        if integrator.variant == interactions
+
+    }
+    integrators = get_integrators(system, other, interaction)
+
+    - for integrator in config.integrators         (?)
+      integrator.apply(interactions)
+}
+
+* Engine Layout
+Rough outline:
+- for t in 0..T
+  let state = engine.states[t]
+
+  tree = get_tree(state.systems)
+
+  - for system in state.systems
+
+    - for other in state.systems
+      interactions = get_interactions(system, other)
+
+      - for entity in system.entities
+        // load entity's attributes
+
+        - for other in other.entities
+          nodes = get_relevant_nodes()
+
+          - for interaction in interactions
+            interaction.apply(entity, other)
+
+interactions: Vec<Box<dyn Interaction>>
+trait Interaction {
+    fn apply(&self, entity: Box<dy)
+}
+** Definite
+- state_id
+  - system_id
+    - other_id
+      - entity_id
+        - other_id
+** Question
+loop over interactions
+1. inside entity loop
+   + pro: only walk tree once
+   + con: have to specify nodes ONCE
+2. inside system loop
+   + con: have to walk tree multiple times
+     sol: composed interactions
+   + pro: different trees for different system pairs
+3. inside integrator inside system loop
+   + see below
+
+.
+1. interactions have integrator
+2. integrators have interactions
+   + pro: can apply forces
+     - F(x) gravity
+     - F(v) air resistance
+     - F(t) external force
+
+** Configuration
+** States
+** Systems
+** Entitiies
+** Interactions
+** Integrators
+* Methods
+** Visualization
+*** Server
+*** Client
+** Examples
+** Concurrency
+* Results
+* Discussion
+* Appendix
+* TODOs
+** PROJ basic general foundations
+*** Rocket
+*** Tokio
+*** ...
+*** WebSys
+*** WASM
+** TODO write trait-objects to bytes
+** TODO load trait-objects from bytes on client
+** TODO send bytes from server to client
+** TODO receive bytes from server on client
+** TODO create Server template
+Features:
+- Async
+- get/post/... methods
+  + primitive types
+  + JSON
+- database access
+- serialize/deserialize, bytestream (??)
+- static file-server (optional)
+- basic template (optional)
+** TODO implement Diesel CRUD
+- for various data types
+- nested lists (constraints)
+** TODO implement Server-Client communication
+- TCP via std / tokio
+- HTTP via rocket (+tokio)
+- reqwest
+
+*** TODO implement get-method on Server, send JSON
+*** TODO implement post-method on Server, receive JSON -> write to db
+*** TODO implement post-method on Client, send JSON
+*** TODO implement get-method on Client, receive JSON -> update state
+** TODO create basic App
+*** TODO implement Input
+- known user-id
+  - verbs = get_verbs(user_id)
+  - display_grid(verbs)
+- known verb
+  - objects = get_objects(verb)
+  - display_grid(objects)
+- known object
+  - variants = get_variants(object)
+  - display_list(variants)
+- known variant
+  - additions = get_additions()
+  - display_list(additions)
+- later: location & tags
+- known everything
+  - save to db
+
+*** TODO implement sync to db
+- sync on startup / periodically / on event
+
+- known user-id
+
+- verbs = get_verbs_from_db(user_id)
+- objects = get_objects_from_db(user_id)
+- variants = get_variants_from_db(user_id)
+- additions = get_additions_from_db(user_id)
+** TODO create basic WASM Client
+** Physical Fundamentals
+*** Kepler's Laws
+*** Spin-Spin Interaction (Ising Model)
+
+\begin{align*}
+    H(\sigma)
+    &=-\sum_{\langle i,j\rangle}J_{ij}\sigma_i\sigma_j
+        -\mu\sum_jh_j\sigma_j \\
+    P_\beta(\sigma)
+    &=\frac{1}{Z_\beta}\cdot\exp(-\beta H(\sigma)) \\
+    Z_\beta
+    &=\sum_\sigma\exp(-\beta H(\sigma))
+\end{align*}
+
+*** Fluid Dynamics
+- many different models
+*** Diffusion / Heat Flow
+\begin{align*}
+    \pderiv{y}{t}
+    =\alpha\cdot\pdderiv{y}{x}
+\end{align*}
+*** Advection Equation
+\begin{align*}
+    \pderiv{y}{t}
+    =\alpha\cdot\pderiv{y}{x}
+\end{align*}
+
+*** epsilon
+$$\Phi\sim\frac{1}{\sqrt{r^2+\varepsilon^2}}$$   ->   $$F\sim-\frac{r}{(r^2+\varepsilon^2)^{\frac{3}{2}}}$$
+*** Interactions
+*** spatial partitioning
+*** discrete differentiation
+**** finite difference methods
+*** TODO move this chapter to mxyz.org
+*** Interesting Scenarios
+**** Star-Planet: Circular Orbit
+**** Star-Planet: Elliptical Orbit
+**** Star-Planet: Hyperbolical Orbit
+**** Star-Planet-Moon
+**** 3-Body Figure-8
+**** Solar System
+** Computational Physics Fundamentals
+*** Collision
+**** a-priori
+**** a-posteriori
+*** Force Application
+$$\ddot y=f(t, y(t))$$
+
+Integration Schemes:
+**** Euler
+- exp/imp ?
+- forward/central/backwards FD ?
+**** Runge-Kutta
+***** Order 1
+- forward Euler
+***** Order 2
+\begin{align}
+    y_{n+1}=y_n+\frac{1}{6}h(k_1+2k_2+2k_3+k_4)
+    t_{n+1}=t_n+h
+\end{align}
+
+\begin{align}
+    k_1
+        &=f(t_n,y_n) \\
+    k_2
+        &=f(t_n+h/2,y_n+hk_1/2) \\
+    k_3
+        &=f(t_n+h/2,y_n+hk_2/2) \\
+    k_4
+        &=f(t_n+h,y_n+hk_3)
+\end{align}
+
+***** Order 4
+***** Order N
+\begin{equation*}
+    y_{n+1}=y_n+h\sum_{i=1}^sb_ik_i
+\end{equation*}
+...
+
+***** Explicit Midpoint Method
+***** Heun's Method
+***** Ralston's Method
+***** Third Order (?)
+**** Midpoint Method
+
+\begin{align*}
+    y_{n+1}
+        &=y_n+hf\bigg(t_n+\frac{h}{2},y_n+\frac{h}{2}\cdot f(t_n,y_n)\bigg) \\
+    t_{n+1}
+        &=t_n+h
+\end{align*}
+
+**** Verlet
+***** "Normal"
+***** Velocity Verlet
+- similar to Leap-Frog ?
+**** Leap-Frog
+- time-step $\Delta t$ must be constant for stability
+
+\begin{align*}
+    a_i
+        &=A(x_i) \\
+    v_{i+\frac{1}{2}}
+        &=v_{i-\frac{1}{2}}+a_i\cdot\Delta t \\
+    x_{i+\frac{1}{2}}
+        &=x_i+v_{i+\frac{1}{2}}\cdot\Delta t
+\end{align*}
+
+or (synchronized form)
+
+\begin{align*}
+    x_{i+1}
+        &=x_i+v_i\Delta t+\frac{1}{2}a_i\Delta t^2 \\
+    v_{i+1}
+        &=v_i+\frac{1}{2}(a_i+a_{i+1})\Delta t^2
+\end{align*}
+
+or (kick-drift-kick), for variable time-steps!
+
+\begin{align*}
+    v_{i+\frac{1}{2}}
+        &=v_i+a_i\frac{\Delta t}{2} \\
+    x_{i+1}
+        &=x_i+v_{i+\frac{1}{2}}\Delta t \\
+    v_{i+1}
+        &=v_{i+\frac{1}{2}}+a_{i+1}\frac{\Delta t}{2}
+\end{align*}
+
+**** Bulirsch-Stoer
+** Things to Think about
+*** adaptive time-steps
+*** split field & object interaction_variants in separate enum?
+**** same for field-field, field-object, object-field, object-object?
+*** split integrator_variants into separate enum as well?
+** Interaction
+*** IDEA struct Interaction
+*** IDEA enum Interaction
+*** IDEA trait Interaction
+** IDEA v1 Interaction Matrix (boolean entries)
+entries: Vec<Vec<Option<bool>>>
+- row Vec<Option<bool>> for to-update system
+  - entry Option<bool> for from-update system
+    - None -> interaction not permitted to be activated
+      + hard-coded, non-changeable
+    - Some(bool) -> bool
+      + apply if true
+      + toggleable (true/false)
+** IDEA v2 Interaction Matrix (Integrator entries)
+entries: Vec<Vec<Option<bool>>>
+- row Vec<Option<bool>> for to-update system
+  - entry Option<bool> for from-update system
+    - None -> interaction not permitted to be activated
+      + hard-coded, non-changeable
+    - Some(integrator) -> integrator
+** IDEA v1 Integrator
+active: Option<bool>
+** Interaction Examples
+*** Field-Field
+**** Ising
+*** Field-Object
+**** FieldFromObjects
+*** Object-Field
+**** Force
+*** Object-Object
+**** Force
+
+** Finite Differences
+forward difference quotient:     $$\deriv{f}{x} \approx\frac{f(x+\Delta x)-f(x)}{\Delta x}$$
+
+central difference quotient:     $$\deriv{f}{x} \approx\frac{f(x+\Delta x)-f(x-\Delta x)}{2\Delta x}$$
+
+backward difference quotient:    $$\deriv{f}{x} \approx\frac{f(x)-f(x-\Delta x)}{\Delta x}$$
+
+** Interaction
+*** Idea 1
+pub struct Interaction {
+    matrix: Vec<Vec<bool>>,
+    variant: InteractionVariant
+}
+** Integrator & Interaction
+_Integrator_:
+- works very differently for PhysicalObjects & Field
+- datatype: trait object? or enum?
+
+_Interaction_:
+- needs to (in principle) be ~applicable to all system-pairs~
+- needs to possibly be composed of multiple interactions
+
+- sub-categories
+  - PhysicalObject
+- examples
+  - Force
+  - Ising
+
+State-Update Reordering
+- for interaction in interactions
+  - for system in self.systems
+    - for other in state.systems
+      - match interaction
+        - specific_interact(system, other)
+- Pros/Cons:
+  + PRO don't have to match interaction for each entity
+    -> high performance for 1 interaction
+  + CON have to walk the tree for each interaction
+    -> low performance for for than 1 interaction
+    - idea: compose multiple interactions into one?
+
+Interaction Composing:
+- define one interaction trait-object-instance struct
+  with field: interactions: Vec<Box<dyn Interaction>>
+
+For specific-interact, two options:
+- function
+  + PRO compiles for same function signature
+  + CON not sure how to get info about integrator/parameters
+- trait object method
+  + CON does it work?
+  + PRO custom parameters for each interaction
+  + PRO can specify type of integrator
+
+_Interaction Matrix_:
+- ~one for each interaction~
+
+_Problem_: integrator/interaction not saved in state, but in config
+  + PRO config is not copied in each time-step
+    - more memory-efficient (but "further-away" from step-methods)
+  + CON information of config-changes lost on time-reverse
+    - only really relevant in live-mode
+    - changes could be saved as diffs
+      -> OK (later)
+  + CON cannot easily be made system-specific
+
+State Update Idea:
+- for system in self.systems
+  ~create_trees()~
+- for system in self.systems
+  - for other in state.systems
+    ~interactions = get_interactions(system.id, other.id)~
+    - for entity in system.entities
+      - for other in other.entities
+        - for interaction in interactions
+          ~integrator = interaction.integrator~
+
+get_interactions():
+    let out = vec![];
+    for interactions in interactions {
+        match interaction(system, other) {
+            true => out.push(interaction)
+        }
+    }
+
+Layout Idea:
+
+** Integration Schemes
+*** Euler
+**** Explicit
+Application
+- $$\dot y(t)=f(t,y(t))$$
+- $$y(t_0)=y_0$$
+
+Method
+- $$t_{n+1}=t_n+h$$
+- $$y_{n+1}=y_n+h\cdot f(t_n,y_n)$$
+**** Implicit
+*** Runge-Kutta
+Application
+- $$\dot y(t)=f(t,y(t))$$
+- $$y(t_0)=y_0$$
+
+**** 1st Order
+**** 2nd Order
+**** 4th Order
+- $$y_{n+1}=y_n+h/6\cdot(k_1+2k_2+2k_3+k_4)$$
+- $$k_1=f(t_n,y_n)$$
+- $$k_2=f(t+h/2,y_n+k_1h/2)$$
+- $$k_3=f(t_n+h/2,y_n+k_2h/2)$$
+- $$k_4=f(t_n+h,y_n+k_3h)$$
+
+**** nth Order
+*** Leap-Frog
+*** Verlet
+*** Bulirsch-Stoer
+*** Symplectic (?)
+*** TODO take notes of error orders / compute complexity orders
+*** TODO implement a few Integrators in Rust-mxyz
+** Engine Layout
+- struct Engine
+  + vec State
+  + struct State
+    + vec System
+    + enum System
+      + PhysicalParticles
+        + entities: Box<dyn Particle>
+        - trait Particle
+          - struct Planet
+          - struct Ant
+          - struct Electron
+          - struct Proton
+      + DiscreteField
+        + entities: Box<dyn Particle>
+        - trait DiscreteFieldCell
+          - struct ForceVector
+          - struct FluidCell
+          - struct IsingCell
+          - struct GameOfLifeCell
+- enum Interaction ~?~
+  + struct <Interaction> ~?~
+    + integrator
+    + variant
+- struct EngineConfig
+  + interaction_matrix ~?~
+** ?
+*** async: tokio / websocket ?
+*** reqwest
+*** bytestream
+"{to,from}_{ne,le,be}_bytes"
+- e.g. ~to_be_bytes()~
+*** tcp / udp
+*** diesel database
+*** arc mutex
+*** par_iter
+*** wasm
+
+** Introduction
+*** What is the goal of this project?
+*** Where can I look at the results?
++ [[http://mader.xyz][mader.xyz]]
+** Mile-Stones & Time-Line
+*** TODO decide on basic Engine layout
+- trees/neighboorhood thingies?
+
+**** struct Engine
+#+begin_src rust
+struct Engine {
+    config: ?
+    states: Vec<State>,
+}
+#+end_src
+**** struct State
+#+begin_src rust
+struct State {
+    systems: Vec<System>,
+}
+#+end_src
+**** enum System
+#+begin_src rust
+enum System {
+    ForceField(ForceField),
+    PhysicalBodies(PhysicalBodies),
+}
+#+end_src
+***** struct ForceField
+#+begin_src rust
+struct ForceField {
+    ?: Vec<?>
+}
+#+end_src
+***** struct PhysicalBodies
+#+begin_src rust
+struct PhysicalBodies {
+    ?: Vec<?>
+}
+#+end_src
+***** struct Ants
+***** struct Boids
+**** trait Entity
+***** struct PhysicalBody
+- impl Mass
+- impl Position
+- impl Velocity
+***** struct ForceVector
+- impl Force
+- doesn't need position, will get it from iter-idx (?)
+**** trait Attribute
+*PhysicalBody etc.*
+- Mass       f64
+- Position   [f64; 3]
+- Velocity   [f64; 3]
+- Spin       bool
+
+- Force
+  - obj-obj
+  - field-obj
+  - obj-universe
+  - field-universe
+
+- Density    f64
+- Temperate  f64
+
+- Alive      bool
+
+- HasDetected(Thing)       enum Thing(Predator, Prey, Friendly, Enemy)
+**** struct Config
+- ?
+**** enum Interaction
+both
+- self-self (+ universe: external forces, from f(), not entity)
+- self-other
+
+basically this:
++ enum InteractionVariant(IntegratorVariant)
+
+struct InteractionConfig (?)
+- (physical) parameters (?)
+
+*Variants:*
+- Collision(CollisionIntegrator)
+- Force(PhysicalForce)     enum PhysicalForce(Newton, Coulomb, LennardJones, ..., Boids)
+  ~!~ how to: both give info about /which force/, and /which integrator/
+- Ising(IsingIntegrator)
+- Fluid (?)
+- ...
+- GameOfLife
+
+- Object
+  + Object
+    - force
+    - collision
+    - ...
+    - ant-interaction
+    - boid-interaction
+  + Field
+    - ... (complex)
+  + ...
+- Field
+  + Object
+    - force
+  + Field
+    - ... (complex)
+  + ...
+- ...
+
+**** enum Integrator
++ Object
+  + Collision (el. + in.)
+  + Force
+    - Euler (exp + imp)
+      /forward/backwards/center -> config?/
+    - RungeKutta
+      /2, 4, ..? -> config?/
+    - Verlet
+    - LeapFrog
++ Field
+  + Ising
+  + Fluid (?)
+  + ...
+  + GameOfLife
+  + ...
++ ...
+*** DONE implement a basic Engine
+*** DONE implement a basic Server
+**** DONE create tera-template: index
+**** DONE access static folder
+**** DONE create tera-template: simulation (+ JS)
+*** DONE implement a basic Client
+**** DONE ...
+*** TODO create Renderer in Client
+**** TODO create Renderer struct
+- entities: Vec<DrawableEntity>
+***** TODO create Canvas struct
+- id: usize (?)
+- ctx: Context
+***** TODO create DrawableEntity trait
++ returns a web-sys object thingy (?)
+***** HOLD struct Plot: DrawableEntity (?)
++ draw plot (e.g. energy)
+*** WAIT implement Event Handling
+**** WAIT implement Button (+ ButtonMenu)
+**** WAIT implement Slider
+**** WAIT implement Client->Server communication
+*** PROJ home-page layout
+**** all simulations
+**** sorted by topic / physical field
+***** double pendulum
+****** single pendulum
+****** chaotic multi-pendula
+*** DONE run the Client from WASM
+**** DONE compile Client to WASM
+**** DONE load WASM from JS (+ init Engine)
+*** NOTE implement a couple of System's
+*** TODO "design" & create Integrator & Interaction
+*** TODO "design" & create System & Entity
+*Systems:*
+- Field
+- Objects
+- ...
+- Ants
+- Boids
+
+*Entities:*
+- FieldCell (?)
+- PhysicalBody (?)
+*** TODO create Entity traits
+- see above
+*** PROJ write State to byte-stream (+ read)
+*** PROJ save byte-stream (file + db)
+*** PROJ send data from /server/ to /client/
+*** PROJ send data from /client/ to /server/
+*** PROJ implement server-side multithreading
+*** PROJ implement client-side multithreading
+arc + wasm (?)
+*** WAIT demonstrate for M.Sc. thesis
+** Engine Layout
+- copy from above!
+** Basic Layout
+- struct Engine
+  + EngineConfig
+  + vec(State)
+- struct EngineConfig
+  + vec(SystemConfig)
+- struct SystemConfig
+- struct State
+  + vec(System)
+- enum System
+  # + vec<T: Entity>
+- trait Entity
+** Project Components
+*** mxyz-engine
+use mxyz-utils
+
+**** ~struct Engine~
+***** ~init(sim_id: SimulationID)~
+state.init(sim_id)
+*****  ~run()~
+loop {
+    self.step()
+}
+***** ~step()~
+ state = engine.states[-1]
+****** state.systems.iter().map(|sys| sys.step())
+relevant_systems = get_from_config()
+interactions = get_from_config()
+******* for sys in relevant_systems.iter()
+neighborhood = get_neighborhood(sys)
+******** TODO sys.entities.par_iter().map(|e| e.step())
+********* for other in neighborhood.entities.iter()
+********** for interaction in interactions
+integrator = get_from_config()
+integrator.step(sys, other, interaction, config)
+********** for boundary in boundaries
+integrator = get_from_config()
+integrator.step(sys, interaction, config)
+
+***** TODO ~save()~
+-> to file
+-> to db
+**** config
+***** ~struct EngineConfig~
+***** system_config
+****** ~trait SystemConfig~
+******* ~interactions: Vec<T: Interaction>~
+**** interaction
+***** TODO ~trait Interaction~
+***** TODO ~FieldInteraction~
+- /Ising/
+- GameOfLife
+- Diffusion
+- RockPaperScissors
+- /FluidV01/
+***** TODO ~enum ObjectInteraction~
+- CollisionElastic
+- CollisionInelastic
+- ForceNewton
+- ForceCoulomb
+- ForceLennardJones
+- ForceRepulsion
+- ForceAlignment
+- ForceCohesion
+***** TODO ~enum Boundary~
+- ForceRepulsion
+- CollisionElastic
+- CollisionInelastic
+- Periodic
+- /None/
+***** TODO ~FieldBoundary~
+- Periodic
+- /None/
+**** interaction
+***** ~trait Integrator~
+****** TODO ~step()~
+**** state
+***** TODO ~enum SimulationID~
+***** ~struct state~
+**** system
+***** ~struct System~
+***** entity
+****** ~trait Entity~
+
+*** mxyz-server
+use mxyz-utils
+use mxyz-database
+
+**** TODO -> async, send to client
+*** mxyz-client
+use mxyz-engine
+use mxyz-utils
+
+**** ~struct Client~
+***** TODO ~Renderer~
+****** TODO ~init()~
+******* TODO load state
+-> from file
+-> from db
+****** TODO ~draw()~
+*** mxyz-utils
+**** TODO file-io
+**** TODO serialization
+**** TODO plotting
+**** WAIT timing
+*** mxyz-database
+*** mxyz-chronos
+~struct Chronos~
+** Introduction
+*** What is this all about?
+
+~Learn~ C.S. skills & ~present~ them online, including
+- computational physics & algorithms
+- back-end web-development
+- front-end web-development
+- databases
+
+*** What Topics should be adressed?
+
+- Classical Mechanics
+- Newtonian Gravity
+- Oscillations & Waves
+- Thermo-Dynamics
+- Electro-Magnetism
+- Fluid Dynamics
+- Quantum Mechanics
+- General Relativity
+- Special Relativity
+- Cellular Automata
+- Machine Learning
+
+*** Project Directory Hierarchy Overview
+**** mader.xyz
+***** mxyz-engine
+- struct Engine
+****** Integrator
+- enum Integrator
+****** System
+- struct System
+******* Field
+- struct Field
+******* ObjFamily
+- struct ObjFamily
+***** mxyz-physics
+****** Interaction
+- enum Interaction
+***** mxyz-client
+- struct Client
+****** Simulation
+- struct Simulation
+***** mxyz-server
+***** mxyz-database
+***** mxyz-utils
+***** mxyz-main
+**** TODO define project file-structure/directory hierarchy
+*** Choosing a Framework
+**** What Layout is suited best for storing the state vectors?
+***** PROJ Performance Tests
+We have
++ ~      5 systems
++ ~     10 attributes
++ ~   1000 things
++ ~ 100000 steps
+
+|---+-----------------------------------|
+| A | + easily cloned into next step    |
+|   | + sorted by attribute             |
+|   | + less sub-vecs than B            |
+|---+-----------------------------------|
+| B | + easily cloned into next step    |
+|   | + info about thing close together |
+|   | - lots of sub-vecs                |
+|---+-----------------------------------|
+| C | ?                                 |
+|---+-----------------------------------|
+| D | + least sub-vecs                  |
+|---+-----------------------------------|
+| E | - lots of sub-vecs                |
+|---+-----------------------------------|
+| Z |                                   |
+|---+-----------------------------------|
+
+****** WAIT Alpha
+- systems
+  - steps
+    - attributes
+      - things
+****** TODO Beta
+- systems
+  - steps
+    - things
+      - attributes
+****** HOLD Gamma
+- systems
+  - attributes
+    - steps
+      - things
+****** HOLD Delta
+- systems
+  - attributes
+    - things
+      - steps
+****** HOLD Epsilon
+- systems
+  - things
+    - steps
+      - attributes
+****** HOLD Zeta
+- systems
+  - things
+    - attributes
+      - steps
+***** PROJ Performance Tests (old)
+****** TODO Test-Alpha: Sorted by Context
+- Vec<System>
+  - Vec<Thing>
+    - Vec<Attribute>
+      - Vec<State>
+****** WAIT Test-Beta: One State for each time-step
+- Vec<State>
+  - Vec<System>     (Field or ObjFamily)
+    - Vec<Thing>    (Cell or Object)
+      - Vec<Attribute>
+****** WAIT Test-Gamma: Sorted by Vector length
+- Vec<System>         (~ 5)
+  - Vec<Attribute>    (~ 10)
+    - Vec<Thing>      (~ 1000)
+      - Vec<State>    (~ 10000)
+****** WAIT Test-Delta: One big Vector
+- Vec<f64>
+****** WAIT Test-Epsilon
+- Vec<System>
+  - Vec<State>
+    - Vec<Object>
+      - Vec<Attribute>
+***** Layout
+
+- State(s)
+  - System(s)        -> can drop entire systems
+    - Attribute(s)   -> Vec<T>
+      - Item(s)      -> can drop items
+
+** Simulations & their tags/categories
+*** Implemented
+*** Ideas
+**** Single Pendulum
+**** Double Pendulum
+**** Lissajous Figures
+**** Fourier Transformation
+**** Harmonic Oscillator
+***** Main Idea
+- include single pendulum (?)
+- circle (x,y=sin...)
+- draw pendulum mass at y-coord -> sth.w/ Hooke's law?
+**** Non-compressible Fluid Flow
+**** Compressible (Gaseous) Flow
+**** Wave Superposition
+- eg. ripples in pond
+**** Fuel Flow through Rocket Engine
+**** Ising model
+**** Heat Transport/Diffusion
+**** Thermal Motion
+**** Brownian Motion
+**** Boids
+**** Ants
+**** Game of Life
+**** Double-Slit-Experiment
+- super-position of spherical waves
+**** Hydrogen Orbitals
+- also energy eigen-value spectrum
+**** Animated Feynman Graphs
+- electron-positron annhilation
+  + and varieties of graph (photon absorption, ...)
+- weak interaction
+**** Same-Charge Repulsion
+**** Proton-Electron "Interaction"
+**** Field between Opposing Charges
+**** Wien filter
+**** Fluid Flow in River
+**** Fluid Flow around Object
+**** Fluid Flow through Pipe
+**** Induction
+- current through rotation wire frame
+**** Electro-magnetic Wave Propagation (3D)
+**** Electrical Circuits
+- srame-work as logical circuits
+- ccoded potential -> visible $U$
+**** Reflection of Circular Waves in Enclosing Mirrors
+**** Galileo Cannon
+**** Billard Table
+**** Neutron star equation of state (TOV eq.)
+**** cellular automata with cool patterns
+- snow-flake formation
+- Langton's ant
+- von Neumann automaton
+**** Sound Synthesis
+- with Fourier
+**** Multi-stage Rocket Flight
+**** Soft-bodies
+**** Marching Cubes
+**** Transverse & Longitudinal Waves
+**** Taylor approximation
+**** Fractals
+**** Circuits (logial & electrical)
+**** 2 bodies: laws of Kepler
+- conic sections
+  + ellipse
+  + circle
+  + parabola
+  + hyperbola
+- eccentricity
+  + from $r$ & $v_0$
+**** 2 bodies: binaries on concentric orbits
+**** 3 bodies: Sun, Earth, Moon
+**** 3 bodies: figure-8
+**** 3 bodies: Lagrange points
+**** n bodies: asteroids around binary system
+- asteroids as particles
+- toggle extra planets
+**** n bodies: our Solar System
+**** n bodies: symmetrical satellite constellation
+("flowers")
+**** more stable 3 body orbits
+**** StarLink constellation in 3D globe animation
+**** 3 bodies: solar eclipse
+*** TODO add tags/categories to simulations
+** Milestones
+*** DONE implement server-side compute (without render)
+*** TODO handle both field & objects in one framework
+*** TODO generalize field/obj state-vecs to generic types
+*** TODO handle both 2D & 3D/ND simulations in one framework
+*** TODO make Rust-based server accessible online
+*** TODO implement QuadTree
+*** TODO implement multi-thread computing
+*** TODO implement GPU computing
+*** TODO implement async comuting
+*** TODO implement to-file saving of state-vectors
+*** TODO implement from-file loading of state-vectors & rendering
+*** TODO categorize simulations via tags
+*** TODO implement to-video conversion of state-vecs via renderer
+*** TODO implement good-looking client-side button menus
+*** TODO generalize interactivity
+*** TODO upload coolest simulations to youtube
+*** TODO link website & youtube channel to LinkedIn
+*** TODO use this project for the MSc thesis application/content
+** Keeping the code clean
+*** TODO do re-factoring
+*** TODO write README.org files
+*** TODO write doc-strings
+** Idea dump
+*** Lagrange points
+*** Equipotential lines/surfaces
+*** switch PoV via Galilean boosts
+- eg. center on Mars
+- or via Lorenz boosts?
+*** for few bodies (~3): show connecting lines
+-> rotating triangle
+*** display forces
+*** display a system's center of mass
+*** visualize object position-history via tails
+*** Meta Balls
+*** Hand-drawn Digit Classifier
+*** Hand-drawn Object Classifier
+*** Disease Spread
+*** Forest Fire
+*** Rock-Paper-Scissors
+*** Monte-Carlo pi calculation
+*** Games played against AI?
+**** pong
+**** chess
+** Resources
+- https://www.karlsims.com/fluid-flow.html
+** old
+- button: randomize initial setup
+- button: toggle tail drawing
+- button: toggle field drawing   (TODO: which one?)
+- button: toggle vector drawing
+  + to center of mass
+  + velocity
+  + acceleration
+*** ideas
+**** client
+***** general
+****** TODO decide: where to load client? in base.tera or simulation/base.tera ?
+****** TODO initialize states
+***** renderer
+****** general
+******* TODO add slider: DT
+******* TODO run x times, only show newest
+******* TODO get rid of interaction button menus (?)
+******* TODO arg-enum multibuttons
+******* TODO coordinate trfs
+******** [ ] rotate (+ auto-rotate)
+******** [ ] "pan"
+******** [ ] boost into inertial system
+******** [ ] follow planet (non-inertial)
+****** family
+******* TODO configure: draw tails starting from current position
+******* TODO configure: load default display-settings
+******* TODO add slider: tail length
+******* TODO add button: hide
+******* TODO add button: ignore (hide + don't calculate)
+******* TODO precompute tails
+****** field
+******* TODO configure: load default display-settings
+******* TODO add button: hide
+******* TODO add button: ignore (hide + don't calculate)
+**** database
+***** display-settings
+***** title, short-title, id, ...
+| id           | title         | short-title   |
+|              |               |               |
+| 2body-kepler | Kepler's laws | Kepler's laws |
+| 3body-fig8   |               |               |
+*** PROJ rework 07 (final?)
+**** things to consider
+***** field
+****** 2D vs. 3D
+****** boundaries
+****** integrators
+****** interactions
+******* field
+******* object
+****** partitioning
+***** object
+****** 2D vs. 3D
+****** boundaries
+****** integrators
+****** interactions
+******* field
+******* object
+****** partitioning
+******* quad-tree (or oct-tree)
+******* sectors
+**** steps
+***** branch: master
+****** initialize git repository
+******* create /.gitignore/
+****** initialize root-crate
+******* create /Cargo.toml/
+***** create branch: init-server
+****** initialize server-crate
+******* create /mxyz-server/Cargo.toml/
+****** create basic code-skeleton for server
+******* create /mxyz-server/src/main.rs/
+******** setup code-skeleton for routes/views
+******** setup code-skeleton for static file-server
+******* create /static/ & /templates/ directories (+ empty /README.org/)
+****** add /scripts/ directory and create /script/run/ script
+****** add base-template, base-css & favicon
+******* create /mxyz-server/templates/base.html.tera/
+******* create /mxyz-server/static/css/base.css/
+******* create /mxyz-server/static/media/images/favicon.ico/
+****** add basic index page
+******* create /mxyz-server/src/views/mod.rs/
+******* create /mxyz-server/src/views/index/mod.rs/
+******* create /mxyz-server/templates/index/index.tera/
+******* create /mxyz-server/static/css/index/base.css/
+***** create branch: init-client
+****** initialize client-crate
+***** create branch: init-database
+****** initialize database-crate
+***** create branch: init-chronos
+****** initialize chronos-crate
+***** create branch: init-utils
+****** initialize utils-crate
+***** create branch: init-physics
+****** initialize physics-crate
+***** create branch: init-numerics
+****** initialize numerics-crate
+*** PROJ rework 06
+**** TODOs
+***** [ ] live-calculation || display
+**** project hierarchy
+***** mxyz-chronos
+****** data-collection
+****** data-preparation
+****** data-processing
+****** data-visualization
+***** mxyz-client
+****** chronos
+****** physics
+******* renderer
+***** mxyz-database
+***** mxyz-physics
+****** engine
+******* boundary
+******* integrator
+******* interaction
+******* partitioning
+******* state
+***** mxyz-server
+****** static
+******* css
+******* js
+******* media
+******** thumbnails
+****** templates
+***** utils
+****** dom
+*** rocket.rs ~rework~ [0/4]
+GOAL: rust $\to$ rocket.rs $\to$ html $\to$ js $\to$ wasm $\to$ rust
+**** TODO create new simulation framework
+***** [X] think re: handle ~n-body~ as well as ~cell-auto~
+***** [ ] think re: for n-body ~fields~ -> calc. in renderer?
+***** [ ] think re: how to do fluid simulations?
+***** TODO create simulation ~engine~ in new framework
+- static bodies
+****** [X] code skeleton
+****** [ ] initialize state vector
+******* [ ] initialize static attractors
+******* [ ] initialize bodies
+******* [ ] initialize particles
+******* [ ] initialize field(s)
+******* [ ] initialize grid
+****** [ ] step all body-type vector
+******* [ ] step bodies
+******* [ ] step
+***** TODO create simulation ~renderer~ in new framework
+****** [X] code skeleton
+****** [ ] draw
+******* [ ] draw grid
+******* [ ] draw field(s)
+******* [ ] draw particles
+******* [ ] draw bodies
+******* [ ] draw static attractors
+
+***** TODO decide: implement enum BodyType?
+- planet ?
+- particle ?
+- boolean_cell
+- float_cell
+- float_vec
+***** TODO [#A] learn about Diesel database
+***** IDEA look at list of most commonly used rust crates
+**** TODO re-create simulation pages
+***** oscillators
+****** [ ] (graph) ~single-pendulum~
+****** [ ] (graph) ~double-pendulum~
+****** [ ] (graph) ~lissajous~
+***** emergent-behavior
+****** [ ] (nbody) ~boids~
+****** [ ] (nbody) ~ants~
+****** [ ] (celau) ~game-of-life~
+***** gravity
+****** [ ] (nbody) ~3body-moon~
+****** [ ] (nbody) ~3body-fig8~
+****** [ ] (nbody) ~nbody-flowers~
+******* TODO: rename -> (?)
+****** [ ] (nbody) ~nbody-asteroids~
+******* TODO: rename -> asteroids/binary (?)
+****** [ ] (nbody) ~nbody-solsys~
+***** electro-magnetism
+****** [ ] (nbody) ~charge-interaction~
+******* TODO: rename -> (?)
+****** [ ] (nbody) ~wien-filter~
+***** thermodynamics
+****** [ ] (celau) ~ising~
+****** [ ] (nbody) ~thermal-motion~
+****** [ ] (nbody) ~brownian-motion~
+***** fluid-dynamics
+****** [ ] (fluid) ~diffusion~
+***** various ~(?)~
+****** [ ] (graph) ~monte-carlo-pi~
+****** [ ] (graph) ~rock-paper-scissors~
+***** ~IDEAS~
+****** quantum-mechanics
+******* [ ] (qphy?) ~harmonical-oscillator~ (move to waves?)
+**** TODO setup rocket-server on DigitalOcean droplet
+https://steadylearner.medium.com/how-to-deploy-rust-web-application-8c0e81394bd5
+**** TODO rethink ~page_id~ nomenclature
+*** pimp my ~index~ [0/2]
+**** TODO re-structure ~css~ files
+**** TODO add header thingy (with text?)
+- about me -> LinkedIn / mail
+*** further down the road
+**** TODO setup diesel db
+**** TODO re-write chronos
+1. data collection
+2. data preparation
+3. data processing
+4. data visualization
+**** server security
+***** TODO implement secure ~login~
+**** HOLD look-up: how to use button/input events from rust
+**** alternate epsilon values
+1. $1/r^2$
+2. $1/(r^2+\varepsilon^2)$
+3. $(1/r^2)*(2/(1+e^(-a*(r/b)^2))-1)$
+*** [ ] add old notes
+Goal of web-app:
+  - playground for acquiring skills & showcasing results re:
+    + backend & frontend web development
+      (python, js, html/css, rust, mongodb, server management/security)
+    + (computational) physics
+  - visualization of various chronos datasets
+    (time-series plot, stats, daily summary/review, memories/photos, todos)
+
+Main components of web app:
+  - backend       -> python flask & html/css (jinja), served by apache2
+  - frontend      -> js (-> ReactJS) + rust
+  - database      -> mongoDB
+**** general
+  + basics
+  + stdweb
+  + Rocket?
+  + write stand-alone simulations in rust, then import into page
+  + learn about webpack chunking
+    + several templates with part of React app (+ loading rust)
+  + continue working on chronos
+    + load raw into db
+    + better graphs, favorites
+***** [X] decide on server implementation
+CLOSED: [2021-08-22 Sun 00:46]
+-> flask backend, react/rust frontend !
+***** [ ] basic web app functionality
+****** [X] configure host
+******* [X] connect mader.xyz to 188.166.164.214
+******* [X] put server online again
+******* [X] set up basic react web app (served by flask) on DigitalOcean
+******** [X] set up apache
+******** [X] set up flask backend
+******** [X] set up JS frontend (optional: React? -> no, for now)
+****** [ ] change URL from IP to mader.xyz
+***** [ ] ~rebuild mader.xyz website in React~
+****** [ ] talk to Kati re: homepage design
+- Grundidee fuer die Website
+  + Spielerei, zum Ueben verschiedener Dinge
+    - Web Development (frontend & backend + web design)
+    - Computational Physics (Simulationen)
+  + Praesentation (bestimmt gut zu haben, sammeln & darstellen)
+- ~Layout?~
+****** [ ] create home page
+******* [ ] fix mobile css (max 2 cols in nav grid)
+******* [ ] create thumbnail-"overlay?", on-hover, persistent on mobile
+******* [ ] add favicon
+******* grid layout
+******** [X] create grid for individual pages
+- general layout: one or two squares
+  + on mobile: on top of each other
+  + on desktop: next to each other
+******** [X] make all thumbnails b&w by default
+******** [X] on-hover: enlarge thumbnail
+******** [X] on-hover: deactivate b&w filter
+******** [ ] on-hover: display name with animation
+******** [ ] create thumbnails (as gif on hover?)
+******* index layout
+- sort by topic? by relevance?
+******** introduction: text? carousel? selection of coolest simulations?
+******** gravitational n-body dynamics
+********* 2-body problem
+********** varying eccentricity
+********** different algorithms: summation (ex./implicit?), rk2, rk4, ...
+********* 3-body problem
+********** Moon around Planet around Star
+********** stable 3-body orbits (fig8 + others)
+********* n-body problem
+********** quad-/oct-tree implementation
+********** globular cluster
+********** asteroids around binary
+********** asteroids around planet around star
+******** fluid dynamics
+********* diffusion
+********* incompressible fluid
+- flow around air-foil
+******** electro-magnetism
+********* Ising model
+********* charged-particle interaction
+********* Wien filter
+******** statistical physics & thermodynamics
+********* gas in a box (elastic collision)
+- leads to Boltzmann dist.?
+********* Brownian motion
+******** emergent behavior
+********* boids (flocking)
+********* ants
+********* game of life
+******** cellular automata
+********* rock-paper-scissors
+********* forest fires
+******** various
+********* single pendulum
+********* double pendulum
+********** chaos demonstration
+********* Lissajous figures
+********* Fourier transform
+********* M.C. pi calculation
+********* tatooine
+****** [ ] re-create individual pages (component-based)
+***** [ ] ~load Rust code from js~
+****** [ ] find out how to: pre-compile Rust into .wasm
+- wasm-pack
+****** [ ] find out how to: load .wasm file into React
+- add to dependencies in package.json -> import in js
+****** DONE find out how to: draw on html canvas from Rust
+CLOSED: [2021-11-15 Mon 17:32] SCHEDULED: <2021-08-29 Sun>
+****** [ ] try to load rust into vanilla js (no React)
+if it works -> ditch React?
+***** [X] setup database locally (dev client)
+CLOSED: [2021-08-22 Sun 00:47]
+***** [ ] setup database on server
+****** [ ] make sure database is stored at a secure location on server
+***** [ ] clean up project
+****** [ ] split code into multiple files (classes, function libraries, ...)
+****** [ ] re-structure css into separate files
+****** [ ] re-name "pkg" (containing .wasm) to something else?
+****** [ ] re-name "wasm_test" (rust lib)
+***** [X] fuse css files
+CLOSED: [2021-09-06 Mon 14:58] SCHEDULED: <2021-08-26 Thu 14:00>
+define var in js? eg: import CSS_LOC + "base.css"
+-> doesn't work, flask (backend) css is outside src/
+setup symlink to flask (be) css
+-> doesn't load css
+better:
+-> define path to react (frontend) css in flask, load css
+
+current:
+just include css into base template
+(less efficient, but easier to implement)
+
+even better?
+-> define path to css from flask backend, pass to templates
+***** [ ] fix header home div in React fe
+***** [ ] fix mobile css
+***** [ ] make section titles bigger (than navgrid section titles)
+***** [ ] think re: move from button links to stealthy links? (defined in be base.css)
+***** [ ] load running_on_server param from file, not config
+***** [ ] load secret key from .env (& add to git repo)
+***** [ ] rewrite README.org
+***** [ ] move stuff from .env to .flaskenv (dev mode)
+***** switch branches when working on chronos/maderxyz !
+**** chronos
+***** database (+ datasets)
+****** datasets
+******* sleep cycle
+******** go-to-bed date
+******** go-to-bed time
+******** get-up time
+******** sleep quality
+******** hours in bed
+******** wake up mood
+******** heart rate
+******** step count
+******** [ ] sleep notes
+******* finances
+******** [ ] income per tag
+******** [ ] expense per tag
+******** net worth
+******* QS Export (Apple Health / Watch)
+******** active calories
+******** distance
+******** step count
+******** heart rate
+******** cycling distance
+******** ...
+******* spotify
+******** playtime
+******** playtime by artist
+******** playtime by genre
+
+******* recipes?
+****** [ ] make sure output data is saved to database in all getter functions
+******* [ ] add data-to-db code before return (but do still return! backwards comp.)
+****** [ ] think re: optimal db entry hierarchy
+****** [ ] restructure database, recreate time-series entries
+***** raw data collection
+****** [ ] download spotify dataset
+DEADLINE: <2022-06-23 Thu +6w>
+:PROPERTIES:
+:LAST_REPEAT: [2022-05-16 Mon 01:53]
+:END:
+- State "DONE"       from "[ ]"        [2022-05-16 Mon 01:53]
+- State "DONE"       from "[ ]"        [2022-04-04 Mon 12:16]
+- State "DONE"       from "[ ]"        [2022-02-22 Tue 15:02]
+- State "DONE"       from "[ ]"          [2022-01-19 Wed 14:45]
+:LOGBOOK:
+- State "DONE"       from "[ ]"        [2021-11-15 Mon 17:29]
+- State "[X]"        from "[ ]"          [2021-10-04 Mon 16:58]
+- State "[X]"        from "[ ]"          [2021-08-18 Wed 15:40]
+- State "[X]"        from "[ ]"          [2021-06-24 Thu 12:20]
+- State "[X]"        from "[ ]"          [2021-05-06 Thu 11:59]
+- State "[X]"        from "[ ]"          [2021-04-27 Tue 11:55]
+- State "[X]"        from "[ ]"          [2021-02-03 Wed 14:29]
+- State "[X]"        from "[ ]"          [2021-01-11 Mon 01:01]
+:END:
+****** [ ] download Google Takeout dataset (on Legion)
+DEADLINE: <2022-06-22 Wed 15:00 +10w>
+:PROPERTIES:
+:LAST_REPEAT: [2022-04-22 Fri 14:18]
+:END:
+- State "DONE"       from "[ ]"          [2022-04-22 Fri 14:18]
+- State "DONE"       from "[ ]"        [2022-02-22 Tue 15:02]
+- State "DONE"       from "[ ]"          [2022-01-19 Wed 14:45]
+:LOGBOOK:
+- State "DONE"       from "[ ]"        [2021-11-16 Tue 16:18]
+- State "[X]"        from "[ ]"          [2021-09-26 Sun 18:57]
+- State "[X]"        from "[ ]"          [2021-07-04 Sun 22:38]
+- State "[X]"        from "[ ]"          [2021-05-06 Thu 11:59]
+- State "[X]"        from "[ ]"          [2021-01-28 Thu 03:52]
+:END:
+**** comp_phys
+Simulation data is either pre-computed using Python or C, or the equations
+are solved iteratively live by the browser utilizing JS.
+***** fluid dynamics
+https://www.karlsims.com/fluid-flow.html
+***** [[~/code/mader.xyz/FlaskApp/comp_phys/README.org][README]]
+***** structure
+****** [ ] classical mechanics
+******* [ ] cannon ball trajectory
+******* [ ] Galilean cannon
+******* [ ] billard balls
+- link to
+  + statistical physics: gas in a box
+****** [ ] gravity
+******* [ ] 2-body problem: simplest form
+- Newtonian model of gravity
+- motion around common barycenter (center of mass)
+- [ ] elliptical / eccentric orbit
+- [ ] circular orbit
+- [ ] display connection line -> show constant area velocity
+******* [ ] 2-body problem: geocentric orbits
+- add connection line between satelite & ground
+- plot ground: use some kind of map projection?
+******* [ ] 3-body problem: moons
+- trajectory
+- radius of Hill sphere
+  \begin{equation}
+    r_H \approx a \cdot \sqrt{\frac{m}{3M}}
+  \end{equation}
+  + [ ] think re: (where does 3 come from?)
+- visualization of Hill sphere for different planets
+  + Earth
+  + Jupiter
+  + Mars
+- motion relative to barycenter (no fixed central star)
+- Roche limit -> tidal forces destroy moon
+******* [ ] 3-body problem: planet in orbit around stellar binary
+- [ ] include multiple planets
+- [ ] think re: how to avoid divergence? -> epsilon? dt? ...?
+******* [ ] 3-body problem: stable figure-8 solution
+- special case of equal masses
+- average velocity, momentum & position is equal to 0
+- draw triangle -> barycenter stays at center of triangle
+- plot kinetic/potential energies -> back-and-forth between 3 bodies
+- add connection line
+******* [ ] 3-body problem: Earth-Mars transit window
+******* [ ] 4-body problem: planet in orbit around triple star system
+- think re: how to avoid divergence?
+******* [ ] n-body problem: symmetric satelite constellation
+- [ ] add boost animation, transition seamlessly
+- [ ] calculate once, rotate and draw
+******* [ ] n-body problem: many bodies in orbit around central object
+- no need for direct $O(N^2)$ summation, only "feel" central object
+******* [ ] n-body problem: current solar system
+- pull real-time data -> plot as it is now
+- add feature to increase time/speed
+  + [ ] think re: can I download data from any point in time?
+    -> otherwise calculate position
+- links:
+  + Earth-Mars transit window
+******* [ ] n-body problem: hierarchical tree algorithm for cloud of massive bodies
+******* [ ] n-body problem: interactive planet-placer
+****** [ ] fluid dynamics
+******* [ ] initially unidirectional flow (through e.g. a tube)
+******** [ ] flow without obstacle
+- homogenous velocity field
+- exactly laminar
+******** [ ] flow around a sphere
+- vortices / turbulence
+******** [ ] flow around an airfoil
+- high-pressure/low-pressure areas
+******** [ ] flow around an arbitrary (user-"painted") object
+- calculate $c_w$ value from flow (?)
+******** [ ] flow around a truck
+- Tesla Semi vs. traditional truck
+******* [ ] flow through a rocket engine
+******* [ ] accreting star / planet
+- link to
+  + fluid dynamics: accreting black hole
+******* [ ] accreting black hole
+****** [ ] emergent behavior
+******* [ ] boids
+http://www.harmendeweerd.nl/boids/
+https://gamedevelopment.tutsplus.com/tutorials/understanding-steering-behaviors-collision-avoidance--gamedev-7777
+******** [ ] find optimal parameters
+******* [ ] ants
+******** [ ] find optimal parameters
+****** [ ] harmonical oscillators
+******* [ ] pendulum: single pendulum
+******** [X] write python simulation
+******** [X] implement displaying
+******** [X] add description
+CLOSED: [2021-02-12 Fri 01:28]
+- acceleration g due to gravity
+- equation of motion
+******* [ ] pendulum: double pendulum
+******** [X] write python simulation
+******** [X] implement displaying
+******** [X] add description
+CLOSED: [2021-02-12 Fri 01:28]
+- double pendulum Lagrangian
+- Euler-Lagrange equation
+- equations of motion
+- 4th order Runge-Kutta scheme
+******** [ ] demonstrate chaos (100 pendula w/ slightly different init. conditions)
+******* [ ] pendulum: general n-pendulum
+******* [ ] Lissajous curves
+******** [ ] solve analytically -> uses less compute power
+****** [ ] cellular automata
+******* [ ] introduction
+******** [ ] neighborhoods
+- von Neumann
+- Moore
+******** [ ] create own neighborhood
+******** [ ] see how it influences behavior
+******* [ ] Conway's Game of Life
+******** [ ] add more examples
+********* [ ] add glider(s)
+********* [ ] add logic gates (?)
+******** [ ] explain rules
+******** [ ] link to video about Turing completeness
+******* [ ] rock-paper-scissors
+******** [ ] fix thumbnail
+******** [ ] make slider for grid size N
+******** [ ] make slider for threshold value
+******** [ ] make slider for number of colors
+******** [ ] maybe also make slider for choosing colors (?)
+******** [ ] toggle periodic boundaries
+******** [ ] add options (e.g. threshold)
+******* [ ] forest fire
+******** [ ] add initial state (river, forest, clearing, path)
+******** [ ] add wind
+******** [ ] increase grid size/resolution
+********* [ ] think re: choose more efficient sampling?
+******* [ ] water simulation
+******* [ ] hex-lattice fluid/gas simulation
+******** [ ] simulate flow around air foil
+******** [ ] simulate flow through pipe (boundary effects -> parabola profile?)
+******** [ ] simulate flow around ball
+******** [ ] simulate shock wave
+******** [ ] simulate flow through rocket engine (?)
+******* [ ] terrain generation
+******* [ ] wave propagation
+******** [ ] simulate single slit
+******** [ ] simulate double slit
+******** [ ] simulate standing wave
+******** [ ] simulate wave interference
+******** [ ] simulate spheric propagation & reflection (?)
+******* [ ] physarum simulation
+******* [ ] Sierpinski triangle
+******* [ ] Rule 30 / Rule 110
+******* [ ] Brian's brain ([[https://en.wikipedia.org/wiki/Brian%27s_Brain][wiki]])
+******* [ ] CoDi (neural network brain simulation)
+******* [ ] Langton's ant
+******** [ ] implement custom rulesets -> different patterns emerging
+******* [ ] Rule 184 (traffic flow)
+****** [ ] statistical physics & thermodynamics
+******* [ ] Ising model
+******** [X] plot magnetization live
+CLOSED: [2021-03-17 Wed 20:12]
+******** [ ] write explanation
+******* [ ] thermal motion (Boltzmann)
+******** [ ] write python simulation (generalize to include Brownian, variable r)
+#+begin_src python
+for step_idx in range(nr_of_steps):
+
+    for body_idx in range(nr_of_bodies):
+
+        # treat wall collision
+        # inverse velocities in x- or z-direction
+
+        # treat collision with other bodies
+        for body_jdx in range(nr_of_bodies):
+            # adjust velocities (elastic collision)
+#+end_src
+******** [ ] implement displaying
+******** [ ] add description
+- Maxwell-Boltzmann distribution
+- kinetic theory of heat
+******** [ ] implement elastic collisions
+-> momentum exchange (assume 1D problem)
+******** [ ] barometer, calculate from kinetic energies & from wall collisions
+******** [ ] add links
+********* [ ] Brownian motion
+******* [ ] Brownian motion
+******** [ ] implement displaying
+******** [ ] add description
+- mean squared displacement
+******** [ ] add links
+********* [ ] random walk
+******** [ ] find optimal parameters
+dependent on hardware?
+******** [ ] display traveling distance vs time (fit root func)
+******* [ ] random walk
+******** [ ] write python simulation
+******** [ ] implement displaying
+******** [ ] add description
+******* [ ] heat diffusion
+- through various materials
+******* square 1: simulation / widget thingy
+******* square 2: description (format in tex, or even in org?)
+****** [ ] electro-magnetism
+******* [ ] electric force field lines from charge placement
+******* [ ] magnetic force field lines from static magnet
+******* [ ] magnetic force field from current through wire
+******* [ ] Lorentz force acting on moving charge in $B$ field
+******* [ ] Wien/Lorentz filter
+******* [ ] electro-magnetic wave propagation
+- link to:
+  + cellular automata: wave propagation
+****** [ ] quantum mechanics
+******* [ ] hydrogen line wavelengths
+******* [ ] harmonical oscillator
+******* [ ] wavepacket-wavepacket scattering (particle collision)
+******* [ ] proton scattering with heavier ions (Glauber model)
+****** [ ] mathematics
+******* [ ] random-walk
+******* [ ] Monte Carlo calculation of Pi
+******* [ ] statistics of nuclear decay
+- Monte Carlo simulation of decaying material
+- nuclear chain reaction
+- Bernoulli process (Gauss dist. from addition of random variables)
+****** [ ] create interface where stats can be seen
+******* [ ] create page with most-interesting multi-year datasets
+******** [ ] sleep schedule ("sleep snake") !
+******** [ ] average resting heart rate !
+******** [ ] time spent listening to music on spotify !
+******** [ ] photos added to library per day !
+******** [ ] stack plot of timew data, time spent per project !
+******** [ ] messages sent per day (filter: sms/wa/fb & by contact) !
+******** [ ] diagram of days on which I ate vegetarian !
+******** [ ] diagram of days on which I smoked weed (heat map or bar plot?) !
+******** [ ] diagram of days on which I drank alcohol !
+******** [ ] visualize daily review goals (7 day moving average?)
+******** [ ] sleep quality (per hour asleep?) (?)
+******** [ ] youtube videos clicks per day
+******** [ ] anki cards reviewed per day (visualize streak)
+******** [ ] duolingo xp per day (visualize streak)
+******** [ ] average heart rate variability over the day
+******** [ ] google search history for input word (show most-searched words)
+******** [ ] visualize social time
+******** [ ] visualize youtube watch history
+******** [ ] visualize messages sent over time on whatsapp
+******** [ ] do sentiment analysis of whatsapp mesages
+******** [ ] visualize finances over time (my net worth)
+******* [ ] start on monthly summary page
+****** [ ] add widget-specific settings
+******* [ ] add reset button
+******* [ ] add reverse button
+******* [ ] add pause button
+******* [ ] add tail length slider
+***** write display functions
+****** in python (pygame)
+****** in javascript (HTML canvas)
+***** [ ] write simulations
+****** precalculate in C/py/js?
+******* save to / load from txt? -> if complete, start live-sim
+***** [ ] find out: best method for drawing on canvas
+- "requestAnimationFrame(f)"
+- "setInterval(f, time)"
+***** implementations
+****** in C++
+****** in Python
+****** in JS
+****** in Rust
+******* [ ] ask Rafael again
+***** [ ] re-write .js simulations into .rs
+- boids
+- ants
+***** [ ] write a larger simulation in Rust
+- fluid dynamics: flow around air foil
+- n-body dynamics: globular cluster / asteroid ring
+- chaos: double pendula
+**** backend
+***** chronos
+****** load raw data into database
+******* emacs org
+******** [X] write fct. re: load journal into db
+******** [ ] think re: change fct/file name of journal loader?
+******* facebook
+******** [ ] write fct. re: load facebook chat history into db
+******** [ ] write fct. re: load facebook comment history into db
+******** [ ] write fct. re: load facebook friends history into db
+******** [ ] write fct. re: load facebook like history into db
+******** [ ] write fct. re: load facebook login history into db
+******** [ ] write fct. re: load facebook poke history into db
+******** [ ] write fct. re: load facebook profile update history into db
+******** [ ] write fct. re: load facebook search history into db
+******* google sheets
+******** [ ] write fct. re: load generic spreadsheet into db
+******** [ ] write fct. re: load finance spreadsheet into db
+******** [ ] write fct. re: load income history from into db
+******** [ ] write fct. re: load expenditure history from into db
+******** [ ] write fct. re: load daily goal history into db
+******** [ ] write fct. re: load time spent history into db
+******* google takeout
+******** [ ] write fct. re: load chrome browser history into db
+******** [ ] write fct. re: load gmaps location history into db
+******** [ ] write fct. re: load gmaps review history into db
+******** [ ] write fct. re: load gmaps saved places history into db
+******** [ ] write fct. re: load yt comment history into db
+******** [ ] write fct. re: load yt playlist history into db
+******** [ ] write fct. re: load yt search history into db
+******** [ ] write fct. re: load yt watch history into db
+******* icloud
+******** [ ] write fct. re: load mail history into db
+******* life cycle
+******** [ ] write fct. re: load life cycle export into db
+******* photos
+******** [ ] write fct. re: load photos taken history into db
+******* qs export
+******** [ ] write fct. re: load qs export for active calories into db
+********* [X] think re: rename active calories loader fct/file?
+currently named "energy active"
+********* [ ] rewrite fct to not save each datapoint to db individually!
+******** [ ] write fct. re: load qs export for cycling distance into db
+********* [ ] rewrite fct to not save each datapoint to db individually!
+******** [ ] write fct. re: load qs export for distance into db
+********* [ ] rewrite fct to not save each datapoint to db individually!
+******** [ ] write fct. re: load qs export for flights climbed into db
+********* [ ] rewrite fct to not save each datapoint to db individually!
+******** [ ] write fct. re: load qs export for heart rate into db
+********* [ ] rewrite fct to not save each datapoint to db individually!
+******** [ ] write fct. re: load qs export for sleep analysis into db
+********* [ ] rewrite fct to not save each datapoint to db individually!
+******** [ ] write fct. re: load qs export for steps into db
+********* [ ] rewrite fct to not save each datapoint to db individually!
+******** [ ] write fct. re: load qs export for heart rate at rest into db
+from where?
+******** [ ] write fct. re: load qs export for heart rate variability into db
+from where?
+******** [ ] write fct. re: load qs export for exercise minutes into db
+from where?
+******** [ ] write fct. re: load qs export for mindful minutes into db
+from where?
+******** [ ] write fct. re: load qs export for stand hours into db
+from where?
+******** [ ] write fct. re: load qs export for swimming distance into db
+from where?
+******* reddit
+******** [ ] create module for pulling/loading reddit data
+******** [ ] write fcts re: load raw reddit datasets into db
+******* skype
+******** [ ] write fct. re: load skype chat history into db
+******* sleep cycle
+******** [X] write fct. re: load sleep cycle export into db
+******** [ ] rewrite fct to handle sleepdata_6S.csv as well
+******* sms
+******** [ ] write fct. re: load sms chat history into db
+******* spotify
+******** [ ] write fct. re: load spotify library history into db
+******** [ ] write fct. re: load spotify play history into db
+******** [ ] write fct. re: load spotify search history into db
+******* steam
+******** [ ] create module for pulling/loading reddit data
+******** [ ] write fcts re: load raw steam datasets into db
+******* uni/school
+******** [ ] write fct. re: load grade history into db
+think re: move directly into time-series collection?
+******* whatsapp
+******** [ ] write fct. re: load whatsapp chat history into db
+****** create time-series objects & add to db   (bool or num)
+******* emacs org-mode
+******** [ ] write fct re: make ts for nr. of chars/words in daily journal
+******* facebook
+******* google sheets
+******** [ ] write fct re: make ts for nr. of hours spent per tag
+******** [ ] write fct re: make ts for daily goals from Time20XY
+******* google takeout
+******** [ ] write fct re: make ts for lat/long coords
+******** [ ] write fct re: make ts for altitude above sea-level
+******* life cycle
+******* qs export
+******** [ ] write fct re: make ts for heart rate
+******** [ ] write fct re: make ts for nr. of steps
+******* reddit
+******** [ ] write fct re: make ts for nr. of up-/down-votes
+******** [ ] write fct re: make ts for nr. of comments (or comment chars)
+******** [ ] write fct re: make ts for nr. of awards
+******* skype
+******** write fct re: make ts for nr. of msgs/chars sent (per chat)
+******* sleep cycle
+******** [ ] write fct re: make ts for sleep duration
+******** [ ] write fct re: make ts for bed time
+******** [ ] write fct re: make ts for get-up time
+******** [ ] write fct re: make ts for wake-up time
+******** [ ] write fct re: make ts for fell-asleep time
+******** [ ] write fct re: make ts for sleep quality
+******* sms
+******** [ ] write fct re: make ts for nr. of msgs/chars sent (per chat)
+******* steam
+******** [ ] write fct re: make ts for nr. of msgs/chars sent (per chat)
+******* uni/school
+******** [ ] write fct re: make ts for grades
+******* whatsapp
+******** [ ] write fct re: make ts for nr. of msgs/chars sent (per chat)
+******* [ ] write fcts for adjusting time series objects' resolution
+******* [ ] think re: how to show both source & category in org nested lists?
+******* [ ] rewrite fcts for ts creation: don't add Nones, only useful information
+****** create statistics & add to db
+***** comp_phys
+***** [ ] clean up backend
+****** [X] clean up 3-body moon
+CLOSED: [2021-06-24 Thu 23:41]
+****** [X] clean up 3-body fig8
+CLOSED: [2021-06-24 Thu 23:41]
+****** [ ] clean up n-body flowers
+****** [ ] clean up n-body asteroids
+****** [ ] clean up stat.phys. ising
+****** [ ] clean up harm.osc. double pendulum
+****** [ ] clean up harm.osc. Lissajous
+****** [ ] clean up M.C. calculation of pi
+****** [ ] clean up M.C. ants
+http://188.166.164.214/static/media/thumbnails/3body_moon.png
+****** [ ] clean up cell.auto. game of life
+****** [ ] clean up cell.auto. boids
+****** [ ] clean up cell.auto. rock-paper-scissors
+****** [ ] clean up electro-magnetism wien filter
+****** [ ] clean up unfinished stuff
+***** [ ] load raw data from disk/web, save to db
+(+ finances, school+uni, ...)
+****** [ ] apple health
+******* [ ] get time series: activity history
+****** [ ] facebook
+******* [ ] get time series: msg history
+****** [ ] google sheets
+******* [ ] implement Time20XY download
+******* [ ] implement finance log download
+******* [ ] delete gspread_creds.json
+****** [ ] google takeout
+******* [ ] get time series: location history
+****** [ ] life cycle
+****** [ ] org-mode journal
+****** [ ] photos (icloud)
+******* [ ] get time series: dates of photo additions
+****** [ ] qutebrowser
+******* [ ] get time series: browsing history
+****** [ ] safari
+******* [ ] get time series: site visits (history)
+****** [ ] sleep cycle
+******* [ ] get time series: information about nights
+****** [ ] spotify
+******* [ ] get time series: play-events
+***** [ ] create modules for creating interesting statistics
+****** [ ] health
+******* [ ] sleep
+******** [X] create sleep snake !!! (2020-10-15 15:00)
+******** [ ] get sleep quality vs sleep time
+******** [ ] get sleep quality per hour vs sleep time
+******* [ ] diet
+******* [ ] drug consumption
+******** [ ] get monthly consumption (weed, alcohol, tabacco, ...) !!!
+****** [ ] social
+******* [ ] create timeline of chars/msgs sent per day/month/year
+******* [ ] contacts from daily note
+******* [ ] find out top10 chats by char/msg count per day/month/year
+******* [ ] instant messaging
+******** [ ] pull sources
+********* [ ] sms
+********* [ ] facebook
+********* [ ] whatsapp
+****** [ ] time spending
+******* [ ] get time spent per category vs. time
+******* [ ] incorporate timewarrior
+******* [ ] incorporate Time20XY
+****** [ ] spotify
+******* [ ] get top10 musicians per day/month/year !!!
+******* [ ] get top10 songs per day/month/year
+******* [ ] get top10 albums per day/month/year
+******* [ ] get total playtime per day/month/year
+****** correlation finder
+***** [ ] create time-series objects
+(+ spotify, ...)
+****** [ ] health
+******* [ ] activity
+******** [ ] active calories
+******** [ ] cycling distance
+******** [ ] distance
+******** [ ] exercise minutes
+******** [ ] flights climbed
+******** [ ] heart rate
+******** [ ] heart rate at rest
+******** [ ] heart rate variability
+******** [ ] steps
+******** [ ] whether I played ping pong
+******** [ ] whether I took a walk
+******* [ ] diet
+******** [ ] whether dinner was great
+******** [ ] whether I ate late
+******** [ ] whether I ate nothing all day
+******** [ ] whether I cooked for myself
+******** [ ] whether I drank tea
+******** [ ] whether I ate vegan
+******** [ ] whether I ate vegetarian
+******** [ ] whether I went to bed hungry
+******* [ ] drug consumption
+******** [ ] whether I consumed alcohol
+******** [ ] whether I consumed caffeine
+******** [ ] whether I consumed mdma
+******** [ ] whether I consumed tabacco
+******** [ ] whether I consumed weed
+******** [ ] whether I smoked cigaretts
+******** [ ] whether I drank a bit of beer
+******** [ ] whether I drank a lot of beer
+******** [ ] whether I drank a bit of schnaps
+******** [ ] whether I drank a lot of schnaps
+******* [ ] hygiene?
+******** [ ] whether I took a shower
+******** [ ] whether I took a bath
+******** [ ] whether I wore braces at night (move?)
+******* [ ] sickness
+******** [ ] whether I had dry hands
+******** [ ] whether I had a headache
+******** [ ] whether I had back pain
+******** [ ] whether I puked
+******** [ ] whether I was sick
+******* [ ] sleep
+******** [ ] sleep quality
+******** [ ] hours in bed
+******** [ ] sleep regularity
+******** [ ] wake-up mood
+******** [ ] whether I listened to music before sleep
+******** [ ] whether I slept in a tent
+******** [ ] whehter I slept under clear sky
+******** [ ] whether I went to bed tired
+****** [ ] personal
+******* [ ] mood
+******** [ ] whether I had a bad day
+******** [ ] whether I had a good day
+******** [ ] whether I had a sad day
+******** [ ] whether I had a stressful day
+******* [ ] sexual
+******* [ ] location
+****** [ ] social
+******* [ ] chat history (?)
+******* [ ] contacts met in person (?)
+***** [ ] list all data collection modules/db entries
+***** [ ] think re: page layout? -> templates!
+- mobile: list
+- desktop: more complex layout, grid
+**** frontend
+***** chronos
+****** app tabs
+******* [ ] input
+******** [ ] show category mind-map
+- click on category: zoom in
+******** [ ] add category/dataset
+- click on +: add new category
+******** [ ] add datapoints
+- add boolean data + more info
+  (how many joints? what did I eat? calories?)
+******** add input field everywhere
+******* [ ] raw data
+- show long-term raw data
+******** show (selected/some) plots
+******** [ ] display meta-info about datasets
+- how many ts datasets are loaded?
+- what's the 'nr of entry'-distribution? avg? mean?
+******** [ ] add option: toggle between plot (bar/scatter) & calendar view
+******** [ ] add option: toggle option to show nr of msgs either by chat or total
+******** [ ] add option: toggle mavg (sum?)
+******** [ ] add option: change N for mavg
+******** [ ] add option: change nr. of displayed/active datasets
+1. single dataset
+2. 2 datasets side by side + correlations
+******** [ ] add axis labels
+******** [ ] prettify ticks
+******** [ ] set boundaries (case-dependent on bool/num/time/date dataset)
+******** [ ] add option: show datasets sorted by nr. of entries / by name
+******** [ ] make chartjs transition from chart to chart smoothly (possible?)
+******** [ ] add option: toggle full list of datasets vs. scrollable (w/ overflow)
+******* [ ] insights
+******** [ ] long-term stats / correlations
+- show long-term plots
+- show statistics
+- show correlations / trends
+- choose resolution / show as moving-avg
+******** [ ] calendar
+- show daily/weekly/monthly/yearly summary
+******** [ ] summaries: daily/weekly/monthly/yearly
+********* create daily view
+******** show streaks/goals/mvg-avgs
+****** initial setup
+what to track? categories? visualize as mind-map
+****** interesting visualizations
+******* raw data (by category)
+******** health
+********* activity
+********** heart rate
+********* diet
+********** days on which I ate vegetarian
+********** days on which I ate vegan
+********* drug consumption
+********** alcohol
+********** mdma
+********** n2o
+********** poppers
+********** shrooms
+********** tabacco
+********** weed
+********* hygiene
+********* sickness & injury
+********* sleep
+********** sleep snake (sleep-/bed-times, moving-avg)
+******** social
+********* nr. of messages/characters sent/received over time (by chat name)
+********* topX IM contacts (by msgs/chars)
+********* topX used words (by chat name, over time?)
+******** time spending (?)
+********* nr. of hours played over time (by video game)
+******* insights
+******** summary
+********* daily
+********* weekly
+********* monthly
+********* yearly
+what happened?
+what were the highlights?
+what skills did I learn?
+who did I spend time with?
+what did I spend time on?
+time-spans? (relationships, locations, seasons, vacations)
+********* life
+*bucket list
+********** [ ] approximate percentage of life left
+******** correlations
+***** comp_phys
+****** n-body / gravity
+******* 3-body problem: Moon
+******* 3-body problem: stable figure-8 orbit
+******* n-body problem: cloud of asteroids around double star (?)
+******* quad tree
+******* oct tree
+****** electro-magnetism
+******* interacting charged particles in a box
+******* Lorentz force
+******* Hall sensor/effect
+****** quantum mechanics
+******* harmonical oscillator
+****** statistical physics
+******* particles in a box, thermal motion
+******* Brownian motion
+****** cellular automata
+******* forest fire
+******* game of life
+****** harmonical oscillators
+******* Lissajous figures
+******* Fourier transforms
+******** 1D
+******** 2D
+****** emergent behavior
+******* ants
+******** [ ] show stats: delivered food
+******** [ ] add button: toggle grid
+******** [ ] add pre-compute fct: next directions for each grid cell
+******* boids
+******** [ ] add hierarchical multi-tree
+****** general relativity (?)
+****** mathematics (?)
+****** mini-games
+****** recurrent neural networks
+******* chat bot
+****** convolutional neural networks
+******* cat/dog classfier
+****** [ ] add more buttons
+***** [ ] include planned features & implementation into emacs org
+***** [ ] think re: what's the main purpose of this app?
+***** [ ] think re: what pages do I want? what stats? what kind of diagrams?
+(bar plots, pie plots, stack plots, moving avg, cell heatmap, gps map)
+***** [ ] think re: which branch to work on
+***** [ ] setup one page as React app
+**** ...
+***** engine
+****** state
+******* fields
+******** field
+********* cells
+- Vec<Vec<f64>>
+********** cell
+- Vec<f64>
+********* interactions
+********** FieldFieldInteraction
+- ? Ising (S-B + S-S)
+- ? GameOfLife
+- ? Diffusion
+- ? Fluid
+********** FieldObjectInteraction
+- from bodies (G,em)
+********* FieldIntegrator
+- ? batch-wise
+******* obj families
+******** family
+********* objects
+- Vec<Vec<f64>>
+********** object
+- Vec<f64>
+********* interactions
+********** ObjectObjectInteraction
+- NewtonianGravity
+- CoulombInteraction
+- ElasticCollision
+- Boid
+********** ObjectFieldInteraction
+- acceleration (G,E+B)
+********* ObjectIntegrator
+- Euler (imp/exp)
+- Runge-Kutta (2/4)
+- Leapfrog
+- Verlet
+********* ? boundaries
+****** step
+******* step fields
+******* step objects
+*** project hierarchy (sensible to do it here in emacs?)
+**** struct Simulation
+
+#+begin_src rust
+pub struct Simulation {
+    engine:   Engine,
+    renderer: Renderer,
+    page_id:  String,
+}
+impl Simulation {
+    pub fn new(page_id: &str) -> Self {
+        let engine = Engine::new(page_id);
+        let renderer = Renderer::new(page_id);
+        let page_id = String::from(page_id),
+        Simulation { engine, renderer, page_id }
+    }
+    pub fn init(&mut self) {
+        self.engine.init();
+        self.renderer.init();
+    }
+    pub fn step(&mut self) {
+        self.engine.step();
+        self.renderer.display(&self.engine.states)
+    }
+}
+#+end_src
+
+**** struct Engine
+- stores & modifies a ~state vector~
+- handles ~bodies~, ~particles~ and ~cellular automata~ (eg. fields?)
+- uses different ~numerical algorithms~
+- uses different ~interactions~
+
+#+begin_src rust :exports code :eval never-export
+pub struct Engine {
+    states: Vec<State>,
+    page_id: String,
+}
+impl Engine {
+    pub fn new(page_id: &str) -> Self {
+        let states: Vec<State> = Vec::new();
+        let page_id = String::from(page_id);
+        Engine { states, page_id }
+    }
+    pub fn init() {
+        let initial_state = State::new(&self.page_id);
+        self.states.push(initial_state);
+    }
+    pub fn step() {
+        // TODO match self.page_id (?)
+            // update_bodies()
+            // update_particles()
+            // update_fields()
+            // update_cells()  (?)
+            // update_spins()
+    }
+}
+#+end_src
+
+***** [ ] think: how to implement bodies, particles & fields/cells into same framework
+****** [ ] decide: use sub-state vector?
+***** [ ] think: where to define interaction type?
+****** [ ] think: how to have multiple interactions at the same time? -> even necessary?
+***** [ ] think: state vector with variable item length?
+***** [ ] look-up: state vector with variable type?
+- e.g. f64 or bool
+-> generics
+**** struct State
+- no init() method, done in new()
+- different fields
+  + bodies      (exert influence on environment)
+  + particles   (do not exert influence)
+  + spins       (bool)
+  + fields      (tuple (f64,f64) )
+  + cells       (cellular automata)
+
+#+begin_src rust
+pub struct State {
+    bodies: Vec<f64>,
+    particles: Vec<f64>,
+    spins: Vec<bool>,
+    fields: Vec<(f64, f64)>,
+    cells: Vec<f64>,
+}
+impl State {
+    pub fn new() -> Self {
+        let bodies = Vec<f64> = Vec::new();
+        let particles = Vec<f64> = Vec::new();
+        let spins = Vec<bool> = Vec::new();
+        let fields = Vec<(f64,f64)> = Vec::new();
+        let cells = Vec<f64> = Vec::new();
+
+        // TODO match page_id
+        // -> write to Vec's
+
+        State { bodies, particles, spins, fields, cells }
+    }
+}
+#+end_src
+
+***** TODO think: do I need all the State fields? (or do I need more?)
+**** struct Renderer
+- display bodies & particles
+  + radius, color can vary
+
+#+begin_src rust
+pub struct Renderer {
+    page_id: String,
+}
+impl Renderer {
+    pub fn new(page_id: &str) -> Self {
+        let page_id = String::from(page_id);
+        Renderer { page_id }
+    }
+    pub fn init(&mut self) {
+        // TODO
+        // - initialize plots?
+    }
+    pub fn display(&mut self, states: &Vec<State>) {
+        // TODO
+        // - draw cells
+        // - draw fields
+        // - draw spins
+        // - draw particles   (for dev: switch w/ bodies?)
+        // - draw bodies
+    }
+}
+#+end_src
+
+*** directory hierarchy
+**** ~chronos-data/~
+**** ~flask-server/~
+- ~maderxyz/~  (live)
+  + maderxyz.wsgi
+  + requirements.txt
+  + main.py
+  + ~FlaskApp/~                   python flask (rename to ~backend~?)
+    - init.py                   flask server initialization
+    - config.py
+    - db_config.py              ...fuse with config? (into module?)
+    - ~static/~
+      + ~js/~                     js source code
+        - ~frontend/~             ...remove? (move one step up in hierarchy)
+          + ~build/~              bundled js files
+          + ~pkg/~                pre-compiled rust as wasm
+          + ~src/~
+            - ~chronos/~
+              + ~utils/~
+              + ~pages/~
+                - ...
+              + ~widgets/~
+                - ~calendar/~
+            - ~comp_phys/~
+              + ~utils/~
+              + ~pages/~
+              + ~widgets/~
+            - ~utils/~            ...think re: move all utils here?
+            - App.js
+            - index.js
+      + ~css/~
+      + ~rust/~                   rust source code
+    - ~templates/~                html templates
+      + ~base/~
+      + ~chronos/~
+      + ~comp_phys/~
+      + index.html
+    - ~chronos/~                  python module for data processing
+    - ~comp_phys/~                ...remove?
+  + ~database/~                   mongodb
+  + ~venv/~
+
+- ~maderxyz_r/~               (dev)
+  + README.org
+  + install.sh
+  + run.sh
+  + ~backend/~                (rocket.rs)
+    - ~src/~                  (rs code)
+    - ~templates/~            (tera templates -> html)
+    - ~static/~
+      + ~js/~                 (ln -s to react_frontend? live problem?)
+      + ~images/~             (rename from media)
+        - ~thumbnails/~
+      + ~videos/~
+      + ~wasm/~               (exports)
+  + ~frontend/~               (react+wasm)
+    - App.js
+    - index.js
+    - ~src/~
+      + ~js~                  (js code)
+        - ~base/~
+      + ~src/~                (rs code)
+
+      + ~pkg + dist + target/~
+    - ~css/~
+  + ~database/~
+**** ~maderxyz-server/~
+***** ~src/~
+****** ~views/~
+******* ~index/~
+******** mod.rs
+******** section.rs
+******* mod.rs
+****** main.rs
+***** ~static/~
+****** ~css/~
+******* base.css
+******* comp_phys.css
+****** ~img/~
+****** ~pkg/~
+****** main.js
+***** ~templates/~
+****** ~index/~
+******* index.html.tera
+******* navgrid.html.tera
+****** ~simulations~
+******* base.html.tera
+****** base.html.tera
+***** Cargo.toml
+**** ~maderxyz-client/~
+***** ~src/~
+****** ~simulation/~
+******* mod.rs
+******* engine.rs
+******* renderer.rs
+****** ~utils/~
+****** lib.rs
+***** Cargo.toml
+**** Cargo.toml
+**** [ ] add maybe?
+***** ~maderxyz-chronos/~
+****** ~src/~
+******* lib.rs
+****** Cargo.toml
+***** ~maderxyz-simulations/~
+****** ~src/~
+******* lib.rs
+****** Cargo.toml
+*** BodyThings
+**** bodies
+- feel forces
+- exert forces
+**** statics
+- don't feel forces
+- exert forces
+**** particles
+- feel forces
+- don't exert forces
+*** n-body
+**** get interaction pairs
+***** naive nested loop (order $n^2$)
+***** quad-tree (order $n\log n$)
+**** get acceleration -> update vel. & loc.
+***** ODE:   $$\dot y=f(t,y)$$
+****** Euler (explicit)   $$y_{n+1}=y_n+f(t_n,y_n)\cdot\Delta t$$
+****** Euler (implicit)   $$y_{n+1}=y_n+f(t_{n+1},y_{n+1})\cdot\Delta t$$
+- fixed-point iteration (for non-stiff problems)
+  $$y_{n+1}^0=y_n$$
+  $$y_{n+1}^{i+1}=y_n+f(t_{n+1},y^i_{n+1})\cdot\Delta t$$
+  + convergence
+- alternative: Newton-Raphson method
+****** Verlet
+****** Rk2
+****** Rk4
+***** ODE:   $$\ddot x=f(x)$$
+****** leap-frog
+- also known as "velocity Verlet" integration
+- 2nd order method, Euler only 1st order
+- equations for updating $v$ and $x$
+      $$a_n=f(x_n)$$
+  $$v_{n+1/2}=v_{n-1/2}+a_n\cdot\Delta t$$
+    $$x_{n+1}=x_n+v_{n+1/2}\cdot\Delta t$$
+- reformulate
+  $$x_{n+1}=x_n+v_n\cdot\Delta t+\frac{1}{2}a_n\cdot\Delta t^2$$
+  $$v_{n+1}=v_n+\frac{1}{2}(a_n+a_{n+1})\cdot\Delta t$$
+- time-step $\Delta t$ must remain constant for stability
+- if variable time-steps is required:
+  drift-kick method
+  $$v_{n+1/2}=v_n+a_n\cdot\frac{\Delta t}{2}$$
+  $$x_{n+1}=x_n+v_{n+1/2}\cdot\Delta t$$
+  $$v_{n+1}=v_{n+1/2}+a_{n+1}\cdot\frac{\Delta t}{2}$$
+****** TODO rewrite in above form (also $n\to i$ )
+*** TODO button menus
+**** general
+**** object family
+***** toggle: display
+***** multi-toggle: display motion vec.
+***** multi-toggle: interaction variant
+***** option: variant
+***** option: color mode
+***** option: tail variant
+***** option: integrator
+***** option: boundary conditions
+**** field
+***** (?) toggle: display
+*** TODO buttons
+**** [ ] general
+***** [ ] button: pause
+****** [X] pause engine
+****** [X] pause renderer
+****** [ ] pause both
+***** [X] button: reset
+***** [ ] slider: dt
+**** [ ] object_family-specific config
+- (almost) all of the following also as "total"   -> TODO: maybe only total?
+***** [ ] slider: nr_of_particles
+***** [ ] slider: tail_length
+***** [ ] slider: epsilon
+***** [ ] button: randomize positions
+***** [ ] button: toggle display_velocity_vector
+***** [ ] button: toggle display_acceleration_vector
+***** [ ] button: toggle display_center_of_mass
+***** [ ] button: toggle display_connecting_lines
+- to family members only? config? defaults?
+***** [ ] option: interaction_variant
+****** [ ] newtonian_gravity
+****** [ ] coulomb_interaction
+****** [ ] lennard_jones
+****** [ ] elastic_collision
+****** [ ] wall_collision
+- where to put boundary conditions like this one?
+****** [ ] 1D-gravity
+****** [ ] lorentz_force
+****** [ ] boid
+****** [ ] potential V(r) ~ r
+****** [ ] potential V(r) ~ 1/r^2
+****** [ ] potential V(r) ~ 1/r^3
+****** [ ] potential V(r) ~ e^r
+****** [ ] potential V(r) ~ e^-r
+****** [ ] potential V(r) ~ log(r)
+***** [ ] option: object_color_mode
+**** [ ] field-specific config
+***** [ ] option: neighborhood_variant
+***** [ ] button: randomize entries
+***** [ ] option: interaction_variant
+****** [ ] spin_spin_interaction
+****** [ ] incompressible fluid
+****** [ ] diffusion / heat flow
+****** [ ] game_of_life
+****** [ ] rock_paper_scissors
+****** [ ] forest_fire
+****** [ ] electro-magnetic field interaction
+**** [ ] exports
+***** [ ] take screen-shot (?)
+*** integrators (steppers)
+**** body
+***** [X] euler exp
+***** [ ] leapfrog
+***** [ ] runge-kutta (2&4)
+***** [ ] euler imp
+***** [ ] verlet
+**** field
+***** batchwise / entire ?
+***** diffusion
+***** ising
+*** interactions
+**** who "feels" whom?
+- static, body, particle, field, spins
+- who "feels" whom
+|   | s | b | p | f | s |
+| s | x | x | x | x | x |
+| b |   | x | x | x | x |
+| p |   |   |   |   |   |
+| f |   | x | x | x | x |
+| s |   | x | x | x | x |
+***** static
+****** static-static
+***** body
+****** body-static
+****** body-body
+****** body-field
+***** particle
+****** particle-static
+****** particle-body
+****** particle-field
+***** field
+****** field-static
+****** field-body
+****** field-field
+***** Field-Field
+***** Field-Body
+***** Body-Field
+***** Body-Body
+****** [X] Coulomb repulsion
+****** [X] Newtonian gravity
+****** [ ] Lennard-Jones potential
+****** [ ] elastic collisions
+****** [ ] boid-separation
+****** [ ] boid-cohesion
+****** [ ] boid-alignment
+*** Skills
+**** computational
+***** build QuadTree
+***** build OctTree
+***** build Euler integrator (expl. + impl.)
+***** build LeapFrog integrator
+***** build Verlet integrator (+ vel. Verlet)
+***** build RungeKutta integrator (2 + 4)
+**** physics
+***** gravity
+****** Newton
+$$\vec F=m\vec a=G\cdot\frac{m\cdot M}{|\vec r_2-\vec r_1|^2}\cdot\frac{\vec r_2-\vec r_1}{|\vec r_2-\vec r_1|}$$
+***** electro-magnetism
+****** [ ] Maxwell
+***** continuum dynamics (fluids)
+****** [ ] continuity equation
+****** [ ] Euler equation
+****** [ ] Navier-Stokes equation
+***** quantum mechanics
+****** Lennard-Jones
+$$V(r)=4\varepsilon\cdot\bigg[\bigg(\frac{\sigma}{r}\bigg)^{12}-\bigg(\frac{\sigma}{r}\bigg)^6\bigg]$$
+***** relativity
+**** mathematical
+***** formalisms
+****** Lagrange
+
+$$\mathcal L=T-V$$  (classical)
+
+****** Hamilton
+
+$$0=\delta S=\int\mathcal L\ \text{d}t$$
+
+****** Euler-Lagrange
+
+$$\frac{\partial\mathcal L}{\partial q}=\frac{\text d}{\text dt}\frac{\partial\mathcal L}{\partial\dot q}$$
+
+****** Heisenberg
+
+$$\Delta x\cdot\Delta t\geq\frac{\hbar}{2}$$
+
+****** Schroedinger
+
+$$\hat H\Psi=E\Psi$$
+
+$$\hat H=-\frac{\hbar^2}{2m}\Delta+\hat V(\hat x)$$
+
+******* TODO time-dependent
+***** linear algebra
+***** analysis
+***** statistics
+- Maxwell-Boltzmann law
+- entropy
+***** cellular automata
+****** neighborhoods
+******* Moore
+******* von Neumann
+- Manhattan distance
+** unsorted
+they /can/ all interact, they just don't feel anything
+
+*** Engine
+**** State
+***** System(s)
+- field
+- object family
+- ...
+****** Attribute Vec(s)
+- bool
+- f64
+*** Config
+** thingy
+*** multiple systems
+*** multiple interactions
+*** multiple integrators
+*** multiple boundaries
+
+** engine
+  backend = GPU, CPU, Server
+
+  for ~state~ in engine   (iter -> map -> collect -> push)
+    for ~system~ in state                             ("")
+      relevant_systems = get_relevant_systems(system) -> Vec<Mutex<Arc<dyn System>>>   (Feld vom System) (mut lock, unlock mit {} drop trait )
+                                                         Vec<RefCell<Rc<dyn System>>>  (trait System) sehr viel besser fuer 1 Thread
+*** option A
+    backend(rel_sys, integrator, interactions)
+
+    CPU local:
+      for ~other_system~ in relevant_systems
+        for ~obj/cell~ in system                      ("")
+          neighborhood = get_neighborhood(obj, other_system)   <- aufwendig!
+          for ~neighbor/node~ in neighborhood
+            for ~integrator~ in integrators           ^ ?
+              for ~interaction~ in interactions       <- trait!
+                interaction.apply()
+    GPU:
+       ...
+*** option B
+    for ~interaction~ in interactions
+      ~integrator~ = get_integrator(interaction)
+      for ~other_system~ in relevant_systems
+        for ~obj/cell~ in system
+          neighborhood = get_neighborhood(obj, other_system)
+          for ~neighbor/node~ in neighborhood
+            integrator.step()
+*** pro/con
+**** option A    <-
+~+~ less quad-tree accesses
+**** option B
+~+~ less interaction-matrix accesses
+*** ex
+**** Sun
+**** Earth
+**** Asteroid
+**** Field
+
+
+https://sotrh.github.io/learn-wgpu/beginner/tutorial1-window/#using-rust-s-new-resolver
+*** note
+
+for ~iteration_idx~ in 0..1000 {
+  let trees = construct_trees();
+
+  for ~sys_1~ in state.systems {
+    for ~item_1~ in sys_1.items {
+
+      for ~sys_2~ in sys_1.relevant_systems {
+        let neighbors = get_neighborhood(trees, item_1);
+        for ~item_2~ in neighbors {
+
+          for ~interaction~ in sys_1.interactions {
+            let integrator = get_integrator(interaction);
+            integrator.step(interaction)
+          }
+        }
+      }
+    }
+  }
+}
+/// Massive Particle
+pub trait MassiveParticle: Mass + Position + Velocity {}
+
+/// Position (3D)
+pub trait Position {
+    fn get_position(&self) -> &[f64; 3] {
+        &[0., 0., 0.]
+    }
+    fn set_position(&mut self, _position: &[f64; 3]) {}
+}
+/// Velocity (3D)
+pub trait Velocity {
+    fn get_velocity(&self) -> &[f64; 3] {
+        &[0., 0., 0.]
+    }
+    fn set_velocity(&mut self, _velocity: &[f64; 3]) {}
+}
+/// Acceleration (3D)
+pub trait Acceleration {
+    fn get_acceleration(&self) -> &[f64; 3] {
+        &[0., 0., 0.]
+    }
+    fn set_acceleration(&mut self, _acceleration: &[f64; 3]) {}
+}
+/// Force (3D)
+pub trait Force {
+    fn get_force(&self) -> &[f64; 3] {
+        &[0., 0., 0.]
+    }
+    fn set_force(&mut self, _force: &[f64; 3]) {}
+}
+/// Mass
+pub trait Mass {
+    fn get_mass(&self) -> f64 {
+        1. // TODO what value? 1 or 0?
+    }
+    fn set_mass(&mut self, _mass: f64) {}
+}
+/// Charge
+pub trait Charge {
+    fn get_charge(&self) -> f64 {
+        0.
+    }
+    fn set_charge(&mut self, _charge: f64) {}
+}
+/// Spin (1D)
+pub trait Spin {
+    /// Get 1D Spin Value
+    ///
+    /// - NOTE as of yet first case of a non-zero default value
+    fn get_spin(&self) -> bool {
+        false
+    }
+    fn set_spin(&mut self, _spin: bool) {}
+}
+/// Radius
+///
+/// - e.g. for particles
+pub trait Radius {
+    fn get_radius(&self) -> f64 {
+        0.
+    }
+    fn set_radius(&mut self, _radius: f64) {}
+}
+/// Density
+pub trait Density {
+    fn get_density(&self) -> f64 {
+        0.
+    }
+    fn set_density(&mut self, _density: f64) {}
+}
+/// Temperature
+pub trait Temperature {
+    fn get_temperature(&self) -> f64 {
+        0.
+    }
+    fn set_temperature(&mut self, _temperature: f64) {}
+}
+/// Pressure
+pub trait Pressure {
+    fn get_pressure(&self) -> f64 {
+        0.
+    }
+    fn set_pressure(&mut self, _pressure: f64) {}
+}
+/// GameOfLifeState
+///
+/// - TODO: use Spin instead?
+pub trait GameOfLifeState {
+    fn get_gol_state(&self) -> bool {
+        false
+    }
+    fn set_gol_state(&mut self, _gol_state: bool) {}
+}
+pub mod system;
+use super::integrator::Integrator;
+// pub use system::SystemConfig;
+
+pub struct EngineConfig {
+    pub step_id: (usize, usize),
+    // pub systems: Vec<SystemConfig>,
+    // pub interactions: Vec<Interaction>,
+    pub integrators: Vec<Vec<Integrator>>,
+    pub constants: Constants,
+}
+impl EngineConfig {
+    pub fn new() -> Self {
+        // let systems = vec![];
+        // let interactions = vec![];
+        let integrators = vec![];
+        let step_id = (0, usize::MAX);
+        let constants = Constants::new();
+        EngineConfig {
+            // systems,
+            // interactions,
+            integrators,
+            step_id,
+            constants,
+        }
+    }
+}
+
+pub struct Constants {
+    _g: f64, // Newton's gravitational constant
+}
+impl Constants {
+    pub fn new() -> Self {
+        let g = 1.;
+        Constants { _g: g }
+    }
+}
+
+// // TODO move else-where
+// pub struct InteractionMatrix {
+//     rows: Vec<InteractionMatrixRow>,
+// }
+// impl InteractionMatrix {
+//     pub fn new() -> Self {
+//         let rows = vec![];
+//         InteractionMatrix { rows }
+//     }
+//     pub fn add_row(&mut self) {
+//         let row = InteractionMatrixRow::new(self.rows.len());
+//         self.rows.push(row);
+//         for row in self.rows.iter_mut() {
+//             row.entries.push(vec![]);
+//         }
+//     }
+//     pub fn remove_row(&mut self, row_id: usize) {
+//         self.rows.remove(row_id);
+//         for row in self.rows.iter_mut() {
+//             row.entries.remove(row_id);
+//         }
+//     }
+//     pub fn get_interactions(&self, system: usize, other: usize) -> &Vec<Interaction> {
+//         self.rows.get(system).unwrap().entries.get(other).unwrap()
+//     }
+//     pub fn activate_interaction(&mut self, system: usize, other: usize, interaction: &Interaction) {
+//         // let interactions = &mut self.rows[system].entries[other];
+//         // if !interactions.contains(&interaction) {
+//         //     interactions.push(interaction);
+//         // }
+//     }
+//     pub fn deactivate_interaction(
+//         &mut self,
+//         system: usize,
+//         other: usize,
+//         interaction: &Interaction,
+//     ) {
+//         // let interactions = &mut self.rows[system].entries[other];
+//         // interactions.retain(|i| i != interaction);
+//     }
+// }
+
+// pub struct InteractionMatrixRow {
+//     entries: Vec<Vec<Interaction>>,
+// }
+// impl InteractionMatrixRow {
+//     pub fn new(nr_of_entries: usize) -> Self {
+//         let mut entries = vec![];
+//         for _ in 0..nr_of_entries {
+//             entries.push(vec![]);
+//         }
+//         InteractionMatrixRow { entries }
+//     }
+// }
+// pub struct SystemConfig {}
+// impl SystemConfig {
+//     pub fn new() -> Self {
+//         SystemConfig {}
+//     }
+// }
+#![allow(unreachable_patterns)]
+
+pub fn _print_state(engine: &mxyz_engine::Engine) {
+    let state = &engine.states[engine.config.step_id.0];
+    println!("\n  Steps: {}", engine.config.step_id.0);
+    for system in state.systems.iter() {
+        match system.variant {
+            mxyz_engine::system::SystemVariant::PhysicalObjects => {
+                println!("objects");
+                for e in system.entities.iter() {
+                    println!("    {:?}", e.get_position());
+                }
+            }
+            mxyz_engine::system::SystemVariant::DiscreteField => {
+                println!("field");
+                for e in system.entities.iter() {
+                    println!("    {:?}", e.get_position()); // TODO
+                }
+            }
+            _ => todo!(),
+        }
+    }
+    println!("");
+}
+
+pub fn _print_interaction_matrix(engine: &mxyz_engine::Engine) {
+    for (system_id, _system) in engine.states[engine.config.step_id.0]
+        .systems
+        .iter()
+        .enumerate()
+    {
+        let integrators = &engine.config.integrators[system_id];
+        for (integrator_id, integrator) in integrators.iter().enumerate() {
+            for (interaction_id, interaction) in integrator.interactions.iter().enumerate() {
+                println!(
+                    "\n\nSystem {}, Integrator {}, Interaction {}: {:#?}",
+                    system_id, integrator_id, interaction_id, interaction.matrix
+                );
+            }
+        }
+    }
+}
+use super::config::EngineConfig;
+use super::state::preset::SimulationId;
+use super::state::State;
+
+/// Simulation Engine
+pub struct Engine {
+    pub config: EngineConfig,
+    pub states: Vec<State>,
+}
+impl Engine {
+    /// Creates a new instance of Engine Structure
+    pub fn new() -> Engine {
+        let config = EngineConfig::new();
+        let states = vec![];
+        Engine { config, states }
+    }
+    /// Initializes State & Configuration
+    pub fn init(&mut self, sim_id: &Option<SimulationId>) {
+        let mut initial_state = State::new();
+        initial_state.init(sim_id, &mut self.config);
+        self.states.push(initial_state);
+    }
+    /// Runs Engine
+    pub fn run(&mut self) {
+        let _: Vec<()> = (0..self.config.step_id.1).map(|_| self.step()).collect();
+    }
+    /// Forwards Engine by 1 Time-Step
+    pub fn step(&mut self) {
+        let mut next = self.states[self.config.step_id.0].clone();
+        next.step(&self.config, &self.states);
+        self.states.push(next);
+        self.config.step_id.0 += 1;
+    }
+    /// Exports States (to File or Database)
+    pub fn export(&self) {
+        todo!()
+    }
+}
+use crate::attribute::*;
+use crate::entity::Entity;
+use serde::{Deserialize, Serialize};
+
+#[derive(Clone, Serialize, Deserialize)]
+pub struct FluidCell {
+    velocity: [f64; 3],
+    density: f64,
+}
+impl Entity for FluidCell {}
+impl Force for FluidCell {}
+impl Position for FluidCell {}
+impl Charge for FluidCell {}
+impl Mass for FluidCell {}
+impl FluidCell {
+    pub fn new(velocity: [f64; 3], density: f64) -> Self {
+        FluidCell { velocity, density }
+    }
+}
+impl Velocity for FluidCell {
+    fn get_velocity(&self) -> &[f64; 3] {
+        &self.velocity
+    }
+    fn set_velocity(&mut self, velocity: &[f64; 3]) {
+        self.velocity = *velocity;
+    }
+}
+impl Density for FluidCell {
+    fn get_density(&self) -> f64 {
+        self.density
+    }
+    fn set_density(&mut self, density: f64) {
+        self.density = density;
+    }
+}
+pub mod fluid_cell;
+use crate::attribute::*;
+
+pub trait DiscreteFieldCell: Density + Velocity + Force {}
+
+// /// Entity Trait: Discrete Field Cell
+// pub trait DiscreteFieldCell: DiscreteFieldCellClone + Density + Velocity + Force {}
+// pub trait DiscreteFieldCellClone {
+//     fn clone_box(&self) -> Box<dyn DiscreteFieldCell>;
+// }
+// impl<T> DiscreteFieldCellClone for T
+// where
+//     T: 'static + DiscreteFieldCell + Clone,
+// {
+//     fn clone_box(&self) -> Box<dyn DiscreteFieldCell> {
+//         Box::new(self.clone())
+//     }
+// }
+// impl Clone for Box<dyn DiscreteFieldCell> {
+//     fn clone(&self) -> Box<dyn DiscreteFieldCell> {
+//         self.clone_box()
+//     }
+// }
+pub mod field;
+pub mod object;
+use super::attribute::*;
+
+/// Entity Trait: Discrete Field Cell
+pub trait Entity: EntityClone + Mass + Position + Velocity + Charge + Density + Force {}
+pub trait EntityClone {
+    fn clone_box(&self) -> Box<dyn Entity>;
+}
+impl<T> EntityClone for T
+where
+    T: 'static + Entity + Clone,
+{
+    fn clone_box(&self) -> Box<dyn Entity> {
+        Box::new(self.clone())
+    }
+}
+impl Clone for Box<dyn Entity> {
+    fn clone(&self) -> Box<dyn Entity> {
+        self.clone_box()
+    }
+}
+pub mod planet;
+use crate::attribute::*;
+
+pub trait PhysicalObject: Mass + Position + Velocity + Charge {}
+
+// /// Entity Trait: Physical Object
+// pub trait PhysicalObject: PhysicalObjectClone + Position + Velocity + Mass + Charge {}
+// pub trait PhysicalObjectClone {
+//     fn clone_box(&self) -> Box<dyn PhysicalObject>;
+// }
+// impl<T> PhysicalObjectClone for T
+// where
+//     T: 'static + PhysicalObject + Clone,
+// {
+//     fn clone_box(&self) -> Box<dyn PhysicalObject> {
+//         Box::new(self.clone())
+//     }
+// }
+// impl Clone for Box<dyn PhysicalObject> {
+//     fn clone(&self) -> Box<dyn PhysicalObject> {
+//         self.clone_box()
+//     }
+// }
+use crate::attribute::*;
+// use crate::entity::object::PhysicalObject;
+use crate::entity::Entity;
+use serde::{Deserialize, Serialize};
+
+#[derive(Clone, Serialize, Deserialize)]
+pub struct Planet {
+    pub position: [f64; 3],
+    pub velocity: [f64; 3],
+    pub mass: f64,
+}
+impl Entity for Planet {}
+// impl MassiveParticle for Planet {}
+impl Planet {
+    pub fn new(mass: f64, position: [f64; 3], velocity: [f64; 3]) -> Self {
+        Planet {
+            position,
+            velocity,
+            mass,
+        }
+    }
+}
+impl Mass for Planet {
+    fn get_mass(&self) -> f64 {
+        self.mass
+    }
+    fn set_mass(&mut self, mass: f64) {
+        self.mass = mass;
+    }
+}
+impl Position for Planet {
+    fn get_position(&self) -> &[f64; 3] {
+        &self.position
+    }
+    fn set_position(&mut self, position: &[f64; 3]) {
+        self.position = *position;
+    }
+}
+impl Velocity for Planet {
+    fn get_velocity(&self) -> &[f64; 3] {
+        &self.velocity
+    }
+    fn set_velocity(&mut self, velocity: &[f64; 3]) {
+        self.velocity = *velocity;
+    }
+}
+impl Charge for Planet {}
+impl Force for Planet {}
+impl Density for Planet {}
+use super::interaction::{Interaction, InteractionVariant};
+use crate::state::State;
+use crate::system::System;
+
+const DT: f64 = 0.001; // TODO move else-where
+
+#[derive(Debug)]
+/// Entity Integrator
+pub enum IntegratorVariant {
+    EulerExplicit,
+    EulerImplicit,
+    RungeKutta2,
+    RungeKutta4,
+    RungeKuttaN,
+    VelocityVerlet,
+    Verlet,
+    LeapFrog,
+    BulirschStoer,
+    Collision,
+    CellularAutomaton,
+    MonteCarlo,
+}
+
+#[derive(Debug)]
+pub struct Integrator {
+    pub variant: IntegratorVariant,
+    pub interactions: Vec<Interaction>,
+    //  TODO specify neighborhood/tree calculation (or in interaction?)
+}
+impl Integrator {
+    pub fn new(variant: IntegratorVariant) -> Self {
+        let interactions = vec![];
+        Integrator {
+            variant,
+            interactions,
+        }
+    }
+    pub fn step(&self, system: &mut System, state: &State, other_ids: &Vec<usize>) {
+        println!("\t{:#?}: {:?}", self.variant, other_ids);
+        let stepper = match self.variant {
+            IntegratorVariant::EulerExplicit => euler_explicit,
+            IntegratorVariant::CellularAutomaton => cellular_automaton,
+            IntegratorVariant::Collision => collision,
+            _ => todo!(),
+        };
+        stepper(system, state, other_ids, &self.interactions);
+    }
+}
+
+// pub fn euler_explicit(
+//     entity: &mut Box<dyn PhysicalObject>,
+//     other: &Box<dyn PhysicalObject>,
+//     force_getter: fn(&Box<dyn PhysicalObject>, &Box<dyn PhysicalObject>) -> [f64; 3],
+// ) {
+//     let f = force_getter(entity, &other);
+//     let m1 = entity.get_mass();
+//     let a = [f[0] / m1, f[1] / m1, f[2] / m1];
+//     const DT: f64 = 0.001; // TODO
+//     let v1 = entity.get_velocity();
+//     let v1: Vec<f64> = (0..3).map(|i| v1[i] + a[i] * DT).collect();
+//     entity.set_velocity(&[v1[0], v1[1], v1[2]]);
+//     let y1 = entity.get_position();
+//     let y1: Vec<f64> = (0..3).map(|i| y1[i] + v1[i] * DT).collect();
+//     entity.set_position(&[y1[0], y1[1], y1[2]]);
+// }
+
+// pub fn runge_kutta_4(
+//     _entity: &mut Box<dyn PhysicalObject>,
+//     _other: &Box<dyn PhysicalObject>,
+//     _force_getter: fn(&Box<dyn PhysicalObject>, &Box<dyn PhysicalObject>) -> [f64; 3],
+// ) {
+// }
+
+// pub fn verlet(
+//     _entity: &mut Box<dyn PhysicalObject>,
+//     _other: &Box<dyn PhysicalObject>,
+//     _force_getter: fn(&Box<dyn PhysicalObject>, &Box<dyn PhysicalObject>) -> [f64; 3],
+// ) {
+// }
+
+/// Explicit Euler:
+/// - dy/dt = a(t,y) =  f(t,y)
+/// Steps:
+/// - get f(t,y) as sum of f(t,y) for all interacting entities
+/// - update velocity using f(t,y)
+fn euler_explicit(
+    system: &mut System,
+    state: &State,
+    other_ids: &Vec<usize>,
+    interactions: &Vec<Interaction>,
+) {
+    let entity_ids = 0..system.entities.len(); // TODO only update some?
+    for entity_id in entity_ids {
+        println!("\t\tENT-{}", entity_id);
+        let entity = &mut system.entities[entity_id];
+        let mut acceleration = [0., 0., 0.];
+        /// Loops over the other systems
+        for other_id in other_ids.iter() {
+            let other = &state.systems[*other_id];
+            /// Loops over the Integrator's Interactions (skips if it doesn't apply)
+            //  TODO get interactions to-apply outside of entity-loop
+            println!("\t\t\tOTHER-{}", other_id);
+            for interaction in interactions.iter() {
+                if interaction.matrix.entries[*other_id].unwrap() == false {
+                    continue;
+                }
+                println!("\t\t\t\t{:?}", interaction.variant);
+                /// Loops over the Entities in the interacting System
+                let other_ids = 0..other.entities.len(); // TODO get ids
+                for other_id in other_ids {
+                    println!("\t\t\t\t\tENT-{}", other_id);
+                    let other = &other.entities[other_id];
+                    /// Updates Velocity
+                    match &interaction.variant {
+                        InteractionVariant::Force(f) => {
+                            let mass_1 = entity.get_mass(); // TODO move further up?
+                            let force = [0., 0., 0.]; //  TODO calculate force
+                            f.calculate_from(entity, other);
+                            acceleration = [
+                                acceleration[0] + force[0] / mass_1 * DT,
+                                acceleration[1] + force[1] / mass_1 * DT,
+                                acceleration[2] + force[2] / mass_1 * DT,
+                            ];
+                        }
+                        _ => todo!(),
+                    }
+                }
+            }
+        }
+        /// Updates Position Vector
+        let velocity = entity.get_velocity();
+        let velocity = [
+            velocity[0] + acceleration[0] * DT,
+            velocity[1] + acceleration[1] * DT,
+            velocity[2] + acceleration[2] * DT,
+        ];
+        entity.set_velocity(&velocity);
+    }
+}
+
+pub fn cellular_automaton(
+    _system: &mut System,
+    _state: &State,
+    _other_ids: &Vec<usize>,
+    _interactions: &Vec<Interaction>,
+) {
+}
+
+pub fn collision(
+    _system: &mut System,
+    _state: &State,
+    _other_ids: &Vec<usize>,
+    _interactions: &Vec<Interaction>,
+) {
+}
+#[derive(Debug)]
+pub struct Collision {
+    _dampening: Option<f64>,
+}
+impl Collision {
+    pub fn new() -> Self {
+        let dampening = Some(0.); // TODO default 0 or 1?
+        Collision {
+            _dampening: dampening,
+        }
+    }
+}
+use super::Interaction;
+
+pub struct _Composed {
+    _interactions: Vec<Interaction>,
+    // TODO specify neighborhood/tree calculation (ignore indiviual settings)
+}
+pub struct Diffusion {}
+use crate::entity::Entity;
+
+// TODO move else-where
+const G: f64 = 1.; // Newton Gravity
+const K: f64 = 1.; // Coulomb
+
+#[derive(Debug)]
+pub enum ForceVariant {
+    Coulomb,
+    NewtonianGravity,
+    LennardJones,
+    Hooke,
+    Cohesion,
+    Avoidance,
+    Alignment,
+}
+
+#[derive(Debug)]
+pub struct Force {
+    pub variant: ForceVariant,
+}
+impl Force {
+    pub fn new(variant: ForceVariant) -> Self {
+        Force { variant }
+    }
+    pub fn calculate_from(&self, entity: &Box<dyn Entity>, other: &Box<dyn Entity>) -> [f64; 3] {
+        // TODO move match up? (not needed for every entity, is it?)
+        let force = match self.variant {
+            ForceVariant::NewtonianGravity => {
+                let (m1, m2) = (entity.get_mass(), other.get_mass());
+                let (x1, x2) = (entity.get_position(), other.get_position());
+                let rel_x = [x2[0] - x1[0], x2[1] - x1[1], x2[2] - x1[2]];
+                let dist = rel_x.iter().map(|dx| dx * dx).sum::<f64>();
+                let unit = [rel_x[0] / dist, rel_x[1] / dist, rel_x[1] / dist];
+                let force = G * (m1 * m2) / dist.powf(2.);
+                let force = [unit[0] * force, unit[1] * force, unit[2] * force];
+                force
+            }
+            ForceVariant::Coulomb => {
+                let (q1, q2) = (entity.get_charge(), other.get_charge());
+                let (x1, x2) = (entity.get_position(), other.get_position());
+                let rel_x = [x2[0] - x1[0], x2[1] - x1[1], x2[2] - x1[2]];
+                let dist = rel_x.iter().map(|dx| dx * dx).sum::<f64>();
+                let unit = [rel_x[0] / dist, rel_x[1] / dist, rel_x[1] / dist];
+                let force = K * (q1 * q2) / dist.powf(2.);
+                let force = [unit[0] * force, unit[1] * force, unit[2] * force];
+                force
+            }
+
+            _ => todo!(),
+        };
+        force
+    }
+    // pub fn apply_to_objects_from_objects(
+    //     &self,
+    //     entities: &mut Vec<Box<dyn PhysicalObject>>,
+    //     others: &Vec<Box<dyn PhysicalObject>>,
+    //     integrator: &Integrator,
+    //     self_interaction: bool,
+    // ) {
+    //     let force_getter = match self.variant {
+    //         ForceVariant::NewtonianGravity => force_newton,
+    //         ForceVariant::Coulomb => force_coulomb,
+    //         ForceVariant::Hooke => force_hooke,
+    //         ForceVariant::LennardJones => force_lennard_jones,
+    //         _ => todo!(),
+    //     };
+
+    //     let integrator = match integrator.variant {
+    //         IntegratorVariant::EulerExplicit => integrator::euler_explicit,
+    //         IntegratorVariant::RungeKutta4 => integrator::runge_kutta_4,
+    //         IntegratorVariant::Verlet => integrator::verlet,
+    //         _ => todo!(),
+    //     };
+
+    //     for (entity_id, mut entity) in entities.iter_mut().enumerate() {
+    //         for (other_id, other) in others.iter().enumerate() {
+    //             println!("\t{} - {}", entity_id, other_id);
+    //             if self_interaction {
+    //                 if entity_id == other_id {
+    //                     println!("\t    skip");
+    //                     continue;
+    //                 }
+    //             }
+    //             integrator(&mut entity, &other, force_getter);
+    //         }
+    //     }
+    // }
+}
+
+// fn _force_coulomb(entity: &Box<dyn PhysicalObject>, other: &Box<dyn PhysicalObject>) -> [f64; 3] {
+//     println!("\t\tCOULOMB");
+//     let (q1, q2) = (entity.get_charge(), other.get_charge());
+//     let (y1, y2) = (entity.get_position(), other.get_position());
+//     let u: Vec<f64> = (0..3).map(|i| y2[i] - y1[i]).collect();
+//     let r = u.iter().map(|i| i * i).sum::<f64>().powf(0.5);
+//     if r == 0. {
+//         return [0., 0., 0.]; // TODO sort out self in tree
+//     }
+//     const K: f64 = 1.; // TODO
+//     let force = K * (q1 * q2) / (r * r);
+//     let force: Vec<f64> = (0..3).map(|i| u[i] * force).collect();
+//     let force = [force[0], force[1], force[2]];
+//     force
+// }
+// fn _force_newton(entity: &Box<dyn PhysicalObject>, other: &Box<dyn PhysicalObject>) -> [f64; 3] {
+//     println!("\t    NEWTON");
+//     let (m1, m2) = (entity.get_mass(), other.get_mass());
+//     let (y1, y2) = (entity.get_position(), other.get_position());
+//     let u: Vec<f64> = (0..3).map(|i| y2[i] - y1[i]).collect();
+//     let r = u.iter().map(|i| i * i).sum::<f64>().powf(0.5);
+//     let u: Vec<f64> = u.iter().map(|i| i / r).collect();
+//     if r == 0. {
+//         return [0., 0., 0.]; // TODO sort out self in tree
+//     }
+//     const G: f64 = 1.; // TODO
+//     let force = G * (m1 * m2) / (r * r);
+//     let force: Vec<f64> = (0..3).map(|i| u[i] * force).collect();
+//     let force = [force[0], force[1], force[2]];
+//     force
+// }
+// fn _force_lennard_jones(
+//     entity: &Box<dyn PhysicalObject>,
+//     other: &Box<dyn PhysicalObject>,
+// ) -> [f64; 3] {
+//     println!("\t    LENNARD-JONES");
+//     let (y1, y2) = (entity.get_position(), other.get_position());
+//     let u: Vec<f64> = (0..3).map(|i| y2[i] - y1[i]).collect();
+//     let r = u.iter().map(|i| i * i).sum::<f64>().powf(0.5);
+//     if r == 0. {
+//         return [0., 0., 0.]; // TODO sort out self in tree
+//     }
+//     const E: f64 = 1.;
+//     const S: f64 = 1.;
+//     let force = E * ((S / r).powf(13.) - (S / r).powf(7.));
+//     let force: Vec<f64> = (0..3).map(|i| u[i] * force).collect();
+//     let force = [force[0], force[1], force[2]];
+//     force
+// }
+// fn _force_hooke(entity: &Box<dyn PhysicalObject>, other: &Box<dyn PhysicalObject>) -> [f64; 3] {
+//     println!("\t    HOOKE");
+//     let (y1, y2) = (entity.get_position(), other.get_position());
+//     let u: Vec<f64> = (0..3).map(|i| y2[i] - y1[i]).collect();
+//     let r = u.iter().map(|i| i * i).sum::<f64>().powf(0.5);
+//     if r == 0. {
+//         return [0., 0., 0.]; // TODO sort out self in tree
+//     }
+//     const K: f64 = 1.; // TODO
+//     let force = K * r;
+//     let force: Vec<f64> = (0..3).map(|i| u[i] * force).collect();
+//     let force = [force[0], force[1], force[2]];
+//     force
+// }
+pub struct GameOfLife {}
+use crate::system::System;
+
+/// Interaction "Vector"
+#[derive(Debug)]
+pub struct InteractionVector {
+    pub entries: Vec<Option<bool>>, // pub entries: Vec<Vec<Option<bool>>>,
+}
+impl InteractionVector {
+    pub fn new() -> Self {
+        let entries = vec![];
+        InteractionVector { entries }
+    }
+    pub fn init(&mut self, systems: &Vec<System>) {
+        for _ in 0..systems.len() {
+            self.entries.push(None);
+        }
+    }
+    // TODO auto-add/rm rows/cells on system-add/rm
+    // TODO run tests for matrix on system-delete
+    // TODO run test for all sim_ids (initialization)
+}
+
+// /// Interaction Matrix
+// #[derive(Debug)]
+// pub struct InteractionMatrix {
+//     pub rows: Vec<InteractionMatrixRow>, // pub entries: Vec<Vec<Option<bool>>>,
+// }
+// impl InteractionMatrix {
+//     pub fn new() -> Self {
+//         let rows = vec![];
+//         InteractionMatrix { rows }
+//     }
+//     pub fn init(&mut self, systems: &Vec<System>) {
+//         for _ in 0..systems.len() {
+//             let mut row = InteractionMatrixRow::new();
+//             row.init(&systems);
+//             self.rows.push(row);
+//         }
+//     }
+//     // TODO auto-add/rm rows/cells on system-add/rm
+//     // TODO run tests for matrix on system-delete
+//     // TODO run test for all sim_ids (initialization)
+// }
+
+// #[derive(Debug)]
+// pub struct InteractionMatrixRow {
+//     pub entries: Vec<InteractionMatrixEntry>,
+// }
+// impl InteractionMatrixRow {
+//     pub fn new() -> Self {
+//         let entries = vec![];
+//         InteractionMatrixRow { entries }
+//     }
+//     pub fn init(&mut self, systems: &Vec<System>) {
+//         for _ in 0..systems.len() {
+//             self.entries.push(InteractionMatrixEntry::new());
+//         }
+//     }
+// }
+
+// #[derive(Debug)]
+// pub struct InteractionMatrixEntry {
+//     pub active: Option<bool>,
+// }
+// impl InteractionMatrixEntry {
+//     pub fn new() -> Self {
+//         let active = None;
+//         InteractionMatrixEntry { active }
+//     }
+// }
+pub struct Ising {}
+pub mod collision;
+pub mod composed;
+pub mod diffusion;
+pub mod force;
+pub mod game_of_life;
+pub mod interaction_matrix;
+pub mod ising;
+mod testing;
+use interaction_matrix::InteractionVector;
+
+/// Interaction Variant
+#[derive(Debug)]
+pub enum InteractionVariant {
+    Force(force::Force),
+    Collision(collision::Collision),
+    // Diffusion(diffusion::Diffusion),
+    // GameOfLife(game_of_life::GameOfLife),
+    // Ising(ising::Ising),
+    // Composed(Box<dyn InteractionTrait>),
+}
+
+/// Interaction
+#[derive(Debug)]
+pub struct Interaction {
+    pub variant: InteractionVariant,
+    pub matrix: InteractionVector,
+    pub active: bool,
+}
+impl Interaction {
+    pub fn new(variant: InteractionVariant) -> Self {
+        Interaction {
+            variant,
+            matrix: InteractionVector::new(),
+            active: true,
+        }
+    }
+}
+// use crate::entity::field::DiscreteFieldCell;
+// use crate::entity::object::PhysicalObject;
+use crate::entity::Entity as PhysicalObject;
+
+fn _coulomb(entity: &mut Box<dyn PhysicalObject>, other: &Box<dyn PhysicalObject>) {
+    // parameters
+    let k = 1.;
+    let dt = 0.001;
+    // info from entities for force-calculation
+    let m1 = entity.get_mass();
+    let q1 = entity.get_charge();
+    let x1 = entity.get_position();
+    let q2 = other.get_charge();
+    let x2 = other.get_position();
+    // intermediate steps
+    let u = [x2[0] - x1[0], x2[1] - x1[1], x2[2] - x1[2]];
+    let r = u.iter().map(|u| u * u).sum::<f64>().powf(0.5);
+    // force-calculation
+    let force = k * (q1 * q2) / (r * r);
+    let force = [force * u[0], force * u[1], force * u[2]];
+    // velocity updating (e.g. explicit, Euler)
+    let v1 = entity.get_velocity();
+    let dv = [force[0] / m1 * dt, force[1] / m1 * dt, force[2] / m1 * dt];
+    let v1 = [v1[0] + dv[0], v1[1] + dv[1], v1[2] + dv[1]];
+    entity.set_velocity(&v1);
+}
+#![allow(unused_doc_comments)]
+// #![allow(unused_variables)]
+// #![allow(unused_imports)]
+// #![allow(dead_code)]
+// #![allow(unreachable_patterns)]
+// #![allow(non_snake_case)]
+
+pub mod attribute;
+pub mod config;
+pub mod engine;
+pub mod entity;
+pub mod integrator;
+pub mod interaction;
+pub mod state;
+pub mod system;
+// pub mod neighborhood;
+// pub mod statistics;
+
+pub use engine::Engine;
+#![allow(unused_doc_comments)]
+use mxyz_engine::state::preset::SimulationId;
+use mxyz_engine::Engine;
+mod dev_utils;
+
+fn main() {
+    /// Creates & Initializes Engine
+    let mut engine = Engine::new();
+    engine.init(&Some(SimulationId::ThreeBodyFigureEight));
+
+    /// Runs Engine & Records Execution Time
+    // dev_utils::print_state(&engine);
+    let start_time = std::time::Instant::now();
+    engine.run();
+    let duration = start_time.elapsed().as_millis();
+    println!("\nruntime:\t{} ms", duration);
+    // dev_utils::print_state(&engine);
+    // dev_utils::print_interaction_matrix(&engine);
+}
+pub enum NeighboorhoodVariant {
+    QuadTree,
+    OctTree,
+    Sectors,
+    Random,
+    All,
+    Moore,
+    VonNeumann,
+}
+pub mod preset;
+pub mod tmp;
+use super::config::EngineConfig;
+use super::system::System;
+use preset::SimulationId;
+
+/// State
+#[derive(Clone)]
+pub struct State {
+    pub id: usize,
+    pub systems: Vec<System>,
+}
+impl State {
+    /// Creates new instance of State Structure
+    pub fn new() -> Self {
+        let id = 0;
+        let systems = vec![];
+        State { id, systems }
+    }
+    /// Initializes State & configuration
+    pub fn init(&mut self, sim_id: &Option<SimulationId>, config: &mut EngineConfig) {
+        self.systems = preset::initialize(&sim_id, config);
+    }
+    /// Forwards State
+    pub fn step(&mut self, config: &EngineConfig, states: &Vec<State>) {
+        println!("\n--------\n {}.\n--------\n", config.step_id.0);
+        /// Creates "neighborhoods"
+        let _neighborhoods = tmp::prepare_neighborhoods(); // TODO get relevant neighbors/nodes
+        /// Prepare system-ids   TODO remove maybe?
+        for (id, sys) in self.systems.iter_mut().enumerate() {
+            sys.id = id; // needed e.g. when removing/adding systems
+        }
+        /// Loops over all pairs of systems
+        for system in self.systems.iter_mut() {
+            system.step(&config, &states);
+        }
+    }
+}
+pub mod three_body_figure_eight;
+use crate::config::EngineConfig;
+use crate::system::System;
+use three_body_figure_eight::three_body_figure_eight;
+
+pub enum SimulationId {
+    ThreeBodyFigureEight,
+}
+
+/// Initialize State & Config
+pub fn initialize(sim_id: &Option<SimulationId>, config: &mut EngineConfig) -> Vec<System> {
+    let mut systems = vec![];
+    match sim_id {
+        None => {}
+        Some(id) => match id {
+            SimulationId::ThreeBodyFigureEight => three_body_figure_eight(&mut systems, config),
+        },
+    }
+    systems
+}
+use crate::config::EngineConfig;
+use crate::entity;
+use crate::integrator::{Integrator, IntegratorVariant};
+use crate::interaction::collision::Collision;
+use crate::interaction::force::{Force, ForceVariant};
+use crate::interaction::{Interaction, InteractionVariant};
+use crate::system::{System, SystemVariant};
+
+const NR_OF_STEPS: usize = 2221;
+
+pub fn three_body_figure_eight(systems: &mut Vec<System>, config: &mut EngineConfig) {
+    // I. SYSTEMS
+    // ========================================================================
+    config.step_id.1 = NR_OF_STEPS;
+
+    // System 0: Objects
+    // ------------------------------------------------------------------------
+    let variant = SystemVariant::PhysicalObjects;
+    let mut system = System::new(variant);
+    let speed = 0.;
+    for entity_id in 0..2 {
+        let m = 1.;
+        let x = [2. * (entity_id as f64 - 0.5), 0., 0.];
+        let v = [0., speed * (2. * entity_id as f64 - 1.), 0.];
+        let entity = entity::object::planet::Planet::new(m, x, v);
+        system.entities.push(Box::new(entity));
+    }
+    systems.push(system);
+
+    // System 1: Field
+    // ------------------------------------------------------------------------
+    let variant = SystemVariant::DiscreteField;
+    let mut system = System::new(variant);
+    for _ in 0..2 {
+        let vel = [0., 0., 0.];
+        let dens = 1.;
+        let entity = entity::field::fluid_cell::FluidCell::new(vel, dens);
+        system.entities.push(Box::new(entity));
+    }
+    systems.push(system);
+
+    // III.INTEGRATORS
+    // ========================================================================
+
+    // System 0: Objects
+    // ------------------------------------------------------------------------
+    let mut integrators = vec![];
+    //
+    let mut integrator = Integrator::new(IntegratorVariant::EulerExplicit);
+    let mut interactions = vec![];
+    //
+    let force = Force::new(ForceVariant::NewtonianGravity);
+    let mut interaction = Interaction::new(InteractionVariant::Force(force));
+    interaction.matrix.init(&systems);
+    interaction.matrix.entries[0] = Some(true);
+    interactions.push(interaction);
+    //
+    let force = Force::new(ForceVariant::Coulomb);
+    let mut interaction = Interaction::new(InteractionVariant::Force(force));
+    interaction.matrix.init(&systems);
+    interaction.matrix.entries[0] = Some(true);
+    interactions.push(interaction);
+    //
+    integrator.interactions = interactions;
+    integrators.push(integrator);
+    //
+    let mut integrator = Integrator::new(IntegratorVariant::Collision);
+    let mut interactions = vec![];
+    //
+    let coll = Collision::new();
+    let mut interaction = Interaction::new(InteractionVariant::Collision(coll));
+    interaction.matrix.init(&systems);
+    interaction.matrix.entries[0] = Some(true);
+    interactions.push(interaction);
+    integrator.interactions = interactions;
+    integrators.push(integrator);
+    //
+    config.integrators.push(integrators); // TODO needs to be run for each system!
+
+    // System 1: Field
+    // ------------------------------------------------------------------------
+    let mut integrators = vec![];
+    let mut integrator = Integrator::new(IntegratorVariant::CellularAutomaton);
+    let mut interactions = vec![];
+    let force = Force::new(ForceVariant::NewtonianGravity);
+    let mut interaction = Interaction::new(InteractionVariant::Force(force));
+    interaction.matrix.init(&systems);
+    interaction.matrix.entries[0] = Some(true);
+    interactions.push(interaction);
+    integrator.interactions = interactions;
+    integrators.push(integrator);
+    config.integrators.push(integrators);
+
+    println!("\n\n{}", systems[0].entities.len());
+}
+use crate::config::EngineConfig;
+use crate::integrator::Integrator;
+use crate::state::State;
+
+pub fn get_integrators(system: usize, config: &EngineConfig) -> Option<&Vec<Integrator>> {
+    match &config.integrators.get(system) {
+        None => None,
+        Some(vec) => Some(vec),
+    }
+}
+
+pub fn prepare_neighborhoods() -> Vec<fn() -> Vec<usize>> {
+    // TODO create neighborhoods
+    // - search for interaction partners
+    //  sys_id -> fn(entity_id) -> Vec<entity_jd>
+    //    - GameOfLife: create function, later return cells around entity_id
+    //    - PhysicalBodies: construct tree -> later return Vec<entity_jd> for entity_id
+    //    - only for system that are "felt" by others
+
+    // - from tree
+    // - from neighboring sectors
+    // - random
+    // - all
+    vec![]
+}
+
+enum _Tree {
+    // x,y,z   ->   vec[node]
+    Sectors, // all nodes from same + neighboring sectors
+    QuadOct, // quad/oct tree, return all nodes in opening angle
+    Total,   // all nodes are returned
+}
+
+pub fn get_other_ids(integrator: &Integrator, state: &State) -> Vec<usize> {
+    (0..state.systems.len())
+        .filter(|id| {
+            let mut foo = false;
+            for interaction in integrator.interactions.iter() {
+                if match interaction.matrix.entries[*id] {
+                    None => false,
+                    Some(active) => active,
+                } {
+                    foo = true;
+                }
+            }
+            foo
+        })
+        .collect()
+}
+
+// pub fn get_interactions(sys_id: usize, sys_jd: usize, config: &EngineConfig) -> Vec<&Interaction> {
+//     config
+//         .interactions
+//         .iter()
+//         .filter(|interaction| {
+//             match interaction
+//                 .matrix
+//                 .rows
+//                 .get(sys_id)
+//                 .expect(&format!(
+//                     "System-ID \"{}\" not found in interaction matrix",
+//                     sys_id
+//                 ))
+//                 .entries
+//                 .get(sys_jd)
+//                 .expect(&format!(
+//                     "System-JD \"{}\" not found in interaction matrix",
+//                     sys_jd
+//                 ))
+//                 .active
+//             {
+//                 Some(active) => active, // filter out all entries set to `false`
+//                 None => false,          // also disregard entries set to `None`
+//             }
+//         })
+//         .collect()
+// }
+//// use crate::config::EngineConfig;
+//// use crate::entity::field::DiscreteFieldCell;
+//use crate::entity::Entity as DiscreteFieldCell;
+//// use crate::interaction::Interaction;
+//// use crate::interaction::InteractionVariant;
+//// use crate::system::physical_objects::PhysicalObjects;
+
+//#[derive(Clone)]
+///// System: Force Field
+//pub struct DiscreteField {
+//    pub entities: Vec<Box<dyn DiscreteFieldCell>>,
+//}
+//impl DiscreteField {
+//    pub fn new() -> Self {
+//        let entities = vec![];
+//        DiscreteField { entities }
+//    }
+//    pub fn step(&mut self) {}
+//    ///// Field-Field Interaction
+//    /////
+//    ///// Examples
+//    ///// - tracer density field
+//    ///// - gravity waves
+//    ///// - light
+//    //pub fn interact_with_field(
+//    //    &mut self,
+//    //    _other: &DiscreteField,
+//    //    interactions: &Vec<&Interaction>,
+//    //    _config: &EngineConfig,
+//    //    _self_interaction: bool,
+//    //) {
+//    //    for interaction in interactions.iter() {
+//    //        match &interaction.variant {
+//    //            InteractionVariant::Force(_) => todo!(),
+//    //            InteractionVariant::Collision(_) => todo!(),
+//    //        }
+//    //    }
+//    //}
+//    ///// Field-Object Interaction
+//    /////
+//    ///// Examples
+//    ///// - electro-static field generated by charges
+//    ///// - gravitational field around star
+//    ///// - ball breaking window
+//    //pub fn interact_with_objects(
+//    //    &mut self,
+//    //    _other: &PhysicalObjects,
+//    //    interactions: &Vec<&Interaction>,
+//    //    _config: &EngineConfig,
+//    //    _self_interaction: bool,
+//    //) {
+//    //    for interaction in interactions.iter() {
+//    //        match interaction.variant {
+//    //            InteractionVariant::Force(_) => todo!(),
+//    //            InteractionVariant::Collision(_) => todo!(),
+//    //        }
+//    //    }
+//    //}
+//}
+pub mod discrete_field;
+pub mod physical_objects;
+use super::config::EngineConfig;
+use super::entity::Entity;
+use super::state::tmp;
+use super::state::State;
+
+/// System Variant Enumeration
+#[derive(Debug, Clone)]
+pub enum SystemVariant {
+    DiscreteField,
+    PhysicalObjects,
+}
+
+/// System Structure
+#[derive(Clone)]
+pub struct System {
+    pub id: usize,
+    pub variant: SystemVariant,
+    pub entities: Vec<Box<dyn Entity>>,
+}
+impl System {
+    /// Creates a new System Struct Instance
+    pub fn new(variant: SystemVariant) -> Self {
+        let id = 0; // TODO safe?
+        let entities = vec![];
+        System {
+            id,
+            variant,
+            entities,
+        }
+    }
+    /// Forwards System to next Time-Step
+    pub fn step(&mut self, config: &EngineConfig, states: &Vec<State>) {
+        println!(
+            "SYS-{}: {:?} ({} entities)",
+            self.id,
+            self.variant,
+            self.entities.len()
+        );
+        let system_id = self.id; // TODO some-day, remove (with trees)
+        /// Loads current State
+        let state = &states[config.step_id.0];
+        /// Gets all Integrators for this System
+        let integrators = tmp::get_integrators(system_id, &config).unwrap();
+        /// Loops over Integrators & Applies
+        for integrator in integrators {
+            let other_ids = tmp::get_other_ids(&integrator, &state);
+            integrator.step(self, &state, &other_ids);
+        }
+    }
+}
+// use crate::config::EngineConfig;
+// use crate::entity::object::PhysicalObject;
+// use crate::entity::Entity as PhysicalObject;
+// use crate::interaction::Interaction;
+// use crate::interaction::InteractionVariant;
+// use crate::system::discrete_field::DiscreteField;
+
+//#[derive(Clone)]
+///// System: Physical Objects
+//pub struct PhysicalObjects {
+//    pub entities: Vec<Box<dyn PhysicalObject>>,
+//}
+//impl PhysicalObjects {
+//    pub fn new() -> Self {
+//        let entities = vec![];
+//        PhysicalObjects { entities }
+//    }
+//    pub fn step(&mut self, interactions: Vec<&Interaction>) {
+//        for _interaction in interactions.iter() {}
+//    }
+//    ///// Object-Field Interaction
+//    /////
+//    ///// Examples:
+//    ///// - charges accelerated by voltage
+//    ///// - object falling to the ground
+//    ///// - wall collisions
+//    //pub fn interact_with_field(
+//    //    &mut self,
+//    //    _other: &DiscreteField,
+//    //    interactions: &Vec<&Interaction>,
+//    //    _config: &EngineConfig,
+//    //    _self_interaction: bool,
+//    //) {
+//    //    for interaction in interactions.iter() {
+//    //        match interaction.variant {
+//    //            InteractionVariant::Force(_) => todo!(),
+//    //            InteractionVariant::Collision(_) => todo!(),
+//    //        }
+//    //    }
+//    //}
+//    ///// Object-Object Interaction
+//    /////
+//    ///// Examples:
+//    ///// - mutual gravitational attraction
+//    ///// - Coulomb & Lennard-Jones
+//    ///// - boid forces (avoidance, cohesion, alignment)
+//    //pub fn interact_with_objects(
+//    //    &mut self,
+//    //    // others: &Vec<Box<dyn PhysicalObject>>,
+//    //    other: &PhysicalObjects,
+//    //    interactions: &Vec<&Interaction>,
+//    //    _config: &EngineConfig,
+//    //    _self_interaction: bool,
+//    //) {
+//    //    for _interaction in interactions.iter() {
+//    //        let _entities = &mut self.entities; // TODO filter
+//    //        let _others = &other.entities;
+
+//    //        // let integrator = &interaction.integrator;
+//    //        // match &interaction.variant {
+//    //        //     InteractionVariant::Collision(_) => todo!(),
+//    //        //     InteractionVariant::Force(f) => {
+//    //        //         f.apply_to_objects_from_objects(entities, others, integrator, self_interaction)
+//    //        //     }
+//    //        // }
+//    //    }
+//    //}
+//}
+export DATABASE_URL=postgres://vinc:pw@localhost:5432/mxyz-db_v1
+/src/schema.rs
+[package]
+    name = "mxyz-server"
+    authors = ["Vincent C. Mader <vincent@mader.xyz>"]
+    edition = "2018"
+    version = "0.1.0"
+
+[dependencies]
+    diesel = "1.4.8"
+    mxyz-engine = { path = "../mxyz-engine" }
+
+[dependencies.rocket]
+    features = ["json"]
+    version = "0.5.0-rc.1"
+
+[dependencies.rocket_dyn_templates]
+    features = ["tera"]
+    version = "0.1.0-rc.1"
+
+[dependencies.serde]
+    features = ["derive"]
+    version = "1.0"
+
+
+# For documentation on how to configure this file,
+# see diesel.rs/guides/configuring-diesel-cli
+
+[print_schema]
+file = "src/schema.rs"
+-- This file was automatically created by Diesel to setup helper functions
+-- and other internal bookkeeping. This file is safe to edit, any future
+-- changes will be added to existing projects as new migrations.
+
+DROP FUNCTION IF EXISTS diesel_manage_updated_at(_tbl regclass);
+DROP FUNCTION IF EXISTS diesel_set_updated_at();
+-- This file was automatically created by Diesel to setup helper functions
+-- and other internal bookkeeping. This file is safe to edit, any future
+-- changes will be added to existing projects as new migrations.
+
+
+
+
+-- Sets up a trigger for the given table to automatically set a column called
+-- `updated_at` whenever the row is modified (unless `updated_at` was included
+-- in the modified columns)
+--
+-- # Example
+--
+-- ```sql
+-- CREATE TABLE users (id SERIAL PRIMARY KEY, updated_at TIMESTAMP NOT NULL DEFAULT NOW());
+--
+-- SELECT diesel_manage_updated_at('users');
+-- ```
+CREATE OR REPLACE FUNCTION diesel_manage_updated_at(_tbl regclass) RETURNS VOID AS $$
+BEGIN
+    EXECUTE format('CREATE TRIGGER set_updated_at BEFORE UPDATE ON %s
+                    FOR EACH ROW EXECUTE PROCEDURE diesel_set_updated_at()', _tbl);
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION diesel_set_updated_at() RETURNS trigger AS $$
+BEGIN
+    IF (
+        NEW IS DISTINCT FROM OLD AND
+        NEW.updated_at IS NOT DISTINCT FROM OLD.updated_at
+    ) THEN
+        NEW.updated_at := current_timestamp;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+pub fn run_engine() {}
+// use rocket::response::stream::Event;
+// use rocket::serde::Serialize;
+
+// #[derive(Serialize)]
+// #[serde(crate = "rocket::serde")]
+// struct MyData<'r> {
+//     string: &'r str,
+//     number: usize,
+// }
+
+// fn test() {
+//     let data = MyData {
+//         string: "hello!",
+//         number: 10,
+//     };
+//     let event = Event::json(&data);
+// }
+pub mod protocol;
+#[macro_use]
+extern crate rocket;
+
+use rocket::fs::{relative, FileServer};
+use rocket_dyn_templates::Template;
+mod views;
+
+#[rocket::main]
+pub async fn main() -> Result<(), rocket::Error> {
+    let routes = routes![views::index::route, views::simulation::route];
+    let catchers = catchers![views::error::not_found::route,];
+    let file_server = FileServer::from(relative!("static"));
+
+    rocket::build()
+        .mount("/", routes)
+        .mount("/static", file_server)
+        .attach(Template::fairing())
+        .register("/", catchers)
+        .launch()
+        .await
+}
+trait Protocol {
+    fn to_bytes(&self) -> Vec<u8>;
+    fn from_bytes(bin: &[u8]) -> Self;
+}
+
+// ============================================================================
+
+// use mxyz_engine::system::physical_objects::PhysicalObjects;
+
+// impl Protocol for PhysicalObjects {
+//     fn to_bytes(&self) -> Vec<u8> {
+//         for _entity in &self.entities {
+//             // let a = entity.to_bytes();
+//         }
+//         vec![]
+//     }
+//     fn from_bytes(_bin: &[u8]) -> Self {
+//         PhysicalObjects::new()
+//     }
+// }
+
+// // ============================================================================
+
+// use mxyz_engine::system::discrete_field::DiscreteField;
+
+// impl Protocol for DiscreteField {
+//     fn to_bytes(&self) -> Vec<u8> {
+//         vec![]
+//     }
+//     fn from_bytes(_bin: &[u8]) -> Self {
+//         DiscreteField::new()
+//     }
+// }
+
+// // ============================================================================
+
+use mxyz_engine::entity::object::planet::Planet;
+
+impl Protocol for Planet {
+    fn to_bytes(&self) -> Vec<u8> {
+        let mut bin: Vec<u8> = Vec::new();
+        // bin.push(1);
+        bin.extend_from_slice(&self.mass.to_be_bytes());
+        bin.extend_from_slice(&self.position[0].to_be_bytes());
+        bin.extend_from_slice(&self.position[1].to_be_bytes());
+        bin.extend_from_slice(&self.position[2].to_be_bytes());
+        bin.extend_from_slice(&self.velocity[0].to_be_bytes());
+        bin.extend_from_slice(&self.velocity[1].to_be_bytes());
+        bin.extend_from_slice(&self.velocity[2].to_be_bytes());
+        bin
+    }
+    fn from_bytes(_bin: &[u8]) -> Self {
+        let mass = 0.;
+        let position = [0., 0., 0.];
+        let velocity = [0., 0., 0.];
+        Planet::new(mass, position, velocity)
+    }
+}
+
+// ============================================================================
+
+use mxyz_engine::entity::field::fluid_cell::FluidCell;
+
+impl Protocol for FluidCell {
+    fn to_bytes(&self) -> Vec<u8> {
+        vec![]
+    }
+    fn from_bytes(_bin: &[u8]) -> Self {
+        let velocity = [0., 0., 0.];
+        let density = 0.;
+        FluidCell::new(velocity, density)
+    }
+}
+
+// ============================================================================
+
+// mod testo {
+//     pub trait Protocol {
+//         fn to_bytes();
+//         fn from_bytes(bytes: &[u8]) -> Self;
+//     }
+//     unsafe fn any_as_u8_slice<T: Sized>(p: &T) -> &[u8] {
+//         ::std::slice::from_raw_parts((p as *const T) as *const u8, ::std::mem::size_of::<T>())
+//     }
+
+//     // impl Protocol for FluidCell {
+//     //     fn to_bytes() {}
+//     //     fn from_bytes(bytes: &[u8]) -> Self {
+//     //         unsafe { std::mem::transmute(*bytes) }
+//     //     }
+//     // }
+
+//     use mxyz_engine::entity::field::fluid_cell::FluidCell;
+//     fn testo() {
+//         let velocity = [0., 0., 0.];
+//         let density = 0.;
+//         let foo = FluidCell::new(velocity, density);
+
+//         struct MyStruct {
+//             id: u8,
+//             data: [u8; 1024],
+//         }
+//         let my_struct = MyStruct {
+//             id: 0,
+//             data: [1; 1024],
+//         };
+//         let bytes: &[u8] = unsafe { any_as_u8_slice(&my_struct) };
+//         // tcp_stream.write(bytes);
+//         println!("{:?}", bytes);
+
+//         let s: MyStruct = unsafe { std::mem::transmute(*bytes) };
+//     }
+// }
+table! {
+    confessions (id) {
+        id -> Int4,
+        confession -> Varchar,
+    }
+}
+pub mod not_found;
+use std::collections::HashMap;
+
+extern crate rocket_dyn_templates;
+use rocket::Request;
+use rocket_dyn_templates::Template;
+
+#[catch(404)]
+pub fn route(request: &Request<'_>) -> Template {
+    let info_text = match request.format() {
+        Some(ref mt) if !(mt.is_xml() || mt.is_html()) => {
+            format!("'{}' requests are not supported.", mt)
+        }
+        _ => format!("Sorry, '{}' is an invalid path!", request.uri()),
+    };
+    let context: HashMap<&str, &str> = [("info_text", info_text.as_str())]
+        .iter()
+        .cloned()
+        .collect();
+    Template::render("error/404", &context)
+}
+use std::collections::HashMap;
+
+extern crate rocket_dyn_templates;
+use rocket_dyn_templates::Template;
+
+mod navgrid;
+use navgrid::NavGrid;
+
+#[get("/")]
+pub fn route() -> Template {
+    let navgrid = NavGrid::new();
+    let context: HashMap<&str, &NavGrid> = [("navgrid", &navgrid)].iter().cloned().collect();
+    Template::render("index/base", &context)
+}
+use serde::{Deserialize, Serialize};
+
+mod section;
+use section::NavGridSection;
+
+#[derive(Serialize, Deserialize)]
+pub struct NavGrid {
+    sections: Vec<NavGridSection>,
+}
+impl NavGrid {
+    pub fn new() -> Self {
+        let grid_section_titles: Vec<(&str, &str)> = Vec::from([
+            ("gravity", "gravitational n-body dynamics"),
+            // ("oscillators", "oscillators"),
+            // ("thermo-dynamics", "thermo-dynamics"),
+            // ("fluid-dynamics", "fluid dynamics"),
+            // ("electro-magnetism", "electro-magnetism"),
+            // ("emergent-behavior", "emergent behavior"),
+            // ("quantum-mechanics", "quantum mechanics"),
+            // ("various", "various"),
+            // ("optics", "optics"), // ?
+        ]);
+
+        let mut sections: Vec<NavGridSection> = Vec::new();
+        for (id, title) in grid_section_titles.iter() {
+            sections.push(NavGridSection::new(id, title));
+        }
+
+        NavGrid { sections }
+    }
+}
+use serde::{Deserialize, Serialize};
+
+#[derive(Serialize, Deserialize)]
+pub struct NavGridItem {
+    item_id: String,
+    path_to_thumbnail: String,
+    title: String,
+    state: String,
+}
+impl NavGridItem {
+    pub fn new(item_id: &str, title: &str, state: &str) -> Self {
+        let path_to_thumbnail = format!("/static/img/simulations/{}/thumbnail.png", item_id);
+        let item_id = String::from(item_id);
+        let title = String::from(title);
+        let state = String::from(state);
+
+        NavGridItem {
+            item_id,
+            path_to_thumbnail,
+            title,
+            state,
+        }
+    }
+}
+use serde::{Deserialize, Serialize};
+
+mod item;
+use item::NavGridItem;
+
+#[derive(Serialize, Deserialize)]
+pub struct NavGridSection {
+    section_id: String,
+    title: String,
+    items: Vec<NavGridItem>,
+}
+impl NavGridSection {
+    pub fn new(section_id: &str, title: &str) -> Self {
+        let items: Vec<NavGridItem> = match section_id {
+            "gravity" => Vec::from([
+                // intro
+                // NavGridItem::new("nbody-solar", "solar system"),
+                // basics
+                // NavGridItem::new("2body-kepler", "Kepler's laws"),
+                // NavGridItem::new("3body-moon", "Moon"),
+                // NavGridItem::new("3body-lagrange", "Lagrange points"),
+                // NavGridItem::new("nbody-flowers", "sym. constellations"),
+                // more complex systems
+                // NavGridItem::new("nbody-binary", "stellar binary"),
+                // NavGridItem::new("nbody-asteroids", "asteroids"),
+                // NavGridItem::new("nbody-galaxy", "galaxy"),
+                // NavGridItem::new("nbody-cluster", "stellar cluster (3D)"),
+                // stable 3-body
+                NavGridItem::new("nbody-random", "nbody-random", "active"),
+                // NavGridItem::new("3body-fig8", "figure-8", "active"),
+                // NavGridItem::new("nbody-cloud", "stellar cloud", "inactive"),
+                // NavGridItem::new("nbody-misc", "misc"),
+                // NavGridItem::new("3body-broucke", "broucke"),
+                // NavGridItem::new("3body-liao", "liao"),
+                // NavGridItem::new("3body-freefall", "free-fall"),
+                // NavGridItem::new("3body-moth", "moth"),
+            ]),
+            // "oscillators" => Vec::from([
+            //     NavGridItem::new("harmonic-oscillator", "harmonic oscillator"),
+            //     NavGridItem::new("single-pendulum", "single pendulum"),
+            //     NavGridItem::new("double-pendulum", "double pendulum"),
+            //     NavGridItem::new("lissajous", "Lissajous figures"),
+            //     NavGridItem::new("fourier", "fourier"),  // ...?
+            // ]),
+            "electro-magnetism" => Vec::from([
+                // NavGridItem::new("charge-interaction", "charge interaction"),
+                // NavGridItem::new("charge-field-interaction", "charge-field interaction"),
+                // NavGridItem::new("magnet", "magnet"),  // TODO rename? (multiple entries)
+                // NavGridItem::new("wien-filter", "Wien filter"),
+                // NavGridItem::new("field-field-interaction", "waves"),
+                // NavGridItem::new("electric-motor", "electric-motor"),
+            ]),
+            "thermo-dynamics" => Vec::from([
+                // NavGridItem::new("ising-model", "Ising model"),
+                // NavGridItem::new("thermal-motion", "thermal motion"),
+                // NavGridItem::new("brownian-motion", "Brownian motion"),
+                // NavGridItem::new("heat-conduction", "heat conduction"),
+                // NavGridItem::new("melting", "ice cubes"), // ?
+            ]),
+            // "fluid-dynamics" => Vec::from([
+            // NavGridItem::new("diffusion", "Diffusion"),
+            // NavGridItem::new("incompressible-fluid", "incompressible fluid"),
+            // NavGridItem::new("raptor-flow", "raptor engine"),
+            // ]),
+            "quantum-mechanics" => Vec::from([
+                //     NavGridItem::new("double-slit", "double slit experiment"),
+                //     NavGridItem::new("feynman-graphs", "Feynman graphs"),
+                // NavGridItem::new("lennard-jones", "Lennard-Jones potential"),
+            ]),
+            "emergent-behavior" => Vec::from([
+                //     NavGridItem::new("boids", "boids"),
+                //     NavGridItem::new("ants", "ants"),
+                // NavGridItem::new("game-of-life", "game of life"),
+            ]),
+            "various" => Vec::from([
+                // NavGridItem::new("rock-paper-scissors", "rock-paper-scissors"),
+                    // NavGridItem::new("ca-rulemaker", "cell.aut. rule-maker"),
+                // NavGridItem::new("mc-pi", "Monte Carlo pi"),
+                // NavGridItem::new("hsl-colors", "HSL colors"),
+            ]),
+            _ => Vec::new(),
+        };
+
+        NavGridSection {
+            section_id: String::from(section_id),
+            title: String::from(title), // TODO -> title
+            items,
+        }
+    }
+}
+pub mod error;
+pub mod index;
+pub mod simulation;
+use std::collections::HashMap;
+
+extern crate rocket_dyn_templates;
+use rocket_dyn_templates::Template;
+
+#[get("/simulations/<category>/<sim_id>")]
+pub fn route(category: &str, sim_id: &str) -> Template {
+    let title = String::from(sim_id);
+    let context: HashMap<&str, &str> = [
+        ("category", category),
+        ("sim_id", sim_id),
+        ("title", &title),
+    ]
+    .iter()
+    .cloned()
+    .collect();
+
+    Template::render("simulation/base", &context)
+}
+@import url("canvas.css");
+@import url("section.css");
+
+body {
+  /* color definitions */
+  --main-bg-color: #111111;
+  --main-section-color: #222222;
+  --main-border-color: #555555;
+  --main-text-color: #dddddd;
+  --main-font-family: Arial, Helvetica, sans-serif;
+  --main-border: 2px solid var(--main-border-color);
+  --debug-border: 1px solid green;
+  --main-margin: 10px;
+
+  /* geometry */
+  width: 100%;
+  margin: 0px;
+  padding: 0px;
+  /* fonts */
+  font-family: var(--main-font-family);
+  /* color */
+  background-color: var(--main-bg-color);
+  color: var(--main-text-color);
+  /* various */
+  overflow-x: hidden;
+}
+
+/* HEADER ====================================== */
+
+#page_header {
+  outline: var(--debug-border);
+  /* width: calc(100% - 14px); */
+  text-align: right;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  /* margin-bottom: 13px; */
+}
+
+#home {
+  border: var(--debug-border);
+  cursor: pointer;
+  background-color: black;
+  color: var(--main-text-color);
+  font-size: 18px;
+  font-weight: 690;
+  text-decoration: none;
+  outline: none;
+  /* no effect */
+  /*     margin: auto; */
+  /*     padding: auto; */
+  /*     height: 100%; */
+}
+
+/* CONTENT ====================================== */
+
+#page_content {
+  outline: var(--debug-border);
+  width: 60%;
+  padding-left: 20%;
+  padding-right: 20%;
+}
+@media only screen and (max-width: 1201px) {
+  #page_content {
+    width: 65%;
+    padding-left: 17.5%;
+    padding-right: 17.5%;
+  }
+}
+@media only screen and (max-width: 751px) {
+  #page_content {
+    width: 96%;
+    padding-left: 2%;
+    padding-right: 2%;
+  }
+}
+
+/* ========================================================================= */
+/* slider { */
+/*   outline: none; */
+/* } */
+.canvas_holder {
+  /* border: var(--main-border) */
+  border-radius: 20px;
+  /* width: 94%; */
+  /* margin-top: 3%; */
+  /* margin-bottom: 3%; */
+  /* margin-left: 3%; */
+  /* margin-right: 3%; */
+}
+canvas {
+  border: var(--main-border);
+  background-color: black;
+  border-radius: 20px; /* if changed: also change for section/navgrid_section? */
+  /* overflow: hidden; */
+  width: 100%;
+
+  box-shadow: inset 0px 0px 0px 0px black;
+  box-sizing: border-box;
+}
+@import url("navgrid_section.css");
+@import url("navgrid.css");
+@import url("navgrid_cell.css");
+@import url("navgrid_thumbnail.css");
+#navgrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin-bottom: 45px;
+  margin-top: 15px;
+}
+@media only screen and (max-width: 1201px) {
+  #navgrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media only screen and (max-width: 751px) {
+  #navgrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+.navgrid_cell {
+  /* border: 0px; */
+  /* width: 100%; */
+  /* height: 100%; */
+  /* background-color: #222222; */
+  /* outline: none; */
+  /* position: relative; */
+  /* padding: 0px; */
+  text-decoration: none;
+  /* margin-top: 15px; */
+  color: #dddddd;
+}
+
+.navgrid_cell_title {
+  text-align: center;
+  margin: 0px;
+  padding: 0px;
+  font-size: 14px;
+
+  /* font-variant: normal; */
+}
+.navgrid_section_title {
+  width: 100%;
+  text-align: center;
+  font-weight: 690;
+}
+
+#section_navgrid {
+  width: 100%;
+  /* margin-bottom: 30px; /1* if changed: also change for .section *1/ */
+  /* border: 2px solid #555555; */
+  /* border-radius: 20px; /1* if changed: also change for #canvas/#section? *1/ */
+  /* background-color: #111111; */
+}
+.navgrid_thumbnail-inactive {
+  width: 86%; /* make square (with :after) */
+  border: 2px solid #555555;
+  border-radius: 30px;
+  box-shadow: inset 0px 0px 0px 0px black;
+  box-sizing: border-box;
+
+  /* center */
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 7%; /* left & right done autom. through align */
+  margin-bottom: 7%;
+
+  /* grayscale */
+  filter: grayscale(100%);
+  -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
+}
+
+.navgrid_thumbnail {
+  width: 86%; /* make square (with :after) */
+  border: 2px solid #555555;
+  border-radius: 30px;
+  box-shadow: inset 0px 0px 0px 0px black;
+  box-sizing: border-box;
+
+  /* center */
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 7%; /* left & right done autom. through align */
+  margin-bottom: 7%;
+
+  outline: none;
+
+  /* transition (with :hover) */
+  transition: border 0.35s, filter 0.35s, transform 0.35s ease-in-out;
+  /* grayscale */
+  filter: grayscale(100%);
+  -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
+}
+@media only screen and (max-width: 551px) {
+  .navgrid_thumbnail {
+    filter: grayscale(0%);
+  }
+}
+.navgrid_thumbnail:after {
+  content: "";
+  display: block;
+  padding-bottom: 100%;
+}
+.navgrid_thumbnail:hover {
+  border: 2px solid #555555;
+  transform: scale(1.1);
+  -webkit-filter: grayscale(0%); /* Safari 6.0 - 9.0 */
+  filter: grayscale(0%);
+  cursor: pointer;
+}
+.section {
+  background-color: var(--main-section-color);
+  border-radius: 20px; /* if changed: also change for navgrid_section? */
+  border: var(--main-border);
+  margin-bottom: 25px;
+  text-align: center;
+  padding: 10px;
+}
+
+.section_title {
+  width: 100%;
+  text-align: center;
+  font-weight: 690;
+  margin-bottom: 8px;
+  height: 1em; /* needed for smooth reload  (semi, text "blinks") */
+}
+@import url("old.css");
+#page_content {
+  --page-column-margin: 1.5%;
+  --page-title-height: 10px;
+
+  width: 100%;
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+/* TODO remove ay  */
+#page-columns {
+  width: 100%;
+  margin: 0px;
+  /* width: 90%; */
+  /* margin-left: 5%; */
+  /* margin-right: 5%; */
+}
+#page-column-left {
+  width: 100%;
+  margin: 0px;
+}
+#page-column-right {
+  width: 100%;
+  margin: 0px;
+  /* padding-top: 24px; /1* TODO *1/ */
+}
+
+@media only screen and (min-width: 1201px) {
+  #page-columns {
+    /* display: flex; */
+    /* column-count: 2; */
+    /* column-width: 20%; */
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    width: 100%;
+    margin: 0px;
+  }
+  #page-column-left {
+    margin-right: var(--page-column-margin);
+    margin-left: calc(2 * var(--page-column-margin));
+    width: calc(100% - 3 * var(--page-column-margin));
+  }
+  #page-column-right {
+    margin-left: var(--page-column-margin);
+    margin-right: calc(2 * var(--page-column-margin));
+    width: calc(100% - 3 * var(--page-column-margin));
+  }
+  /* #ay-right-thingy { */
+  /*   width: 100%; */
+  /*   margin: 0px; */
+  /*   /1* margin-top: 24px; /2* must be same as .navgrid_section.height *2/ *1/ */
+  /*   /1* padding: 15px; *1/ */
+  /*   /1* height: 200px; *1/ */
+  /*   border: green; */
+  /*   height: var(--page-title-height); */
+  /* } */
+}
+
+/* #page-title {  width: 100%; */
+/*   text-align: center; */
+/*   font-weight: 690; */
+/*   margin-bottom: 8px; */
+/*   height: 1em; /1* needed for smooth reload  (semi, text "blinks") *1/ */
+/* } */
+
+/* .multi-button { */
+/*   display: grid; */
+/*   grid-template-columns: repeat(5, 1fr); */
+/*   border: 1px solid var(--main-border-color); */
+/*   border-radius: 30px; */
+/*   width: 100%; */
+/*   overflow: hidden; */
+/* } */
+/* .sub-button { */
+/*   border: 0px; */
+/*   border-radius: 0px; */
+/*   height: 100%; /1* works, but why? *1/ */
+/*   border-right: 1px solid var(--main-border-color); */
+/*   background-color: black; */
+/* } */
+/* /1* .sub-button_active { *1/ */
+/* /1*   background-color: var(--main-bg-color); *1/ */
+/* /1* } *1/ */
+/* .sub-button:active { */
+/*   background-color: green; */
+/* } */
+
+/* button { */
+/*   color: white; */
+/*   /1*   /2* border: 0px; *2/ *1/ */
+/*   /1*   border: var(--main-border); *1/ */
+/*   /1*   border-radius: 10000px; *1/ */
+/*   /1*   background-color: var(--main-section-color); *1/ */
+
+/*   /1*   font-family: var(--main-font-family); /2* ? *2/ *1/ */
+/*   /1*   font-size: 16px; *1/ */
+/*   /1*   color: white; *1/ */
+
+/*   /1*   /2* width: 90%; *2/ *1/ */
+/*   /1*   height: 2em; /2* center text vertically *2/ *1/ */
+
+/*   /1*   /2* margin-top: 5px; *2/ *1/ */
+/*   /1*   margin-bottom: 5px; *1/ */
+/*   /1*   /2* margin-right: auto; *2/ *1/ */
+/*   /1*   /2* margin-left: auto; *2/ *1/ */
+/*   /1*   padding: 0px; *1/ */
+/*   /1*   outline: none; *1/ */
+/* } */
+import init, {
+  SimulationComputeClient,
+} from "../../../static/pkg/mxyz_client.js";
+
+let sim_id = document.getElementById("simulation.js").getAttribute("sim_id");
+console.log("simulation-id: ", sim_id);
+
+(async () => {
+  await init();
+
+  // initialization
+  let simulation = SimulationComputeClient.new();
+  simulation.init();
+  simulation.run();
+
+  //   //   // TODO move this definition to rust?
+  //   //   let NR_OF_ITERATIONS_PER_RENDER = 5;
+  //   //   let bm = document.getElementById("button-menu_main");
+  //   //   let slider = document.createElement("input");
+  //   //   slider.type = "range";
+  //   //   slider.id = "slider_set-iterations-per-render";
+  //   //   slider.min = 0;
+  //   //   slider.max = 100;
+  //   //   slider.value = 1; // if changed: also in sim/mod.rs AND/OR sim/config.rs
+  //   //   bm.appendChild(slider);
+  //   //   slider.style = "width: 100%";
+
+  //   //   // event listeners for options
+  //   //   var options = document.getElementsByTagName("select");
+  //   //   for (let idx = 0; idx < options.length; idx++) {
+  //   //     let option = options[idx];
+  //   //     option.addEventListener("change", () => {
+  //   //       simulation.handle_option_event(option.id);
+  //   //     });
+  //   //   }
+
+  //   //   // event listeners for buttons
+  //   //   var buttons = document.getElementsByTagName("button");
+  //   //   for (let idx = 0; idx < buttons.length; idx++) {
+  //   //     let button = buttons[idx];
+  //   //     button.addEventListener("click", () => {
+  //   //       simulation.handle_button_event(button.id);
+  //   //     });
+  //   //   }
+
+  //   //   // event listeners for sliders
+  //   //   var inputs = document.getElementsByTagName("input");
+  //   //   for (let idx = 0; idx < inputs.length; idx++) {
+  //   //     let slider = inputs[idx];
+  //   //     if (slider.getAttribute("type") != "range") continue;
+  //   //     slider.addEventListener("change", () => {
+  //   //       simulation.handle_slider_event(slider.id);
+  //   //     });
+  //   //   }
+
+  //   //   // let last_date = Date.now();
+  // const loop = () => {
+  //   //   //     let date_1 = Date.now();
+  // simulation.render();
+  //   //   //     let date_2 = Date.now();
+  //   //   //     let fps_renderer = 1000 / (date_2 - date_1);
+  //   //   //     let date_3 = Date.now();
+  //   simulation.step(); // TODO move render into sim.step() ?
+  //   //   //     let date_4 = Date.now();
+  //   //   //     let fps_engine = 1000 / (date_4 - date_3);
+  //   //   //     let textfield_fps_e = document.getElementById("textfield_fps_engine");
+  //   //   //     textfield_fps_e.innerHTML = "fps_e: " + Math.round(fps_engine);
+  //   //   //     let textfield_fps_r = document.getElementById("textfield_fps_renderer");
+  //   //   //     textfield_fps_r.innerHTML = "fps_r: " + Math.round(fps_renderer);
+  //   //   //     // let dt = (date_2 - date_1) / 1000;
+  //   //   //     // let fps = 1 / dt;
+  //   //   //     // console.log(fps);
+  //   setTimeout(function () {
+  //     requestAnimationFrame(loop);
+  //   }, 500);
+  // };
+  // loop();
+})();
+<html>
+    <!-- HEAD -->
+    <head>
+        {% block head %}            
+
+        <title>mader.xyz{% block title %}{% endblock title %}</title>
+        <meta charset="utf-8">
+        <link rel="icon" href="/static/img/favicon.ico" type="image/png"/>
+        <link rel="stylesheet" href="/static/css/base.css" type="text/css">
+
+        {% endblock head %}            
+    </head>
+    <!-- BODY -->
+    <body style="background-color: #111111">
+
+        <!-- HEADER / NAVBAR -->
+        <div id="page_header">
+            {% block header %}
+            <a href="/" id="home">mader.xyz</a>
+            {% endblock header %}            
+        </div>
+
+        <!-- CONTENT -->
+        <div id="page_content">
+            {% block content %}
+            {% endblock content %}
+        </div>
+
+    </body>
+</html>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>mader.xyz - 404</title>
+    </head>
+    <body style="background-color: #111111; color: white; text-align: center">
+        <h1>404: There's nothing here. :(</h1>
+        <p>{{ info_text }}<p>
+    </body>
+</html>
+{% extends "base" %}
+
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" type="text/css" href="/static/css/index/base.css">
+{% endblock head %}
+
+{% block content %}
+    {{ super() }}
+    {% include "index/navgrid" %}
+{% endblock content %}
+{% for section in navgrid.sections %}
+    <div class="navgrid_section_title">{{ section.title }}</div>
+    <div id="section_navgrid">
+        <div id="navgrid">
+            {% for item in section.items %}
+                <a href="./simulations/{{ section.section_id }}/{{ item.item_id }}" 
+                  class="navgrid_cell"
+                > 
+                    <img 
+                        {% if item.state == "active" %} class="navgrid_thumbnail" 
+                        {% else %} class="navgrid_thumbnail-inactive" 
+                        {% endif %}
+                        src="{{ item.path_to_thumbnail }}" 
+                        alt="{{ item.item_id }}"
+                    /> 
+                    <div class="navgrid_cell_title">
+                        {{ item.title }}
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+{% endfor %}
+{% extends "base" %}
+
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="/static/css/simulation/base.css" type="text/css">
+{% endblock head %}
+{% block title %} - {{ title }}{% endblock title %}
+{% block content %}
+    {{ super() }}
+    <!-- ====== SIMULATION SCRIPT ========================= -->
+    <script type="module" 
+            id="simulation.js"
+            src="../../static/js/simulation/base.js"
+            sim_id="{{ sim_id }}">
+    </script>
+
+    <!-- ====== COLUMN VIEW (big screen only) ============= -->
+    <div id="page-columns">
+        <div id="page-column-left">
+            <!-- ====== CANVAS ============================ -->
+            <div class="canvas_holder">
+                <canvas id="canvas_0" width="1000px"> </canvas>
+                <script> 
+                    let cnv = document.getElementById("canvas_0");
+                    cnv.height = cnv.width;  // TODO make changeable: width=900px & height=width
+                </script>
+            </div>
+        </div>
+        <div id="page-column-right">
+            <!-- ====== MAIN BUTTON MENU ================== -->
+            <div id="button-menu_0" class="section">
+                <!-- ====== PAGE TITLE ======================== -->
+                <div class="simulation_title"> {{ title }} </div>
+                <br/><br/>
+                Helloooooo,
+                <br/><br/>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+                incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
+                nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu 
+                fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in 
+                culpa qui officia deserunt mollit anim id est laborum.
+                <br/><br/>
+                Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius,
+                turpis et commodo pharetra, est eros bibendum elit, nec luctus magna felis
+                sollicitudin mauris. Integer in mauris eu nibh euismod gravida. Duis ac tellus 
+                et risus vulputate vehicula. Donec lobortis risus a elit. Etiam tempor. 
+                Ut ullamcorper, ligula eu tempor congue, eros est euismod turpis, id tincidunt 
+                sapien risus a quam. Maecenas fermentum consequat mi. Donec fermentum. 
+                Pellentesque malesuada nulla a mi. Duis sapien sem, aliquet nec, commodo eget, 
+                consequat quis, neque. Aliquam faucibus, elit ut dictum aliquet, felis nisl 
+                adipiscing sapien, sed malesuada diam lacus eget erat. Cras mollis scelerisque 
+                nunc. Nullam arcu. Aliquam consequat. Curabitur augue lorem, dapibus quis, 
+                laoreet et, pretium ac, nisi. Aenean magna nisl, mollis quis, molestie eu, 
+                feugiat in, orci. In hac habitasse platea dictumst.
+            </div>
+
+            <!-- ====== BUTTON MENUs ====================== -->
+            <!-- <div id="button-menus"> </div> -->
+        </div>
+    </div>
+{% endblock content %}
+[package]
+    name = "mxyz-utils"
+    authors = ["Vincent C. Mader <vincent@mader.xyz>"]
+    edition = "2018"
+    version = "0.1.0"
+
+[dependencies]
+    # rand = "0.8.4"
+    # bytestream = "0.4"
+
+use std::fs;
+
+pub fn load_file(path_to_file: &str) -> String {
+    fs::read_to_string(path_to_file).expect("ERROR: Something went wrong while reading the file")
+}
+pub mod file_io;
+[toolchain]
+    channel = "nightly-2022-02-02"
+        # macOS -> https://rust-lang.github.io/rustup-components-history/aarch64-apple-darwin.html
+        # linux -> https://rust-lang.github.io/rustup-components-history/
+    components = [ "rustfmt", "rustc-dev" ]
+    targets = [ "wasm32-unknown-unknown" ]
+    # targets = [ "wasm32-unknown-unknown", "thumbv2-none-eabi" ]
+    profile = "minimal"
+#!/bin/sh
+
+
+# clear terminal
+# -----------------------------------------------------------------------------
+
+    clear
+
+
+# get path to project root
+# -----------------------------------------------------------------------------
+
+    cd "$(dirname $0)"
+    PATH_TO_SCRIPTS=$(pwd)
+    PATH_TO_PROJECT="$(cd $PATH_TO_SCRIPTS/.. && echo $(pwd))"
+
+
+# build client (to web-assembly)
+# -----------------------------------------------------------------------------
+
+    cd "$PATH_TO_PROJECT/mxyz-client"
+    if [ "$1" = "--release" ]; then
+        cargo build --target wasm32-unknown-unknown --release
+    else
+        cargo build --target wasm32-unknown-unknown 
+    fi
+
+
+# create js-executable from wasm
+# -----------------------------------------------------------------------------
+
+    PATH_TO_OUT_PKG="$PATH_TO_PROJECT/mxyz-server/static/pkg"
+    PATH_TO_WASM="$PATH_TO_PROJECT/target/wasm32-unknown-unknown/debug/mxyz_client.wasm"
+    wasm-bindgen --target web --out-dir "$PATH_TO_OUT_PKG" "$PATH_TO_WASM"
+
+#!/bin/sh
+
+
+# get path to project root
+# -----------------------------------------------------------------------------
+
+    cd "$(dirname $0)"
+    PATH_TO_SCRIPTS=$(pwd)
+    PATH_TO_PROJECT="$(cd $PATH_TO_SCRIPTS/.. && echo $(pwd))"
+
+
+# build client
+# -----------------------------------------------------------------------------
+
+    cd "$PATH_TO_SCRIPTS"
+    if [ "$1" = "--release" ]; then
+        ./build --release
+    else
+        ./build
+    fi
+
+
+# build & run server
+# -----------------------------------------------------------------------------
+
+    cd "$PATH_TO_PROJECT/mxyz-init"
+    if [ "$1" = "--release" ]; then
+        cargo run --release
+    else
+        cargo run
+    fi
+
+#!/usr/bin/env python3
+
+import os
+import pathlib
+
+
+pwd = pathlib.Path(__file__).parent.resolve()
+proj_root = f"{pwd}/../.."
+
+
+def check_dir(path, code):
+
+    files = os.listdir(path)
+    for item in sorted(files):
+
+        if item in ['out', 'target', '.git', 'pkg', 'Cargo.lock', 'fuse.txt', '.DS_Store']:
+            continue
+        if item.endswith('.png') or item.endswith('.jpg') or item.endswith('.ico'):
+            continue
+        print(item)
+
+        new_path = os.path.join(path, item)
+        if os.path.isdir(new_path):
+            code = check_dir(new_path, code)
+
+        else:
+            with open(new_path, 'r') as fp:
+                code += ''.join(fp.readlines())
+
+    return code
+
+
+code = check_dir(proj_root, "")
+# print(f"\nnr. of lines: {code}")
+path_to_fuse = os.path.join(proj_root, 'scripts/stats/fuse.txt')
+with open(path_to_fuse, 'w') as fp:
+    fp.write(code)
+
+#!/usr/bin/env python3
+
+import os
+import pathlib
+
+
+# pwd = pathlib.Path(__file__).parent.resolve()
+# proj_root = f"{pwd}/../.."
+PATH_TO_PROJECT = pathlib.Path(__file__).parent.resolve()
+proj_root = f"{PATH_TO_PROJECT}/../.."
+
+
+def check_dir(path, length):
+
+    files = os.listdir(path)
+    for item in sorted(files):
+
+        if item in ['out', 'target', '.git', 'pkg', 'Cargo.lock']:
+            continue
+        if item.endswith('.png') or item.endswith('.jpg') or item.endswith('.ico'):
+            continue
+        print(item)
+
+        new_path = os.path.join(path, item)
+        if os.path.isdir(new_path):
+            length = check_dir(new_path, length)
+
+        else:
+            with open(new_path, 'rb') as fp:
+                content = fp.readlines()
+                length += len(content)
+
+    return length
+
+
+length = check_dir(proj_root, 0)
+print(f"\nnr. of lines: {length}")
+

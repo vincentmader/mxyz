@@ -1,0 +1,35 @@
+#!/bin/sh
+
+
+# clear terminal
+# -----------------------------------------------------------------------------
+
+    clear
+
+
+# get path to project root
+# -----------------------------------------------------------------------------
+
+    cd "$(dirname $0)"
+    PATH_TO_SCRIPTS=$(pwd)
+    PATH_TO_PROJECT="$(cd $PATH_TO_SCRIPTS/.. && echo $(pwd))"
+
+
+# build client (to web-assembly)
+# -----------------------------------------------------------------------------
+
+    cd "$PATH_TO_PROJECT/mxyz-client"
+    if [ "$1" = "--release" ]; then
+        cargo build --target wasm32-unknown-unknown --release
+    else
+        cargo build --target wasm32-unknown-unknown 
+    fi
+
+
+# create js-executable from wasm
+# -----------------------------------------------------------------------------
+
+    PATH_TO_OUT_PKG="$PATH_TO_PROJECT/mxyz-server/static/pkg"
+    PATH_TO_WASM="$PATH_TO_PROJECT/target/wasm32-unknown-unknown/debug/mxyz_client.wasm"
+    wasm-bindgen --target web --out-dir "$PATH_TO_OUT_PKG" "$PATH_TO_WASM"
+
