@@ -4,8 +4,8 @@
         <meta charset="utf-8" />
         <title>mader.xyz - 404</title>
     </head>
-    <body style="background-color: #111111;">
+    <body style="background-color: #111111; color: white; text-align: center">
         <h1>404: There's nothing here. :(</h1>
-        The page at {{ uri }} does not exist!
+        <p>{{ info_text }}<p>
     </body>
 </html>
