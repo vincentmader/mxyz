@@ -1,0 +1,12 @@
+[package]
+    name = "mxyz-database"
+    authors = ["Vincent C. Mader <vincent@mader.xyz>"]
+    edition = "2018"
+    version = "0.1.0"
+
+[dependencies]
+    diesel = "1.4.8"
+
+[dependencies.serde]
+    features = ["derive"]
+    version = "1.0"
