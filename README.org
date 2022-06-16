@@ -1,9 +1,16 @@
 * mader.xyz
-** Next Steps
+** Client-Side Computes
+- implement event loop for computes+render
+- forward state
+- display state in HTML canvas
+  (stay general -> eventual switching to server-side computes)
+** Server-Side Computes
 - byte-stream conversion on server
   + convert state to bytes
 - server-client communication via TCP
+  + implement TCP listener on server
   + send byte-stream from server to client
+  + implement periodic (+async?) get requests on client
   + receive byte-stream on client from server
 - byte-stream conversion on client
   + convert state from bytes
