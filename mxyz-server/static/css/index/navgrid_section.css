@@ -1,17 +1,18 @@
 .navgrid_section_title {
   width: 100%;
   text-align: center;
-  font-weight: 690;
-  text-decoration: underline;
-  /* margin-top: 2em; */
-  /* padding: 10px; */
+  font-weight: bold;
+  /* border: var(--debug-border); */
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  /* text-decoration: underline; */
+  font-size: var(--font-size-navgrid-section);
+  /* font-weight: 690; */
 }
 
 #navgrid_section {
   width: 100%;
-  margin-bottom: 2em;
-  /* margin-bottom: 30px; /1* if changed: also change for .section *1/ */
-  /* border: 2px solid #555555; */
+  margin-bottom: 1em;
+  /* border: 1px solid #333333; */
   /* border-radius: 20px; /1* if changed: also change for #canvas/#section? *1/ */
-  /* background-color: #111111; */
 }

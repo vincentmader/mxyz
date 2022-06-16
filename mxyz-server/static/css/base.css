@@ -8,10 +8,13 @@ body {
   --main-text-color: #dddddd;
   --main-font-family: Arial, Helvetica, sans-serif; /* TODO choose font */
   --main-border: 2px solid var(--main-border-color);
-  --debug-border: 1px solid gray;
+  --debug-border: 1px solid #333333;
   --main-margin: 10px;
-  --main-font-size: 1em;
   --main-x-pad: 1em; /* only for mobile screen sizes */
+  --font-size-main: 1em;
+  --font-size-title: calc(1.2 * var(--font-size-main));
+  --font-size-navgrid-section: var(--font-size-main);
+  --font-size-navgrid-thumbnail: var(--font-size-main);
   width: 100%;
   margin: 0px;
   padding: 0px;
@@ -36,8 +39,8 @@ body {
 #home {
   cursor: pointer;
   color: var(--main-text-color);
-  font-size: 18px;
-  font-weight: 690;
+  font-size: var(--font-size-title);
+  font-weight: bold;
   text-decoration: none;
   outline: none;
   margin-right: 15px;

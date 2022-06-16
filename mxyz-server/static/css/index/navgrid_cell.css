@@ -5,5 +5,5 @@
 
 .navgrid_cell_title {
   text-align: center;
-  font-size: var(--main-font-size);
+  font-size: var(--font-size-navgrid-thumbnail);
 }
