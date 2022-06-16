@@ -1,0 +1,108 @@
+#page_content {
+  --page-column-margin: 1.5%;
+  --page-title-height: 10px;
+
+  width: 100%;
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+/* TODO remove ay  */
+#page-columns {
+  width: 100%;
+  margin: 0px;
+  /* width: 90%; */
+  /* margin-left: 5%; */
+  /* margin-right: 5%; */
+}
+#page-column-left {
+  width: 100%;
+  margin: 0px;
+}
+#page-column-right {
+  width: 100%;
+  margin: 0px;
+  /* padding-top: 24px; /1* TODO *1/ */
+}
+
+@media only screen and (min-width: 1201px) {
+  #page-columns {
+    /* display: flex; */
+    /* column-count: 2; */
+    /* column-width: 20%; */
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    width: 100%;
+    margin: 0px;
+  }
+  #page-column-left {
+    margin-right: var(--page-column-margin);
+    margin-left: calc(2 * var(--page-column-margin));
+    width: calc(100% - 3 * var(--page-column-margin));
+  }
+  #page-column-right {
+    margin-left: var(--page-column-margin);
+    margin-right: calc(2 * var(--page-column-margin));
+    width: calc(100% - 3 * var(--page-column-margin));
+  }
+  /* #ay-right-thingy { */
+  /*   width: 100%; */
+  /*   margin: 0px; */
+  /*   /1* margin-top: 24px; /2* must be same as .navgrid_section.height *2/ *1/ */
+  /*   /1* padding: 15px; *1/ */
+  /*   /1* height: 200px; *1/ */
+  /*   border: green; */
+  /*   height: var(--page-title-height); */
+  /* } */
+}
+
+/* #page-title {  width: 100%; */
+/*   text-align: center; */
+/*   font-weight: 690; */
+/*   margin-bottom: 8px; */
+/*   height: 1em; /1* needed for smooth reload  (semi, text "blinks") *1/ */
+/* } */
+
+/* .multi-button { */
+/*   display: grid; */
+/*   grid-template-columns: repeat(5, 1fr); */
+/*   border: 1px solid var(--main-border-color); */
+/*   border-radius: 30px; */
+/*   width: 100%; */
+/*   overflow: hidden; */
+/* } */
+/* .sub-button { */
+/*   border: 0px; */
+/*   border-radius: 0px; */
+/*   height: 100%; /1* works, but why? *1/ */
+/*   border-right: 1px solid var(--main-border-color); */
+/*   background-color: black; */
+/* } */
+/* /1* .sub-button_active { *1/ */
+/* /1*   background-color: var(--main-bg-color); *1/ */
+/* /1* } *1/ */
+/* .sub-button:active { */
+/*   background-color: green; */
+/* } */
+
+/* button { */
+/*   color: white; */
+/*   /1*   /2* border: 0px; *2/ *1/ */
+/*   /1*   border: var(--main-border); *1/ */
+/*   /1*   border-radius: 10000px; *1/ */
+/*   /1*   background-color: var(--main-section-color); *1/ */
+
+/*   /1*   font-family: var(--main-font-family); /2* ? *2/ *1/ */
+/*   /1*   font-size: 16px; *1/ */
+/*   /1*   color: white; *1/ */
+
+/*   /1*   /2* width: 90%; *2/ *1/ */
+/*   /1*   height: 2em; /2* center text vertically *2/ *1/ */
+
+/*   /1*   /2* margin-top: 5px; *2/ *1/ */
+/*   /1*   margin-bottom: 5px; *1/ */
+/*   /1*   /2* margin-right: auto; *2/ *1/ */
+/*   /1*   /2* margin-left: auto; *2/ *1/ */
+/*   /1*   padding: 0px; *1/ */
+/*   /1*   outline: none; *1/ */
+/* } */
