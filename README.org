@@ -1,1 +1,16 @@
 * mader.xyz
+** Next Steps
+- byte-stream conversion on server
+  + convert state to bytes
+- server-client communication via TCP
+  + send byte-stream from server to client
+  + receive byte-stream on client from server
+- byte-stream conversion on client
+  + convert state from bytes
+- display systems/entities in renderer-client
+- database access
+  + save state to database
+    - encode systems/entities
+  + load state from database
+    - decode systems/entities
+
