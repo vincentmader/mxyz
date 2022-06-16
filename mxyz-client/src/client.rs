@@ -1,5 +1,5 @@
 use super::components::canvas::Canvas;
-use super::config::RendererConfig;
+use super::config::ClientConfig;
 use super::renderer::Renderer;
 use super::utils::dom;
 use std::cell::RefCell;
@@ -12,7 +12,7 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
 /// Simulation Client: Renderer
 pub struct SimulationClientV1 {
-    config: RendererConfig,
+    config: ClientConfig,
     renderer: Renderer,
     http_client: reqwest::Client,
     // TODO server -> bytestream -> client
@@ -21,7 +21,7 @@ pub struct SimulationClientV1 {
 impl SimulationClientV1 {
     /// Create new Simulation Renderer Client
     pub fn new() -> Self {
-        let config = RendererConfig::new();
+        let config = ClientConfig::new();
         let renderer = Renderer::new();
         let http_client = reqwest::Client::new();
         SimulationClientV1 {

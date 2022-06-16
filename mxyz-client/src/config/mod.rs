@@ -1,9 +1,9 @@
-pub struct RendererConfig {
+pub struct ClientConfig {
     pub frame_id: (usize, usize),
 }
-impl RendererConfig {
+impl ClientConfig {
     pub fn new() -> Self {
         let frame_id = (0, usize::MAX);
-        RendererConfig { frame_id }
+        ClientConfig { frame_id }
     }
 }
