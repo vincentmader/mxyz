@@ -5,6 +5,7 @@
     ]
     members = [
         "mxyz-client",
+        "mxyz-database",
         "mxyz-engine",
         "mxyz-server",
         "mxyz-utils",
