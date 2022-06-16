@@ -1,4 +1,4 @@
-pub mod canvas;
+// pub mod canvas;
 pub mod console;
 
 /// Enable Panic Hook to console
