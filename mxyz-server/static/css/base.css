@@ -2,79 +2,81 @@
 @import url("section.css");
 
 body {
-  /* color definitions */
   --main-bg-color: #111111;
   --main-section-color: #222222;
   --main-border-color: #555555;
   --main-text-color: #dddddd;
-  --main-font-family: Arial, Helvetica, sans-serif;
+  --main-font-family: Arial, Helvetica, sans-serif; /* TODO choose font */
   --main-border: 2px solid var(--main-border-color);
-  --debug-border: 1px solid green;
+  --debug-border: 1px solid gray;
   --main-margin: 10px;
-
-  /* geometry */
+  --main-font-size: 1em;
+  --main-x-pad: 1em; /* only for mobile screen sizes */
   width: 100%;
   margin: 0px;
   padding: 0px;
-  /* fonts */
   font-family: var(--main-font-family);
-  /* color */
   background-color: var(--main-bg-color);
   color: var(--main-text-color);
-  /* various */
   overflow-x: hidden;
 }
 
-/* HEADER ====================================== */
+/* PAGE HEADER ====================================== */
 
 #page_header {
-  outline: var(--debug-border);
-  /* width: calc(100% - 14px); */
-  text-align: right;
-  padding-top: 6px;
-  padding-bottom: 6px;
-  /* margin-bottom: 13px; */
+  width: 100%;
+  text-align: center;
+  background-color: var(--main-bg-color);
+  border-bottom: var(--main-border);
+  position: fixed;
+  height: 2em;
+  z-index: 1000;
 }
 
 #home {
-  border: var(--debug-border);
   cursor: pointer;
-  background-color: black;
   color: var(--main-text-color);
   font-size: 18px;
   font-weight: 690;
   text-decoration: none;
   outline: none;
-  /* no effect */
-  /*     margin: auto; */
-  /*     padding: auto; */
-  /*     height: 100%; */
+  margin-right: 15px;
 }
 
-/* CONTENT ====================================== */
+/* PAGE CONTENT ====================================== */
 
 #page_content {
-  outline: var(--debug-border);
-  width: 60%;
-  padding-left: 20%;
-  padding-right: 20%;
+  position: absolute;
+  margin-top: 3em;
+  padding-bottom: 1em;
+  --width: 60%;
+  width: var(--width);
+  padding-left: calc((100% - var(--width)) / 2);
+  padding-right: calc((100% - var(--width)) / 2);
 }
 @media only screen and (max-width: 1201px) {
   #page_content {
-    width: 65%;
-    padding-left: 17.5%;
-    padding-right: 17.5%;
+    --width: 65%;
+    width: var(--width);
+    padding-left: calc((100% - var(--width)) / 2);
+    padding-right: calc((100% - var(--width)) / 2);
   }
 }
 @media only screen and (max-width: 751px) {
   #page_content {
-    width: 96%;
-    padding-left: 2%;
-    padding-right: 2%;
+    --width: calc(100% - 2 * var(--main-x-pad));
+    width: var(--width);
+    padding-left: var(--main-x-pad);
+    padding-right: var(--main-x-pad);
   }
 }
 
-/* ========================================================================= */
-/* slider { */
-/*   outline: none; */
-/* } */
+/* VARIOUS =========================================== */
+
+slider {
+  outline: none;
+}
+
+.spacer {
+  height: var(--main-x-pad);
+}

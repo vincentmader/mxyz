@@ -1,6 +1,7 @@
+<div id="navgrid_container">
 {% for section in navgrid.sections %}
     <div class="navgrid_section_title">{{ section.title }}</div>
-    <div id="section_navgrid">
+    <div id="navgrid_section">
         <div id="navgrid">
             {% for item in section.items %}
                 <a href="./simulations/{{ section.section_id }}/{{ item.item_id }}" 
@@ -12,6 +13,7 @@
                         {% endif %}
                         src="{{ item.path_to_thumbnail }}" 
                         alt="{{ item.item_id }}"
+                        onerror="this.onerror=null; this.src='static/img/simulations/default.png'"
                     /> 
                     <div class="navgrid_cell_title">
                         {{ item.title }}
@@ -21,3 +23,4 @@
         </div>
     </div>
 {% endfor %}
+</div>
