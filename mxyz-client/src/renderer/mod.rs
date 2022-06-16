@@ -2,7 +2,7 @@
 // use super::utils::dom;
 // use super::utils::dom::HTMLObject;
 
-const canvas_id: u8 = 0; // TODO
+// const canvas_id: u8 = 0; // TODO
 
 /// Renderer
 pub struct Renderer {

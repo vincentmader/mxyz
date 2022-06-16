@@ -1,7 +1,4 @@
-import init, {
-  // SimulationComputeClient,
-  SimulationRendererClient,
-} from "../../../static/pkg/mxyz_client.js";
+import init, { SimulationClientV1 } from "../../../static/pkg/mxyz_client.js";
 
 let sim_id = document.getElementById("simulation.js").getAttribute("sim_id");
 console.log("simulation-id: ", sim_id);
@@ -9,12 +6,9 @@ console.log("simulation-id: ", sim_id);
 (async () => {
   await init();
 
-  let simulation = SimulationRendererClient.new();
-
-  // initialization
-  // let simulation = SimulationComputeClient.new();
-  // simulation.init();
-  // simulation.run();
+  let simulation = SimulationClientV1.new();
+  simulation.init();
+  simulation.run();
 
   //   //   // TODO move this definition to rust?
   //   //   let NR_OF_ITERATIONS_PER_RENDER = 5;
@@ -56,23 +50,38 @@ console.log("simulation-id: ", sim_id);
   //   //     });
   //   //   }
 
-  //   //   // let last_date = Date.now();
+  // let canvas = document.getElementById("canvas_0");
+  // let ctx = canvas.getContext("2d");
+
+  // let x1 = 0;
+  // let y1 = 0;
+  // let x2 = 1000;
+  // let y2 = 1000;
+
+  // ctx.beginPath();
+  // ctx.moveTo(x1, y1);
+  // ctx.strokeStyle = "purple";
+  // ctx.lineWidth = 4;
+  // ctx.lineTo(x2, y2);
+  // ctx.stroke();
+
+  // //   //   // let last_date = Date.now();
   // const loop = () => {
-  //   //   //     let date_1 = Date.now();
-  // simulation.render();
-  //   //   //     let date_2 = Date.now();
-  //   //   //     let fps_renderer = 1000 / (date_2 - date_1);
-  //   //   //     let date_3 = Date.now();
-  //   simulation.step(); // TODO move render into sim.step() ?
-  //   //   //     let date_4 = Date.now();
-  //   //   //     let fps_engine = 1000 / (date_4 - date_3);
-  //   //   //     let textfield_fps_e = document.getElementById("textfield_fps_engine");
-  //   //   //     textfield_fps_e.innerHTML = "fps_e: " + Math.round(fps_engine);
-  //   //   //     let textfield_fps_r = document.getElementById("textfield_fps_renderer");
-  //   //   //     textfield_fps_r.innerHTML = "fps_r: " + Math.round(fps_renderer);
-  //   //   //     // let dt = (date_2 - date_1) / 1000;
-  //   //   //     // let fps = 1 / dt;
-  //   //   //     // console.log(fps);
+  //   //   //   //   //     let date_1 = Date.now();
+  //   //   // simulation.render();
+  //   //   //   //   //     let date_2 = Date.now();
+  //   //   //   //   //     let fps_renderer = 1000 / (date_2 - date_1);
+  //   //   //   //   //     let date_3 = Date.now();
+  //   //   //   simulation.step(); // TODO move render into sim.step() ?
+  //   //   //   //   //     let date_4 = Date.now();
+  //   //   //   //   //     let fps_engine = 1000 / (date_4 - date_3);
+  //   //   //   //   //     let textfield_fps_e = document.getElementById("textfield_fps_engine");
+  //   //   //   //   //     textfield_fps_e.innerHTML = "fps_e: " + Math.round(fps_engine);
+  //   //   //   //   //     let textfield_fps_r = document.getElementById("textfield_fps_renderer");
+  //   //   //   //   //     textfield_fps_r.innerHTML = "fps_r: " + Math.round(fps_renderer);
+  //   //   //   //   //     // let dt = (date_2 - date_1) / 1000;
+  //   //   //   //   //     // let fps = 1 / dt;
+  //   //   //   //   //     // console.log(fps);
   //   setTimeout(function () {
   //     requestAnimationFrame(loop);
   //   }, 500);
