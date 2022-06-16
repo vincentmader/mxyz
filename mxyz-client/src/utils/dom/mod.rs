@@ -1,4 +1,3 @@
-// pub mod canvas;
 pub mod console;
 
 /// Enable Panic Hook to console
@@ -15,33 +14,33 @@ pub fn set_panic_hook() {
     console_error_panic_hook::set_once();
 }
 
-/// Document Object Model (DOM)
-pub struct DocumentObjectModel {}
-impl DocumentObjectModel {
-    /// Create new DOM Object
-    pub fn new() -> Self {
-        DocumentObjectModel {}
-    }
+// /// Document Object Model (DOM)
+// pub struct DocumentObjectModel {}
+// impl DocumentObjectModel {
+//     /// Create new DOM Object
+//     pub fn new() -> Self {
+//         DocumentObjectModel {}
+//     }
 
-    /// get Window from DOM
-    pub fn window(&self) -> web_sys::Window {
-        web_sys::window().expect("ERROR: no global `window` exists")
-    }
+//     /// get Window from DOM
+//     pub fn window(&self) -> web_sys::Window {
+//         web_sys::window().expect("ERROR: no global `window` exists")
+//     }
 
-    /// get Document from DOM
-    pub fn document(&self) -> web_sys::Document {
-        self.window()
-            .document()
-            .expect("ERROR: there's no document on window")
-    }
+//     /// get Document from DOM
+//     pub fn document(&self) -> web_sys::Document {
+//         self.window()
+//             .document()
+//             .expect("ERROR: there's no document on window")
+//     }
 
-    /// get Page Body from Document
-    pub fn body(&self) -> web_sys::HtmlElement {
-        self.document()
-            .body()
-            .expect("ERROR: document does not have a body")
-    }
-}
+//     /// get Page Body from Document
+//     pub fn body(&self) -> web_sys::HtmlElement {
+//         self.document()
+//             .body()
+//             .expect("ERROR: document does not have a body")
+//     }
+// }
 
 // /// HTML-Object Trait
 // pub trait HTMLObject {
@@ -50,24 +49,24 @@ impl DocumentObjectModel {
 
 // ============================================================================
 
-// /// get Window from DOM
-// pub fn window() -> web_sys::Window {
-//     web_sys::window().expect("no global `window` exists")
-// }
+/// get Window from DOM
+pub fn window() -> web_sys::Window {
+    web_sys::window().expect("ERROR: no global `window` exists")
+}
 
-// /// get Document from DOM
-// pub fn document() -> web_sys::Document {
-//     window()
-//         .document()
-//         .expect("should have a document on window")
-// }
+/// get Document from DOM
+pub fn document() -> web_sys::Document {
+    window()
+        .document()
+        .expect("ERROR: there's no document on window")
+}
 
-// /// get Page Body from Document
-// pub fn body() -> web_sys::HtmlElement {
-//     document()
-//         .body()
-//         .expect("document expect to have have a body")
-// }
+/// get Page Body from Document
+pub fn body() -> web_sys::HtmlElement {
+    document()
+        .body()
+        .expect("ERROR: document does not have a body")
+}
 
 // use wasm_bindgen::prelude::*;
 // use wasm_bindgen::JsCast;
