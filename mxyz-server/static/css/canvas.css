@@ -1,6 +1,6 @@
 .canvas_container {
   /* border: var(--main-border) */
-  border-radius: 20px;
+  border-radius: var(--main-border-radius);
   /* width: 94%; */
   /* margin-top: 3%; */
   /* margin-bottom: 3%; */
@@ -10,10 +10,9 @@
 canvas {
   border: var(--main-border);
   background-color: black;
-  border-radius: 20px; /* if changed: also change for section/navgrid_section? */
-  /* overflow: hidden; */
+  border-radius: var(--main-border-radius);
   width: 100%;
-
+  /* overflow: hidden; */
   box-shadow: inset 0px 0px 0px 0px black;
   box-sizing: border-box;
 }

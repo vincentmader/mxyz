@@ -1,47 +1,66 @@
-@import url("_old.css");
-
 #page_content {
   position: absolute;
   padding: 0px;
   width: 100%;
-  margin-top: 2em; /* NOTE different from index */
+  margin-top: 0;
 }
+
+/* PAGE-COLUMNS ON SMALL SCREEN */
 #page-columns {
-  --page_column_pad: 2.5%;
-  margin: 0px;
-  padding: 0px;
+  --page_column_pad: 3%; /* TODO rename */
 }
 #page-column-left {
-  --width: calc(100% - 2 * var(--page_column_pad));
-  width: var(--width);
-  padding-top: var(--page_column_pad); /* calc((100% - var(--width)) / 2); */
-  padding-right: var(--page_column_pad); /* calc((100% - var(--width)) / 2); */
-  padding-left: var(--page_column_pad); /* calc((100% - var(--width)) / 2); */
+  width: 100%;
   text-align: center;
+  padding: 0px;
+  margin: 0px;
+  margin-top: 2em; /* NOTE different from index, TODO adjust */
 }
 #page-column-right {
+  width: 100%;
+  text-align: center;
+  padding: 0px;
+  margin: 0px;
+}
+
+#page-column-left canvas {
   --width: calc(100% - 2 * var(--page_column_pad));
   width: var(--width);
-  padding-bottom: calc((100% - var(--width)) / 2);
-  padding-left: calc((100% - var(--width)) / 2);
-  padding-right: calc((100% - var(--width)) / 2);
+  margin: var(--page_column_pad);
 }
+#page-column-right .section {
+  width: calc(100% - 2 * var(--page_column_pad));
+  margin: var(--page_column_pad);
+}
+
+/* PAGE-COLUMNS ON BIG SCREEN */
 @media only screen and (min-width: 1201px) {
   #page-columns {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
   }
-  #page-column-left {
-    padding-right: calc(var(--page_column_pad) / 2);
+  #page-column-left canvas {
+    --width: calc(100% - 1.5 * var(--page_column_pad));
+    width: var(--width);
+    margin-right: calc(var(--page_column_pad) / 2);
   }
   #page-column-right {
-    padding-top: var(--page_column_pad); /* calc((100% - var(--width)) / 2); */
-    padding-left: calc(var(--page_column_pad) / 2);
+    margin-top: var(--main-header-height);
+    height: calc(100vh - var(--main-header-height));
+    overflow: scroll;
+  }
+  #page-column-right .section {
+    --width: calc(100% - 1.5 * var(--page_column_pad));
+    width: var(--width);
+    margin-top: var(--page_column_pad);
+    margin-left: calc(var(--page_column_pad) / 2);
   }
 }
+
+/* SIMULATION TITLE */
 .simulation-title {
   text-align: center;
   font-size: var(--font-size-title);
-  margin-top: var(--page_column_pad); /* calc((100% - var(--width)) / 2); */
-  margin-bottom: var(--page_column_pad); /* calc((100% - var(--width)) / 2); */
+  /* margin-top: var(--page_column_pad); */
+  /* margin-bottom: var(--page_column_pad); */
 }

@@ -8,6 +8,7 @@ body {
   --main-text-color: #dddddd;
   --main-font-family: Arial, Helvetica, sans-serif; /* TODO choose font */
   --main-border: 2px solid var(--main-border-color);
+  --main-border-radius: 25px;
   --debug-border: 1px solid #333333;
   --main-margin: 10px;
   --main-x-pad: 1em; /* only for mobile screen sizes */
@@ -15,6 +16,7 @@ body {
   --font-size-title: calc(1.2 * var(--font-size-main));
   --font-size-navgrid-section: var(--font-size-main);
   --font-size-navgrid-thumbnail: var(--font-size-main);
+  --main-header-height: 2em;
   width: 100%;
   margin: 0px;
   padding: 0px;
@@ -32,7 +34,7 @@ body {
   background-color: var(--main-bg-color);
   border-bottom: var(--main-border);
   position: fixed;
-  height: 2em;
+  height: var(--main-header-height);
   z-index: 1000;
 }
 

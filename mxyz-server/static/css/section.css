@@ -1,10 +1,12 @@
 .section {
   background-color: var(--main-section-color);
-  border-radius: 20px; /* if changed: also change for navgrid_section? */
+  border-radius: var(--main-border-radius);
   border: var(--main-border);
-  margin-bottom: 25px;
   text-align: center;
   padding: 10px;
+
+  box-shadow: inset 0px 0px 0px 0px black;
+  box-sizing: border-box;
 }
 
 .section_title {
