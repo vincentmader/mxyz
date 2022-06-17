@@ -5,7 +5,7 @@ use rocket_dyn_templates::Template;
 
 #[get("/simulations/<category>/<sim_id>")]
 pub fn route(category: &str, sim_id: &str) -> Template {
-    let title = String::from(sim_id);
+    let title = format!("{} (TODO: title)", sim_id);
     let context: HashMap<&str, &str> = [
         ("category", category),
         ("sim_id", sim_id),

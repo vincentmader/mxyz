@@ -1,1 +1,47 @@
 @import url("_old.css");
+
+#page_content {
+  position: absolute;
+  padding: 0px;
+  width: 100%;
+  margin-top: 2em; /* NOTE different from index */
+}
+#page-columns {
+  --page_column_pad: 2.5%;
+  margin: 0px;
+  padding: 0px;
+}
+#page-column-left {
+  --width: calc(100% - 2 * var(--page_column_pad));
+  width: var(--width);
+  padding-top: var(--page_column_pad); /* calc((100% - var(--width)) / 2); */
+  padding-right: var(--page_column_pad); /* calc((100% - var(--width)) / 2); */
+  padding-left: var(--page_column_pad); /* calc((100% - var(--width)) / 2); */
+  text-align: center;
+}
+#page-column-right {
+  --width: calc(100% - 2 * var(--page_column_pad));
+  width: var(--width);
+  padding-bottom: calc((100% - var(--width)) / 2);
+  padding-left: calc((100% - var(--width)) / 2);
+  padding-right: calc((100% - var(--width)) / 2);
+}
+@media only screen and (min-width: 1201px) {
+  #page-columns {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+  #page-column-left {
+    padding-right: calc(var(--page_column_pad) / 2);
+  }
+  #page-column-right {
+    padding-top: var(--page_column_pad); /* calc((100% - var(--width)) / 2); */
+    padding-left: calc(var(--page_column_pad) / 2);
+  }
+}
+.simulation-title {
+  text-align: center;
+  font-size: var(--font-size-title);
+  margin-top: var(--page_column_pad); /* calc((100% - var(--width)) / 2); */
+  margin-bottom: var(--page_column_pad); /* calc((100% - var(--width)) / 2); */
+}

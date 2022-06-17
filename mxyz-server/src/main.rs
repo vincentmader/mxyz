@@ -1,9 +1,9 @@
+mod routes;
+
 #[macro_use]
 extern crate rocket;
-
 use rocket::fs::{relative, FileServer};
 use rocket_dyn_templates::Template;
-mod routes;
 
 // ============================================================================
 
