@@ -4,3 +4,4 @@ Cargo.lock
 pkg
 target
 _*
+fuse.txt
