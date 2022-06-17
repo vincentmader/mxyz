@@ -1,9 +1,18 @@
 .navgrid_cell {
   text-decoration: none;
   color: var(--main-text-color);
+  text-align: center;
+  cursor: default;
 }
 
 .navgrid_cell_title {
   text-align: center;
   font-size: var(--font-size-navgrid-thumbnail);
+  cursor: pointer;
+  /* transition: all 500ms; */
+}
+.navgrid_cell_title:hover {
+  /* border: 2px solid #555555; */
+  /* transform: scale(calc(1.2)); */
+  /* font-size: 30; */
 }

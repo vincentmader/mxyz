@@ -7,6 +7,8 @@
 [dependencies]
     diesel = "1.4.8"
     mxyz-engine = { path = "../mxyz-engine" }
+    mxyz-database = { path = "../mxyz-database" }
+    mxyz-utils = { path="../mxyz-utils" }
 
 [dependencies.rocket]
     features = ["json"]

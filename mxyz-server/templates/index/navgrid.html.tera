@@ -15,9 +15,9 @@
                         alt="{{ item.item_id }}"
                         onerror="this.onerror=null; this.src='static/img/simulations/default.png'"
                     /> 
-                    <div class="navgrid_cell_title">
+                    <span class="navgrid_cell_title">
                         {{ item.title }}
-                    </div>
+                    </span>
                 </a>
             {% endfor %}
         </div>

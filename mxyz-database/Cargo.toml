@@ -6,6 +6,7 @@
 
 [dependencies]
     dotenv = "0.15.0"
+    mxyz-utils = { path="../mxyz-utils" }
 
 [dependencies.diesel]
     features = ["postgres"]
