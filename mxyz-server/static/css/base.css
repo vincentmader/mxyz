@@ -5,8 +5,8 @@ body {
   --main-bg-color: #111111;
   --main-section-color: #222222;
   --main-border-color: #555555;
-  --main-text-color: #dddddd;
-  --main-font-family: Arial, Helvetica, sans-serif; /* TODO choose font */
+  --main-text-color: #bbbbbb;
+  --main-font-family: Arial, Verdana, Trebuchet MS, Helvetica, sans-serif; /* TODO choose font */
   --main-border: 2px solid var(--main-border-color);
   --main-border-radius: 25px;
   --debug-border: 1px solid #333333;
@@ -17,6 +17,9 @@ body {
   --font-size-navgrid-section: var(--font-size-main);
   --font-size-navgrid-thumbnail: var(--font-size-main);
   --main-header-height: 2em;
+
+  --page_column_pad: 3%; /* TODO rename? -> atm only used for simulation */
+
   width: 100%;
   margin: 0px;
   padding: 0px;
@@ -30,7 +33,7 @@ body {
 
 #page_header {
   width: 100%;
-  text-align: center;
+  text-align: left;
   background-color: var(--main-bg-color);
   border-bottom: var(--main-border);
   position: fixed;
@@ -39,6 +42,8 @@ body {
 }
 
 #home {
+  padding-left: var(--page_column_pad);
+  padding-right: var(--page_column_pad);
   cursor: pointer;
   color: var(--main-text-color);
   font-size: var(--font-size-title);
