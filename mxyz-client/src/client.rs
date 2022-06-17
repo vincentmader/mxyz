@@ -10,7 +10,7 @@ use wasm_bindgen::prelude::*;
 // ----------------------------------------------------------------------------
 
 #[wasm_bindgen]
-/// Simulation Client: Renderer
+/// Simulation-Client: Renderer
 pub struct SimulationClientV1 {
     config: ClientConfig,
     renderer: Renderer,
@@ -19,7 +19,7 @@ pub struct SimulationClientV1 {
 }
 #[wasm_bindgen]
 impl SimulationClientV1 {
-    /// Create new Simulation Renderer Client
+    /// Creates new Simulation-Renderer-Client
     pub fn new() -> Self {
         let config = ClientConfig::new();
         let renderer = Renderer::new();
@@ -30,12 +30,14 @@ impl SimulationClientV1 {
             http_client,
         }
     }
-    /// Initialize Renderer Client
-    pub fn init(&mut self) {
+    /// Initializes Renderer-Client
+    pub fn init(&mut self, sim_id: &str) {
         dom::set_panic_hook();
+
+        dom::console::log(sim_id);
         self.renderer.init();
     }
-    /// Run Renderer Client in Animation Loop
+    /// Runs Renderer-Client in Animation Loop
     pub fn run(mut self) -> Result<(), JsValue> {
         let f = Rc::new(RefCell::new(None));
         let g = f.clone();
@@ -50,36 +52,42 @@ impl SimulationClientV1 {
         dom::request_animation_frame(g.borrow().as_ref().unwrap());
         Ok(())
     }
-    /// Forward Renderer to Next Time-Step
+    /// Forwards Renderer to Next Time-Step
     pub fn step(&mut self) {
-        // TODO this is just preliminary testing
         let i = self.config.frame_id.0;
-        let r = i as f64;
-        let phi = i as f64;
-        let pos = (r * phi.cos(), r * phi.sin());
-        let pos = (pos.0 + 500., pos.1 + 500.);
-
-        let mut canvas = Canvas::new(0);
-        canvas.set_stroke_style("white");
-        canvas.set_fill_style("white");
-        canvas.draw_circle(pos, 4., true);
+        draw(i);
         self.config.frame_id.0 += 1;
 
         self.sync();
     }
-    /// Get New States from Engine on Server
-    fn sync(&mut self) -> Result<(), reqwest::Error> {
+    /// Gets New States from Engine on Server
+    async fn sync(&mut self) -> Result<(), reqwest::Error> {
+        let a = ":(";
+        // let a = self.http_client.get("https://google.com").send().await;
         // let client = self.http_client;
         // let a = client.get("https://google.com").send()?;
         // let resp = client.get("http://httpbin.org/").send()?;
         // let a = reqwest::get("https://www.rust-lang.org").await;
-        // dom::console::log(&format!("{:?}", a));
+        dom::console::log(&format!("{:?}", a));
         Ok(())
         //     let content = reqwest::get("http://httpbin.org/range/26")
         //         .await?
         //         .text()
         //         .await?;
     }
+}
+
+pub fn draw(i: usize) {
+    // TODO this is just preliminary testing
+    let r = i as f64 * 0.3;
+    let phi = i as f64 * 0.1;
+    let pos = (r * phi.cos(), r * phi.sin());
+    let pos = (pos.0 + 500., pos.1 + 500.);
+
+    let mut canvas = Canvas::new(0);
+    canvas.set_stroke_style("blue");
+    canvas.set_fill_style("blue");
+    canvas.draw_circle(pos, 4., true);
 }
 
 // ============================================================================

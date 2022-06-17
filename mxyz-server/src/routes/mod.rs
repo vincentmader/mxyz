@@ -15,10 +15,17 @@ pub fn get_all_routes() -> Vec<rocket::Route> {
         test_tcp,
         test_download,
         test_db,
+        test_engine,
     ]
 }
 
 // ============================================================================
+
+#[get("/test_engine")]
+fn test_engine() -> content::Json<&'static str> {
+    let foo = "{ 'hi': 'world' }"; // TODO get from engine's state-vec (or db?)
+    content::Json(foo)
+}
 
 // WORKS! =====================================================================
 #[get("/test_json")]
@@ -34,7 +41,7 @@ fn test_download() -> Vec<u8> {
     bytes
 }
 
-// ==== ? =====================================================================
+// WORKS! =====================================================================
 use diesel::prelude::*;
 use mxyz_database::models::*;
 use mxyz_database::models::{NewPlanet, Planet};
