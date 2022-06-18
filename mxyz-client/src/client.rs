@@ -38,7 +38,13 @@ impl SimulationClientV1 {
         self.renderer.init();
     }
     /// Runs Renderer-Client in Animation Loop
-    pub fn run(mut self) -> Result<(), JsValue> {
+    pub async fn run(mut self) -> Result<(), JsValue> {
+        // TODO test get-request to server
+        let client = reqwest::Client::new();
+        let mut stream = client.get("http://127.0.0.1:8000/test_db").send().await?;
+        let body = stream.bytes().await?;
+        dom::console_log(&format!("{:?}", body));
+
         // TODO move animation loop to utils/dom/mod.rs (?)
         let f = Rc::new(RefCell::new(None));
         let g = f.clone();
