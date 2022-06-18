@@ -57,9 +57,23 @@ use mxyz_database::*;
 fn test_db() -> content::Json<&'static str> {
     let connection = mxyz_database::establish_connection();
 
+    // show
+    let results = planets
+        // .filter(published.eq(true))
+        // .limit(5)
+        .load::<Planet>(&connection)
+        .expect("Error loading posts");
+    let nr_of_planets = results.len();
+    println!("Displaying {} planets", nr_of_planets);
+    for planet in results {
+        println!("{}", planet.planet_id);
+        println!("----------\n");
+        println!("{}", planet.mass);
+    }
+
     // add
     let new_planet = NewPlanet {
-        planet_id: &1,
+        planet_id: &((nr_of_planets + 1) as i32),
         system_id: &0,
         mass: &1.,
         pos_x: &0.,
@@ -74,20 +88,10 @@ fn test_db() -> content::Json<&'static str> {
         .get_result(&connection)
         .expect("Error saving new post");
 
-    // show
-    let results = planets
-        // .filter(published.eq(true))
-        .limit(5)
-        .load::<Planet>(&connection)
-        .expect("Error loading posts");
-    println!("Displaying {} planets", results.len());
-    for planet in results {
-        println!("{}", planet.planet_id);
-        println!("----------\n");
-        println!("{}", planet.mass);
-    }
-
+    // let foo = format!("{{ 'hi': '{}' }}", nr_of_planets); // TODO get from engine's state-vec (or db?)
     let foo = "{ 'hi': 'world' }"; // TODO get from engine's state-vec (or db?)
+                                   // let foo = &String::new();
+
     content::Json(foo)
 }
 
