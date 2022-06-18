@@ -1,30 +1,33 @@
 <html>
-    <!-- HEAD -->
+
     <head>
-        {% block head %}            
+    {% block head %}            
 
         <title>mader.xyz{% block title %}{% endblock title %}</title>
         <meta charset="utf-8">
         <link rel="icon" href="/static/img/favicon.ico" type="image/png"/>
         <link rel="stylesheet" href="/static/css/base.css" type="text/css">
 
-        {% endblock head %}            
+    {% endblock head %}            
     </head>
-    <!-- BODY -->
+
     <body style="background-color: #111111">
+    {% block body %}
 
-        <!-- HEADER / NAVBAR -->
         <div id="page_header">
-            {% block header %}
-            <a href="/" id="home">mader.xyz</a>
-            {% endblock header %}            
+        {% block page_header %}
+            <div id="home-button-container">
+                <a href="/" id="home-button">mader.xyz</a>
+            </div>
+        {% endblock page_header %}            
         </div>
 
-        <!-- CONTENT -->
         <div id="page_content">
-            {% block content %}
-            {% endblock content %}
+        {% block page_content %}
+        {% endblock page_content %}
         </div>
 
+    {% endblock body %}
     </body>
+
 </html>

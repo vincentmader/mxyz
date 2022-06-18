@@ -4,22 +4,30 @@
     {{ super() }}
     <link rel="stylesheet" href="/static/css/simulation/base.css" type="text/css">
 {% endblock head %}
+
 {% block title %} - {{ title }}{% endblock title %}
-{% block content %}
+
+{% block page_header %}
     {{ super() }}
+    <div class="simulation-title-container">
+        <span class="simulation-title">{{ title }}</span>
+    </div>
+{% endblock page_header %}
+
+{% block page_content %}
+    {{ super() }}
+
     <!-- ====== SIMULATION SCRIPT ========================= -->
     <script type="module" 
-            id="simulation.js"
-            src="../../static/js/simulation/base.js"
-            category="{{ category }}"
-            sim_id="{{ sim_id }}">
+        id="simulation.js"
+        src="../../static/js/simulation/base.js"
+        category="{{ category }}"
+        sim_id="{{ sim_id }}">
     </script>
 
     <!-- ====== COLUMN VIEW (big screen only) ============= -->
     <div id="page-columns">
         <div id="page-column-left">
-            <!-- ====== PAGE TITLE ======================== -->
-            <div class="simulation-title">{{ title }}</div>
             <!-- ====== CANVAS ============================ -->
             <div class="canvas_container">
                 <canvas id="canvas_0" width="1000px"> </canvas>
@@ -30,14 +38,11 @@
             </div>
         </div>
         <div id="page-column-right">
-            <div id="spacer"></div>
             {% include "boilerplate/section" %}
             {% include "boilerplate/section" %}
             {% include "boilerplate/section" %}
             {% include "boilerplate/section" %}
             {% include "boilerplate/section" %}
-            <!-- ====== BUTTON MENUs ====================== -->
-            <!-- <div id="button-menus"> </div> -->
         </div>
     </div>
-{% endblock content %}
+{% endblock page_content %}

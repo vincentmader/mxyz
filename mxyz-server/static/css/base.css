@@ -13,12 +13,11 @@ body {
   --main-margin: 10px;
   --main-x-pad: 1em; /* only for mobile screen sizes */
   --font-size-main: 1em;
-  --font-size-title: calc(1.2 * var(--font-size-main));
+  --font-size-title: calc(var(--font-size-main));
   --font-size-navgrid-section: var(--font-size-main);
   --font-size-navgrid-thumbnail: var(--font-size-main);
   --main-header-height: 2em;
-
-  --page_column_pad: 3%; /* TODO rename? -> atm only used for simulation */
+  --page_column_pad: 25px; /* TODO rename? -> atm only used for simulation */
 
   width: 100%;
   margin: 0px;
@@ -32,19 +31,29 @@ body {
 /* PAGE HEADER ====================================== */
 
 #page_header {
-  width: 100%;
-  text-align: right;
+  width: calc(100% - 2 * var(--page_column_pad));
+  /* text-align: right; */
   background-color: var(--main-bg-color);
   outline: var(--main-border);
   position: fixed;
-  height: var(--main-header-height);
+  /* height: var(--main-header-height); */
   z-index: 1000;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  padding-right: var(--page_column_pad);
+  padding-left: var(--page_column_pad);
+  padding-top: calc(var(--page_column_pad) / 4);
+  padding-bottom: calc(var(--page_column_pad) / 4);
+  /* padding: auto; */
+  /* padding-top: calc(var(--main-header-height) - var(--font-size-main)) / 2; */
+  /* padding-bottom: calc(var(--main-header-height) - var(--font-size-main)); */
+  /* padding-bottom: 100px; */
 }
 
-#home {
-  --pad: var(--page_column_pad);
-  padding-left: var(--pad);
-  padding-right: var(--pad);
+#home-button-container {
+  text-align: left;
+}
+#home-button {
   cursor: pointer;
   color: var(--main-text-color);
   font-size: var(--font-size-title);
@@ -53,7 +62,7 @@ body {
   outline: none;
 }
 @media only screen and (min-width: 1201px) {
-  #home {
+  #home-button {
     --pad: calc(var(--page_column_pad) / 2);
     padding-left: var(--pad);
     padding-right: var(--pad);

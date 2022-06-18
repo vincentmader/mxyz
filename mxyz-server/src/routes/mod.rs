@@ -88,10 +88,7 @@ fn test_db() -> content::Json<&'static str> {
         .get_result(&connection)
         .expect("Error saving new post");
 
-    // let foo = format!("{{ 'hi': '{}' }}", nr_of_planets); // TODO get from engine's state-vec (or db?)
     let foo = "{ 'hi': 'world' }"; // TODO get from engine's state-vec (or db?)
-                                   // let foo = &String::new();
-
     content::Json(foo)
 }
 

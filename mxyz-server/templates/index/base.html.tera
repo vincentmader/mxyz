@@ -5,7 +5,7 @@
     <link rel="stylesheet" type="text/css" href="/static/css/index/base.css">
 {% endblock head %}
 
-{% block content %}
+{% block page_content %}
     {{ super() }}
     {% include "index/navgrid" %}
-{% endblock content %}
+{% endblock page_content %}
