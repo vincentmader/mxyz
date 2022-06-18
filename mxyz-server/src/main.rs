@@ -1,3 +1,4 @@
+mod cors;
 mod routes;
 
 #[macro_use]
@@ -17,6 +18,7 @@ pub async fn main() -> Result<(), rocket::Error> {
         .register("/", catchers)
         .mount("/", routes)
         .mount("/static", file_server)
+        .attach(cors::CORS)
         .attach(Template::fairing())
         .launch()
         .await
