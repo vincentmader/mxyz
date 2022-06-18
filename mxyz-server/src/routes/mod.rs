@@ -16,8 +16,65 @@ pub fn get_all_routes() -> Vec<rocket::Route> {
         test_download,
         test_db,
         test_engine,
+        // test_stream,
     ]
 }
+
+// #[options("/login")]
+// pub fn handle_cors_request() {}
+
+// #[post("/login", format = "json", data = "<credentials>")]
+// pub fn login(credentials: Json<Credentials>) -> Json<bool> {
+//     println!("{:?}", credentials);
+//     let username = &credentials.username;
+//     let password = &credentials.password;
+//     if credentials.username == "a" {}
+//     let valid = match (username.as_str(), password.as_str()) {
+//         ("root", "root") => true,
+//         ("vincent", "root") => true,
+//         _ => false,
+//     };
+//     println!("valid {}", valid);
+//     Json::from(valid)
+// }
+
+// ============================================================================
+
+// use std::io::prelude::*;
+
+// const HOST: &'static str = "http://127.0.0.1:8000";
+
+// #[get("/proxy")]
+// pub fn test_stream() -> std::io::Result<()> {
+//     // let mut stream = TcpStream::connect(HOST)?;
+//     let mut stream = TcpStream::connect("http://127.0.0.1:8000")?;
+
+//     stream.write(&[1])?;
+//     stream.read(&mut [0; 128])?;
+//     Ok(())
+// } // the stream is closed here
+
+// ============================================================================
+
+// use bytes::Bytes;
+// use tokio_util::io::StreamReader;
+// #[get("/proxy")]
+// async fn proxify() -> rocket::response::Stream<
+//     StreamReader<impl rocket::futures::Stream<Item = Result<Bytes, std::io::Error>>, Bytes>,
+// > {
+//     let url =
+//         reqwest::Url::parse("https://www.rust-lang.org/static/images/rust-logo-blk.svg").unwrap();
+//     let client = reqwest::Client::new();
+//     let response = client.get(url).send().await.unwrap();
+
+//     use rocket::futures::TryStreamExt; // for map_err() call below:
+//     let reader = StreamReader::new(
+//         response
+//             .bytes_stream()
+//             .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e)),
+//     );
+//     rocket::response::Stream::chunked(reader, 4096)
+// }
 
 // ============================================================================
 
@@ -53,13 +110,25 @@ use mxyz_database::*;
 // use self::diesel_demo::*;
 
 #[get("/test_db")]
-// fn test_bytes() -> content::Json<&'static str> {
-fn test_db() -> content::Json<&'static str> {
+fn test_db() -> Vec<u8> {
     let connection = mxyz_database::establish_connection();
+
+    // show
+    let results = planets
+        .limit(i64::MAX)
+        .load::<Planet>(&connection)
+        .expect("Error loading posts");
+    let nr_of_planets = results.len();
+    println!("Displaying {} planets", nr_of_planets);
+    for planet in results.iter() {
+        println!("{}", planet.planet_id);
+        println!("----------\n");
+        println!("{}", planet.mass);
+    }
 
     // add
     let new_planet = NewPlanet {
-        planet_id: &1,
+        planet_id: &(nr_of_planets as i32),
         system_id: &0,
         mass: &1.,
         pos_x: &0.,
@@ -74,21 +143,12 @@ fn test_db() -> content::Json<&'static str> {
         .get_result(&connection)
         .expect("Error saving new post");
 
-    // show
-    let results = planets
-        // .filter(published.eq(true))
-        .limit(5)
-        .load::<Planet>(&connection)
-        .expect("Error loading posts");
-    println!("Displaying {} planets", results.len());
-    for planet in results {
-        println!("{}", planet.planet_id);
-        println!("----------\n");
-        println!("{}", planet.mass);
+    let mut bytes = vec![];
+    for planet in results.iter() {
+        // let foo = planet.
+        bytes.push(0);
     }
-
-    let foo = "{ 'hi': 'world' }"; // TODO get from engine's state-vec (or db?)
-    content::Json(foo)
+    bytes
 }
 
 // ==== ? =====================================================================

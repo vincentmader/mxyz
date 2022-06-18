@@ -12,19 +12,27 @@
     </head>
     <!-- BODY -->
     <body style="background-color: #111111">
+        {% block body %}
 
         <!-- HEADER / NAVBAR -->
         <div id="page_header">
-            {% block header %}
-            <a href="/" id="home">mader.xyz</a>
-            {% endblock header %}            
+            {% block page_header %}
+            <span id="page_title_container">
+                {% block page_title %}
+                {% endblock page_title %}
+            </span>
+            <span id="home_button_container">
+                <a href="/" id="home_button">mader.xyz</a>
+            </span>
+            {% endblock page_header %}            
         </div>
 
         <!-- CONTENT -->
         <div id="page_content">
-            {% block content %}
-            {% endblock content %}
+            {% block page_content %}
+            {% endblock page_content %}
         </div>
 
+        {% endblock body %}
     </body>
 </html>

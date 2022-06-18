@@ -32,6 +32,9 @@ body {
 /* PAGE HEADER ====================================== */
 
 #page_header {
+  /* display: grid; */
+  /* grid-template-columns: repeat(2, 1fr); */
+
   width: 100%;
   text-align: right;
   background-color: var(--main-bg-color);
@@ -41,7 +44,7 @@ body {
   z-index: 1000;
 }
 
-#home {
+#home_button {
   --pad: var(--page_column_pad);
   padding-left: var(--pad);
   padding-right: var(--pad);
@@ -53,7 +56,7 @@ body {
   outline: none;
 }
 @media only screen and (min-width: 1201px) {
-  #home {
+  #home_button {
     --pad: calc(var(--page_column_pad) / 2);
     padding-left: var(--pad);
     padding-right: var(--pad);
