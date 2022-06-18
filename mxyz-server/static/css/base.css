@@ -35,7 +35,7 @@ body {
   width: 100%;
   text-align: right;
   background-color: var(--main-bg-color);
-  border-bottom: var(--main-border);
+  outline: var(--main-border);
   position: fixed;
   height: var(--main-header-height);
   z-index: 1000;

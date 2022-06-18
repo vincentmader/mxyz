@@ -53,9 +53,11 @@
 
 /* SIMULATION TITLE */
 .simulation-title {
-  text-align: center;
+  display: flex;
+  justify-content: center;
   font-size: var(--font-size-title);
   height: var(--font-size-title);
+  line-height: var(--font-size-title);
   padding-top: var(--page_column_pad);
   padding-bottom: 0;
 }
