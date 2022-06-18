@@ -34,11 +34,12 @@ impl SimulationClientV1 {
     pub fn init(&mut self, sim_id: &str) {
         dom::set_panic_hook();
 
-        dom::console::log(sim_id);
+        dom::console_log(sim_id);
         self.renderer.init();
     }
     /// Runs Renderer-Client in Animation Loop
     pub fn run(mut self) -> Result<(), JsValue> {
+        // TODO move animation loop to utils/dom/mod.rs (?)
         let f = Rc::new(RefCell::new(None));
         let g = f.clone();
         *g.borrow_mut() = Some(Closure::wrap(Box::new(move || {
@@ -68,7 +69,7 @@ impl SimulationClientV1 {
         // let a = client.get("https://google.com").send()?;
         // let resp = client.get("http://httpbin.org/").send()?;
         // let a = reqwest::get("https://www.rust-lang.org").await;
-        dom::console::log(&format!("{:?}", a));
+        dom::console_log(&format!("{:?}", a));
         Ok(())
         //     let content = reqwest::get("http://httpbin.org/range/26")
         //         .await?

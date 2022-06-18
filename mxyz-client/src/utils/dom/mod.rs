@@ -1,5 +1,36 @@
-pub mod console;
+use wasm_bindgen::prelude::*;
+use wasm_bindgen::JsCast;
 
+// Window, Document, Body
+// ============================================================================
+
+/// Gets Window from DOM
+pub fn window() -> web_sys::Window {
+    web_sys::window().expect("ERROR: no global `window` exists")
+}
+
+/// Gets Document from DOM
+pub fn document() -> web_sys::Document {
+    window().document().expect("ERROR: no document on window")
+}
+
+/// Gets Page Body from Document
+pub fn body() -> web_sys::HtmlElement {
+    document().body().expect("ERROR: no body on document")
+}
+
+// ANIMATION FRAME
+// TODO move whole Animation Loop from client.rs to here
+// ============================================================================
+
+/// Requests Animation Frame
+pub fn request_animation_frame(f: &Closure<dyn FnMut()>) {
+    window()
+        .request_animation_frame(f.as_ref().unchecked_ref())
+        .expect("ERROR: should register `requestAnimationFrame` OK");
+}
+
+// LOG & DEBUG
 // ============================================================================
 
 /// Enables Panic Hook to console
@@ -16,37 +47,17 @@ pub fn set_panic_hook() {
     console_error_panic_hook::set_once();
 }
 
-// ============================================================================
-
-use wasm_bindgen::prelude::*;
-use wasm_bindgen::JsCast;
-
-/// Requests Animation Frame
-pub fn request_animation_frame(f: &Closure<dyn FnMut()>) {
-    window()
-        .request_animation_frame(f.as_ref().unchecked_ref())
-        .expect("ERROR: should register `requestAnimationFrame` OK");
+/// Manually Logs String to Browser Console
+pub fn console_log(message: &str) {
+    let array = js_sys::Array::new();
+    array.push(&message.into());
+    web_sys::console::log(&array);
 }
 
-// ============================================================================
-
-/// Gets Window from DOM
-pub fn window() -> web_sys::Window {
-    web_sys::window().expect("ERROR: no global `window` exists")
-}
-
-/// Gets Document from DOM
-pub fn document() -> web_sys::Document {
-    window()
-        .document()
-        .expect("ERROR: there's no document on window")
-}
-
-/// Gets Page Body from Document
-pub fn body() -> web_sys::HtmlElement {
-    document()
-        .body()
-        .expect("ERROR: document does not have a body")
+/// Performs JS Alert
+#[wasm_bindgen]
+extern "C" {
+    fn alert(s: &str);
 }
 
 // ============================================================================
@@ -86,45 +97,11 @@ pub fn body() -> web_sys::HtmlElement {
 
 // ============================================================================
 
-// use wasm_bindgen::prelude::*;
-// use wasm_bindgen::JsCast;
-
-// pub fn request_animation_frame(f: &Closure<dyn FnMut()>) {
-//     window()
-//         .request_animation_frame(f.as_ref().unchecked_ref())
-//         .expect("should register `requestAnimationFrame` OK");
-// }
-
 //use gloo::events::EventListener;
-//use wasm_bindgen::JsCast;
 
 //pub fn window() -> web_sys::Window {
 //    web_sys::window().expect("no global `window` exists")
 //}
-
-//pub fn document() -> web_sys::Document {
-//    window()
-//        .document()
-//        .expect("should have a document on window")
-//}
-
-//pub fn body() -> web_sys::HtmlElement {
-//    document()
-//        .body()
-//        .expect("document expect to have have a body")
-//}
-
-//// pub fn request_animation_frame(f: &Closure<dyn FnMut()>) {
-////     window()
-////         .request_animation_frame(f.as_ref().unchecked_ref())
-////         .expect("should register 'requestAnimationFrame' OK");
-//// }
-
-//// pub fn body() -> web_sys::HtmlElement {
-////     document()
-////         .body()
-////         .expect("document should have a body")
-//// }
 
 //pub fn eventlistener_new_p_mousedown() {
 //    let window = web_sys::window().expect("global window does not exists");
@@ -211,25 +188,6 @@ pub fn body() -> web_sys::HtmlElement {
 //    });
 //    on_up.forget();
 //    body.append_child(&paragraph).unwrap();
-//}
-
-//pub fn set_panic_hook() {
-//    // When the `console_error_panic_hook` feature is enabled,
-//    // we can call the `set_panic_hook` function at least
-//    // once during initialization, and then we will get
-//    // better error messages if our code ever panics.
-//    //
-//    // For more details see
-//    // https://github.com/rustwasm/console_error_panic_hook#readme
-//    #[cfg(feature = "console_error_panic_hook")]
-//    console_error_panic_hook::set_once();
-//}
-
-//use wasm_bindgen::prelude::*;
-
-//#[wasm_bindgen]
-//extern "C" {
-//    pub fn alert(s: &str);
 //}
 
 //pub fn add_button_to_menu<F>(
