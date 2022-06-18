@@ -32,11 +32,6 @@
   #page-columns {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    /* float: left; */
-    /* display: flex; */
-  }
-  #page-column-left {
-    /* flex: 75%; */
   }
   #page-column-left canvas {
     --width: calc(100% - 1.5 * var(--page_column_pad));
@@ -44,7 +39,6 @@
     margin-right: calc(var(--page_column_pad) / 2);
   }
   #page-column-right {
-    /* flex: 25%; */
     margin-top: var(--main-header-height);
     height: calc(100vh - var(--main-header-height));
     overflow: scroll;
