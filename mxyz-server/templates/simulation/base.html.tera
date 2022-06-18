@@ -9,8 +9,8 @@
 
 {% block page_header %}
     {{ super() }}
-    <div class="simulation-title-container">
-        <span class="simulation-title">{{ title }}</span>
+    <div id="simulation-title-container">
+        <span id="simulation-title">{{ title }}</span>
     </div>
 {% endblock page_header %}
 

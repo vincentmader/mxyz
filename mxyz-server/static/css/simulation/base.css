@@ -28,10 +28,11 @@
 }
 
 /* SIMULATION TITLE */
-.simulation-title-container {
+#simulation-title-container {
+  padding-right: calc(var(--main-border-radius));
   text-align: right;
 }
-.simulation-title {
+#simulation-title {
   text-align: center;
   color: var(--main-text-color);
   font-size: var(--font-size-title);
@@ -60,8 +61,10 @@
     margin-top: var(--page_column_pad);
     margin-left: calc(var(--page_column_pad) / 2);
   }
-  .simulation-title-container {
+  #simulation-title-container {
     text-align: center;
+  }
+  #home-button-container {
   }
 }
 
