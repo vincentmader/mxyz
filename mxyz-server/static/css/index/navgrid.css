@@ -1,20 +1,14 @@
 #navgrid_container {
-  /* padding-top: 1em; */
-  /* padding-bottom: 1em; */
-  /* position: absolute; */
-  /* padding-bottom: 3em; */
 }
 #navgrid {
   --thumbnail_initial_width: 0.9;
   --thumbnail_max_width: 0.97;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  /* margin-bottom: 28px; */
-  /* margin-top: 78px; */
 }
 @media only screen and (max-width: 1201px) {
   #navgrid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 @media only screen and (max-width: 751px) {
