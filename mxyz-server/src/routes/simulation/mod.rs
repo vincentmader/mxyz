@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 extern crate rocket_dyn_templates;
+use rocket::get;
 use rocket_dyn_templates::Template;
 
 #[get("/simulations/<category>/<sim_id>")]

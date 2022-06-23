@@ -3,28 +3,41 @@ pub mod index;
 pub mod simulation;
 
 use rocket::response::content;
+use rocket::{get, routes};
 
 /// Returns Vector of all Rocket Routes
 pub fn get_all_routes() -> Vec<rocket::Route> {
     routes![
         index::route,
         simulation::route,
-        // testing
+        // // testing
         test_json,
-        test_bytes,
-        test_tcp,
-        test_download,
+        // test_bytes,
+        // test_tcp,
+        // test_download,
         test_db,
         test_engine,
     ]
 }
 
+// use mxyz_engine::state::State;
+// use rocket_contrib::json::Json;
+
+// #[get("/state/<id>")]
+// fn test_get_state(id: usize) -> Json<State> {
+//     // let user_from_id = User::from(id);
+//     /* ... */
+//     let state = State::new();
+//     Json(state)
+// }
+
 // ============================================================================
 
 #[get("/test_engine")]
 fn test_engine() -> content::Json<&'static str> {
-    let foo = "{ 'hi': 'world' }"; // TODO get from engine's state-vec (or db?)
-    content::Json(foo)
+    todo!();
+    // let foo = "{ 'hi': 'world' }"; // TODO get from engine's state-vec (or db?)
+    // content::Json(foo)
 }
 
 // WORKS! =====================================================================
@@ -36,18 +49,18 @@ fn test_json() -> content::Json<&'static str> {
 
 // WORKS! =====================================================================
 #[get("/test_download")]
-fn test_download() -> Vec<u8> {
+fn _test_download() -> Vec<u8> {
     let bytes = vec![0, 1, 2];
     bytes
 }
 
 // WORKS! =====================================================================
 use diesel::prelude::*;
-use mxyz_database::models::*;
+// use mxyz_database::models::*;
 use mxyz_database::models::{NewPlanet, Planet};
 use mxyz_database::schema::planets;
 use mxyz_database::schema::planets::dsl::*;
-use mxyz_database::*;
+// use mxyz_database::*;
 // use mxyz_database::schema::*;
 // use self::diesel::prelude::*;
 // use self::diesel_demo::*;
@@ -88,36 +101,36 @@ fn test_db() -> content::Json<&'static str> {
         .get_result(&connection)
         .expect("Error saving new post");
 
-    let foo = "{ 'hi': 'world' }"; // TODO get from engine's state-vec (or db?)
+    let foo = "{ 'hello': 'world' }"; // TODO get from engine's state-vec (or db?)
     content::Json(foo)
 }
 
 // ==== ? =====================================================================
 #[get("/test_bytes")]
 // fn test_bytes() -> content::Json<&'static str> {
-fn test_bytes() -> Vec<u8> {
+fn _test_bytes() -> Vec<u8> {
     let bytes = vec![0, 1, 2];
     bytes
 }
 
 // ==== ? =====================================================================
 #[get("/test_tcp")]
-fn test_tcp() -> content::Json<&'static str> {
-    tcp().unwrap();
+fn _test_tcp() -> content::Json<&'static str> {
+    _tcp().unwrap();
     let foo = "{}"; // TODO bytes!
     content::Json(foo)
 }
 
 use std::net::{TcpListener, TcpStream};
-fn handle_client(stream: TcpStream) {
+fn _handle_client(_stream: TcpStream) {
     // ...
 }
 
-fn tcp() -> std::io::Result<()> {
+fn _tcp() -> std::io::Result<()> {
     let listener = TcpListener::bind("127.0.0.1:80")?;
     // accept connections and process them serially
     for stream in listener.incoming() {
-        handle_client(stream?);
+        _handle_client(stream?);
     }
     Ok(())
 }

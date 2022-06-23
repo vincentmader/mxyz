@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 extern crate rocket_dyn_templates;
+use rocket::catch;
 use rocket::Request;
 use rocket_dyn_templates::Template;
 
