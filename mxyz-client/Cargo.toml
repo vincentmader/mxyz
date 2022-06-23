@@ -38,6 +38,13 @@
         'Node',
         'Window',
         'console',
+        'WebSocket',
+        "BinaryType",
+        "Blob",
+        "ErrorEvent",
+        "FileReader",
+        "MessageEvent",
+        "ProgressEvent",
     ]
 
 [features]

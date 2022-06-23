@@ -1,3 +1,8 @@
+#![allow(unused_variables)]
+#![allow(unreachable_code)]
+
+// NOTE: use bincode::serialize instead
+
 trait Protocol {
     fn to_bytes(&self) -> Vec<u8>;
     fn from_bytes(bin: &[u8]) -> Self;
