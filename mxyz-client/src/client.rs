@@ -5,15 +5,6 @@ use super::utils::dom;
 use std::cell::RefCell;
 use std::rc::Rc;
 use wasm_bindgen::prelude::*;
-// use super::utils::dom::console;
-
-// pub struct Client {
-//     pub user_id: usize,
-//     pub topics: Vec<String>,
-//     pub sender: Option<mpsc::UnboundedSender<std::result::Result<Message, warp::Error>>>,
-// }
-
-// ----------------------------------------------------------------------------
 
 #[wasm_bindgen]
 /// Simulation-Client: Renderer
@@ -46,16 +37,16 @@ impl SimulationClientV1 {
         // TODO test get-request to server
         // - TCP get-requests (bytestream? -> decode)
         // - move inside animation loop (async?)
-        let client = reqwest::Client::new();
-        let mut stream = client
-            .get("http://127.0.0.1:8000/test_db")
-            .send()
-            .await
-            .unwrap();
-        let body = stream.bytes().await.unwrap();
-        dom::console_log(&format!("{:?}", body));
+        // let client = reqwest::Client::new();
+        // let mut stream = client
+        //     .get("http://127.0.0.1:8000/test_db")
+        //     .send()
+        //     .await
+        //     .unwrap();
+        // let body = stream.bytes().await.unwrap();
+        // dom::console_log(&format!("{:?}", body));
 
-        start_websocket().unwrap();
+        // start_websocket().unwrap();
 
         // ANIMATION LOOP
         // todo: move to utils/dom/mod.rs (?)
@@ -82,13 +73,13 @@ impl SimulationClientV1 {
     }
     /// Gets New States from Engine on Server
     async fn sync(&mut self) -> Result<(), reqwest::Error> {
-        let a = ":(";
+        // let a = "TODO";
         // let a = self.http_client.get("https://google.com").send().await;
         // let client = self.http_client;
         // let a = client.get("https://google.com").send()?;
         // let resp = client.get("http://httpbin.org/").send()?;
         // let a = reqwest::get("https://www.rust-lang.org").await;
-        dom::console_log(&format!("{:?}", a));
+        // dom::console_log(&format!("{:?}", a));
         Ok(())
         //     let content = reqwest::get("http://httpbin.org/range/26")
         //         .await?
@@ -286,3 +277,9 @@ pub fn start_websocket() -> Result<(), JsValue> {
 
     Ok(())
 }
+
+// pub struct Client {
+//     pub user_id: usize,
+//     pub topics: Vec<String>,
+//     pub sender: Option<mpsc::UnboundedSender<std::result::Result<Message, warp::Error>>>,
+// }

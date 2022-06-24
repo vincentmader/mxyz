@@ -7,19 +7,19 @@ use rocket_dyn_templates::Template;
 /// Rocket Server
 pub struct RocketServer {
     routes: Vec<Route>,
-    file_server: FileServer,
     catchers: Vec<Catcher>,
+    file_server: FileServer,
 }
 impl RocketServer {
     /// Creates a new Server instance
     pub fn new() -> Self {
         let routes = routes::get_all_routes();
-        let file_server = FileServer::from(relative!("static"));
         let catchers = catchers![routes::error::not_found::route,];
+        let file_server = FileServer::from(relative!("static"));
         RocketServer {
             routes,
-            file_server,
             catchers,
+            file_server,
         }
     }
     /// Starts the Server aynchronously
@@ -44,7 +44,7 @@ use std::io;
 use tokio::net::{TcpListener, TcpStream};
 
 const HOST: &str = "127.0.0.1";
-const PORT: usize = 8080;
+const PORT: usize = 1234;
 
 // ============================================================================
 
