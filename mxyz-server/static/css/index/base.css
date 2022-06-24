@@ -3,6 +3,13 @@
 @import url("navgrid_cell.css");
 @import url("navgrid_thumbnail.css");
 
+#page_content {
+  --width: 90%;
+  width: var(--width);
+  --pad: calc((100% - var(--width)) / 2);
+  padding-left: var(--pad);
+  padding-right: var(--pad);
+}
 @media only screen and (min-width: 751px) {
   #page_content {
     --width: 90%;
