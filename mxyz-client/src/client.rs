@@ -20,27 +20,25 @@ use wasm_bindgen::prelude::*;
 pub struct SimulationClientV1 {
     config: ClientConfig,
     renderer: Renderer,
-    http_client: reqwest::Client,
+    // http_client: reqwest::Client,
     // TODO server -> bytestream -> client
 }
 #[wasm_bindgen]
 impl SimulationClientV1 {
     /// Creates new Simulation-Renderer-Client
-    pub fn new() -> Self {
-        let config = ClientConfig::new();
+    pub fn new(client_id: usize) -> Self {
+        let config = ClientConfig::new(client_id);
         let renderer = Renderer::new();
-        let http_client = reqwest::Client::new();
+        // let http_client = reqwest::Client::new();
         SimulationClientV1 {
             config,
             renderer,
-            http_client,
+            // http_client,
         }
     }
     /// Initializes Renderer-Client
     pub fn init(&mut self, sim_id: &str) {
         dom::set_panic_hook();
-
-        dom::console_log(sim_id);
         self.renderer.init();
     }
     /// Runs Renderer-Client in Animation Loop
@@ -69,13 +67,6 @@ impl SimulationClientV1 {
                 return;
             }
             self.step(); //
-                         // let client = reqwest::Client::new();
-                         // let mut stream = client
-                         //     .get("http://127.0.0.1:8000/test_db")
-                         //     .send()
-                         //     .await
-                         //     .unwrap();
-                         // let body = stream.bytes().await.unwrap();
             dom::request_animation_frame(f.borrow().as_ref().unwrap());
         }) as Box<dyn FnMut()>));
         dom::request_animation_frame(g.borrow().as_ref().unwrap());
@@ -207,19 +198,19 @@ extern "C" {
 
 #[wasm_bindgen]
 pub fn start_websocket() -> Result<(), JsValue> {
+    // let address = "wss://echo.websocket.events";
     let address = "wss://echo.websocket.events";
     let ws = WebSocket::new(address)?;
 
     // For small binary messages, like CBOR, Arraybuffer is more efficient than Blob handling
     ws.set_binary_type(web_sys::BinaryType::Arraybuffer);
 
-    // create callback
+    // Create OnMessage Callback.
     let cloned_ws = ws.clone();
     let onmessage_callback = Closure::wrap(Box::new(move |e: MessageEvent| {
-        // Handle difference Text/Binary,...
+        // Handle ArrayBuffer.
         if let Ok(abuf) = e.data().dyn_into::<js_sys::ArrayBuffer>() {
             console_log!("message event, received arraybuffer: {:?}", abuf);
-
             let array = js_sys::Uint8Array::new(&abuf);
             let len = array.byte_length() as usize;
             console_log!("Arraybuffer received {}bytes: {:?}", len, array.to_vec());
@@ -232,6 +223,8 @@ pub fn start_websocket() -> Result<(), JsValue> {
                 //     Err(err) => console_log!("error sending message: {:?}", err),
                 _ => {}
             }
+
+        // Handle Blob.
         } else if let Ok(blob) = e.data().dyn_into::<web_sys::Blob>() {
             console_log!("message event, received blob: {:?}", blob);
 
@@ -250,34 +243,41 @@ pub fn start_websocket() -> Result<(), JsValue> {
             fr.set_onloadend(Some(onloadend_cb.as_ref().unchecked_ref()));
             fr.read_as_array_buffer(&blob).expect("blob not readable");
             onloadend_cb.forget();
+
+        // Handle Text.
         } else if let Ok(txt) = e.data().dyn_into::<js_sys::JsString>() {
             console_log!("message event, received Text: {:?}", txt);
+        // Handle Other.
         } else {
             console_log!("message event, received Unknown: {:?}", e.data());
         }
     }) as Box<dyn FnMut(MessageEvent)>);
-    // set message event handler on WebSocket
+    // Set message event handler on WebSocket.
     ws.set_onmessage(Some(onmessage_callback.as_ref().unchecked_ref()));
-    // forget the callback to keep it alive
+    // Forget the callback to keep it alive.
     onmessage_callback.forget();
 
+    // Create OnError Callback.
     let onerror_callback = Closure::wrap(Box::new(move |e: ErrorEvent| {
         console_log!("error event: {:?}", e);
     }) as Box<dyn FnMut(ErrorEvent)>);
+    // Set error event handler on WebSocket.
     ws.set_onerror(Some(onerror_callback.as_ref().unchecked_ref()));
+    // Forget the callback to keep it alive.
     onerror_callback.forget();
 
+    // Create OnOpen Callback.
     let cloned_ws = ws.clone();
     let onopen_callback = Closure::wrap(Box::new(move |_| {
         console_log!("socket opened");
-        // match cloned_ws.send_with_str("ping") {
-        //     Ok(_) => console_log!("message successfully sent"),
-        //     Err(err) => console_log!("error sending message: {:?}", err),
-        // }
+        match cloned_ws.send_with_str("ping") {
+            Ok(_) => console_log!("message successfully sent"),
+            Err(err) => console_log!("error sending message: {:?}", err),
+        }
         // send off binary message
         match cloned_ws.send_with_u8_array(&vec![0, 1, 2, 3]) {
-            // Ok(_) => console_log!("binary message successfully sent"),
-            // Err(err) => console_log!("error sending message: {:?}", err),
+            Ok(_) => console_log!("binary message successfully sent"),
+            Err(err) => console_log!("error sending message: {:?}", err),
             _ => {}
         }
     }) as Box<dyn FnMut(JsValue)>);
