@@ -4,7 +4,7 @@
 @import url("navgrid_thumbnail.css");
 
 #page_content {
-  --width: 90%;
+  --width: calc(100% - var(--page_column_pad));
   width: var(--width);
   --pad: calc((100% - var(--width)) / 2);
   padding-left: var(--pad);
