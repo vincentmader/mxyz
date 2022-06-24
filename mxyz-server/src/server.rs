@@ -4,19 +4,19 @@ use rocket::fs::{relative, FileServer};
 use rocket::{catchers, Catcher, Route};
 use rocket_dyn_templates::Template;
 
-/// MXYZ Server
-pub struct Server {
+/// Rocket Server
+pub struct RocketServer {
     routes: Vec<Route>,
     file_server: FileServer,
     catchers: Vec<Catcher>,
 }
-impl Server {
+impl RocketServer {
     /// Creates a new Server instance
     pub fn new() -> Self {
         let routes = routes::get_all_routes();
         let file_server = FileServer::from(relative!("static"));
         let catchers = catchers![routes::error::not_found::route,];
-        Server {
+        RocketServer {
             routes,
             file_server,
             catchers,
