@@ -6,6 +6,7 @@ extern crate tokio;
 #[macro_use]
 extern crate rocket;
 use rocket::fs::{relative, FileServer};
+use rocket::{Catcher, Route};
 use rocket_dyn_templates::Template;
 use std::io;
 use tokio::net::{TcpListener, TcpStream};
@@ -42,21 +43,42 @@ async fn start_tcp_listener() -> io::Result<()> {
 
 #[rocket::main]
 pub async fn main() -> Result<(), rocket::Error> {
-    let routes = routes::get_all_routes();
-    let file_server = FileServer::from(relative!("static"));
-    let catchers = catchers![routes::error::not_found::route,];
+    let server = Server::new();
+    server.start().await
+}
 
-    // TCP Listener
-    std::thread::spawn(move || {
-        start_tcp_listener().unwrap();
-    });
-
-    rocket::build()
-        .mount("/", routes)
-        .mount("/static", file_server)
-        .attach(cors::CORS)
-        .attach(Template::fairing())
-        .register("/", catchers)
-        .launch()
-        .await
+/// MXYZ Server
+pub struct Server {
+    routes: Vec<Route>,
+    file_server: FileServer,
+    catchers: Vec<Catcher>,
+}
+impl Server {
+    /// Creates a new Server instance
+    pub fn new() -> Self {
+        let routes = routes::get_all_routes();
+        let file_server = FileServer::from(relative!("static"));
+        let catchers = catchers![routes::error::not_found::route,];
+        Server {
+            routes,
+            file_server,
+            catchers,
+        }
+    }
+    /// Starts the Server aynchronously
+    pub async fn start(self) -> Result<(), rocket::Error> {
+        // Start TCP Listener in separate thread.
+        std::thread::spawn(move || {
+            start_tcp_listener().unwrap();
+        });
+        // Launch Rocket.
+        rocket::build()
+            .mount("/", self.routes)
+            .mount("/static", self.file_server)
+            .attach(cors::CORS)
+            .attach(Template::fairing())
+            .register("/", self.catchers)
+            .launch()
+            .await
+    }
 }
