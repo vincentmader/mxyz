@@ -3,7 +3,7 @@ use crate::entity::Entity;
 use crate::system::ToBytes;
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FluidCell {
     velocity: [f64; 3],
     density: f64,

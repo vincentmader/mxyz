@@ -17,6 +17,7 @@ pub trait Entity:
     + Density
     + Force
     + ToBytes
+    + std::fmt::Debug
 {
 }
 pub trait EntityClone {

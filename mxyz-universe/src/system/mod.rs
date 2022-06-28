@@ -10,7 +10,7 @@ pub enum SystemVariant {
 }
 
 /// System Structure
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct System {
     pub id: usize,
     pub variant: SystemVariant,
