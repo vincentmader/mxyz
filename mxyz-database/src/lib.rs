@@ -38,19 +38,20 @@ fn show_planets() {
 
 pub fn create_planet<'a>(
     conn: &PgConnection,
+    new_planet: NewPlanet,
     // planet: mxyz_universe::entity::object::planet::Planet,
 ) -> Planet {
-    let new_planet = NewPlanet {
-        planet_id: &0,
-        system_id: &0,
-        mass: &1.,
-        pos_x: &0.,
-        pos_y: &0.,
-        pos_z: &0.,
-        vel_x: &0.,
-        vel_y: &0.,
-        vel_z: &0.,
-    };
+    // let new_planet = NewPlanet {
+    //     planet_id: &0,
+    //     system_id: &0,
+    //     mass: &1.,
+    //     pos_x: &0.,
+    //     pos_y: &0.,
+    //     pos_z: &0.,
+    //     vel_x: &0.,
+    //     vel_y: &0.,
+    //     vel_z: &0.,
+    // };
 
     println!("{:?}", new_planet);
     diesel::insert_into(planets::table)

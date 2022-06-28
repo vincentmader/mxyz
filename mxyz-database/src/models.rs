@@ -2,6 +2,7 @@ use super::schema::planets;
 
 #[derive(Queryable, Debug)]
 pub struct Planet {
+    // pub step_id: i32,
     pub planet_id: i32,
     pub system_id: i32,
     pub mass: f64,
@@ -16,6 +17,7 @@ pub struct Planet {
 #[derive(Insertable, Debug)]
 #[table_name = "planets"]
 pub struct NewPlanet<'a> {
+    // pub step_id: &'a i32,
     pub planet_id: &'a i32,
     pub system_id: &'a i32,
     pub mass: &'a f64,
