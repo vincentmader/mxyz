@@ -19,7 +19,10 @@ pub fn establish_connection() -> PgConnection {
     dotenv().ok();
 
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    PgConnection::establish(&database_url).expect(&format!("Error connecting to {}", database_url))
+    let conn = PgConnection::establish(&database_url)
+        .expect(&format!("Error connecting to {}", database_url));
+    // diesel::delete(planets.filter(true)).execute(&conn)?;
+    conn
 }
 
 fn show_planets() {
@@ -28,9 +31,9 @@ fn show_planets() {
         // .filter(published.eq(true))
         .limit(5)
         .load::<Planet>(&connection)
-        .expect("Error loading posts");
+        .expect("Error loading planets");
 
-    println!("Displaying {} posts", results.len());
+    println!("Displaying {} planets", results.len());
     for planet in results {
         println!("{}", planet.mass);
     }
@@ -41,19 +44,7 @@ pub fn create_planet<'a>(
     new_planet: NewPlanet,
     // planet: mxyz_universe::entity::object::planet::Planet,
 ) -> Planet {
-    // let new_planet = NewPlanet {
-    //     planet_id: &0,
-    //     system_id: &0,
-    //     mass: &1.,
-    //     pos_x: &0.,
-    //     pos_y: &0.,
-    //     pos_z: &0.,
-    //     vel_x: &0.,
-    //     vel_y: &0.,
-    //     vel_z: &0.,
-    // };
-
-    println!("{:?}", new_planet);
+    // println!("{:?}", new_planet);
     diesel::insert_into(planets::table)
         .values(&new_planet)
         .get_result(conn)

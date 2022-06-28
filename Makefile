@@ -1,4 +1,5 @@
 engine:
+	./scripts/rebuild_db
 	cargo run -p mxyz-engine # --release
 server:
 	cargo run -p mxyz-server # --release

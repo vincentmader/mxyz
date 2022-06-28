@@ -1,5 +1,7 @@
 CREATE TABLE planets (
-  planet_id SERIAL PRIMARY KEY,
+  dbentry_id SERIAL PRIMARY KEY,
+  step_id INT NOT NULL,
+  planet_id INT NOT NULL,
   system_id INT NOT NULL,
   -- physical attributes
   mass    FLOAT NOT NULL,
@@ -11,7 +13,9 @@ CREATE TABLE planets (
   vel_z   FLOAT NOT NULL
 );
 CREATE TABLE fluid_cells (
-  cell_id SERIAL PRIMARY KEY,
+  dbentry_id SERIAL PRIMARY KEY,
+  step_id INT NOT NULL,
+  cell_id INT NOT NULL,
   system_id INT NOT NULL,
   -- physical attributes
   density FLOAT NOT NULL,

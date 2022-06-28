@@ -1,0 +1,5 @@
+#!/bin/sh
+
+dropdb mxyz-db_v1
+createdb mxyz-db_v1
+cd ./mxyz-database && diesel migration run
