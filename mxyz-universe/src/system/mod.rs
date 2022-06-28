@@ -28,23 +28,6 @@ impl System {
         }
     }
 }
-impl ToBytes for System {
-    fn to_bytes(&self) -> Vec<u8> {
-        let bytes = vec![];
-
-        let _system_variant_id = match self.variant {
-            SystemVariant::PhysicalObjects => 0,
-            SystemVariant::DiscreteField => 1,
-            _ => todo!(),
-        };
-
-        for entity in self.entities.iter() {
-            let _foo = entity.to_bytes();
-        }
-        //...
-        bytes
-    }
-}
 impl System {
     pub fn get_variant_id(system_variant: &SystemVariant) -> usize {
         match system_variant {
@@ -56,9 +39,27 @@ impl System {
 }
 
 // TODO move else-where
-pub trait ToBytes {
-    fn to_bytes(&self) -> Vec<u8>;
-}
-pub trait FromBytes {
-    fn from_bytes(bytes: Vec<u8>) -> Self;
-}
+// pub trait ToBytes {
+//     fn to_bytes(&self) -> Vec<u8>;
+// }
+// pub trait FromBytes {
+//     fn from_bytes(bytes: Vec<u8>) -> Self;
+// }
+
+//impl ToBytes for System {
+//    fn to_bytes(&self) -> Vec<u8> {
+//        let bytes = vec![];
+
+//        let _system_variant_id = match self.variant {
+//            SystemVariant::PhysicalObjects => 0,
+//            SystemVariant::DiscreteField => 1,
+//            _ => todo!(),
+//        };
+
+//        for entity in self.entities.iter() {
+//            let _foo = entity.to_bytes();
+//        }
+//        //...
+//        bytes
+//    }
+//}

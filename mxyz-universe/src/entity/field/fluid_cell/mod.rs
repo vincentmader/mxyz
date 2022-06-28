@@ -1,6 +1,6 @@
 use crate::entity::attribute::*;
 use crate::entity::Entity;
-use crate::system::ToBytes;
+// use crate::system::ToBytes;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -9,13 +9,13 @@ pub struct FluidCell {
     density: f64,
 }
 impl Entity for FluidCell {}
-impl ToBytes for FluidCell {
-    fn to_bytes(&self) -> Vec<u8> {
-        let bytes = vec![];
-        // ... TODO
-        bytes
-    }
-}
+// impl ToBytes for FluidCell {
+//     fn to_bytes(&self) -> Vec<u8> {
+//         let bytes = vec![];
+//         // ... TODO
+//         bytes
+//     }
+// }
 impl Force for FluidCell {}
 impl Position for FluidCell {}
 impl Charge for FluidCell {}

@@ -5,9 +5,14 @@ extern crate dotenv;
 pub mod models;
 pub mod schema;
 
+use self::diesel::prelude::*;
+use self::models::*;
+use self::models::{NewPlanet, Planet};
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use dotenv::dotenv;
+use schema::planets;
+use schema::planets::dsl::*;
 use std::env;
 
 pub fn establish_connection() -> PgConnection {
@@ -17,12 +22,7 @@ pub fn establish_connection() -> PgConnection {
     PgConnection::establish(&database_url).expect(&format!("Error connecting to {}", database_url))
 }
 
-use self::diesel::prelude::*;
-use self::models::*;
-
 fn show_planets() {
-    use schema::planets::dsl::*;
-
     let connection = establish_connection();
     let results = planets
         // .filter(published.eq(true))
@@ -36,11 +36,10 @@ fn show_planets() {
     }
 }
 
-use self::models::{NewPlanet, Planet};
-
-pub fn create_planet<'a>(conn: &PgConnection) -> Planet {
-    use schema::planets;
-
+pub fn create_planet<'a>(
+    conn: &PgConnection,
+    // planet: mxyz_universe::entity::object::planet::Planet,
+) -> Planet {
     let new_planet = NewPlanet {
         planet_id: &0,
         system_id: &0,

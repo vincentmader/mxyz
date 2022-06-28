@@ -1,3 +1,5 @@
+use super::schema::planets;
+
 #[derive(Queryable, Debug)]
 pub struct Planet {
     pub planet_id: i32,
@@ -10,8 +12,6 @@ pub struct Planet {
     pub vel_y: f64,
     pub vel_z: f64,
 }
-
-use super::schema::planets;
 
 #[derive(Insertable, Debug)]
 #[table_name = "planets"]

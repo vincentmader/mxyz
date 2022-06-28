@@ -1,7 +1,7 @@
 pub mod attribute;
 pub mod field;
 pub mod object;
-use crate::system::ToBytes;
+// use crate::system::ToBytes;
 use attribute::*;
 // use serde::{Deserialize, Serialize};
 
@@ -16,7 +16,7 @@ pub trait Entity:
     + Charge
     + Density
     + Force
-    + ToBytes
+    // + ToBytes
     + std::fmt::Debug
 {
 }
