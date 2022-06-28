@@ -25,6 +25,8 @@ impl RocketServer {
     /// Starts the Server aynchronously
     pub async fn start(self) -> Result<(), rocket::Error> {
         // Start TCP Listener in separate thread.
+        // TODO test if client can get/post data
+        // TODO `move` needed?
         std::thread::spawn(move || {
             start_tcp_listener().unwrap();
         });
@@ -40,35 +42,49 @@ impl RocketServer {
     }
 }
 
-use std::io;
-use tokio::net::{TcpListener, TcpStream};
-
-const HOST: &str = "127.0.0.1";
-const PORT: usize = 1234;
-
 // ============================================================================
 
-// socket = stream
-async fn process_socket<T>(socket: T) {
-    // The `Connection` lets us read/write redis **frames** instead of
-    // byte streams. The `Connection` type is defined by mini-redis.
-    // let mut connection = Connection::new(socket);
+use std::{env, io::Error};
 
-    // if let Some(frame) = connection.read_frame().await.unwrap() {
-    //     println!("GOT: {:?}", frame);
-
-    //     // Respond with an error
-    //     let response = Frame::Error("unimplemented".to_string());
-    //     connection.write_frame(&response).await.unwrap();
-    // }
-}
+use futures_util::{future, StreamExt, TryStreamExt};
+use log::info;
+use tokio::net::{TcpListener, TcpStream};
 
 #[tokio::main]
-async fn start_tcp_listener() -> io::Result<()> {
-    let address = format!("{}:{}", HOST, PORT);
-    let listener = TcpListener::bind(&address).await.unwrap();
-    loop {
-        let (socket, _) = listener.accept().await?;
-        process_socket(socket).await;
+async fn start_tcp_listener() -> Result<(), Error> {
+    // let _ = env_logger::try_init();
+    let addr = env::args()
+        .nth(1)
+        .unwrap_or_else(|| "127.0.0.1:1234".to_string());
+
+    // Create the event loop and TCP listener we'll accept connections on.
+    let try_socket = TcpListener::bind(&addr).await;
+    let listener = try_socket.expect("Failed to bind");
+    info!("Listening on: {}", addr);
+
+    while let Ok((stream, _)) = listener.accept().await {
+        tokio::spawn(accept_connection(stream));
     }
+
+    Ok(())
+}
+
+async fn accept_connection(stream: TcpStream) {
+    let addr = stream
+        .peer_addr()
+        .expect("connected streams should have a peer address");
+    info!("Peer address: {}", addr);
+
+    let ws_stream = tokio_tungstenite::accept_async(stream)
+        .await
+        .expect("Error during the websocket handshake occurred");
+
+    info!("New WebSocket connection: {}", addr);
+
+    let (write, read) = ws_stream.split();
+    // We should not forward messages other than text or binary.
+    read.try_filter(|msg| future::ready(msg.is_text() || msg.is_binary()))
+        .forward(write)
+        .await
+        .expect("Failed to forward messages")
 }
