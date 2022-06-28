@@ -1,7 +1,8 @@
 #![allow(unused_variables)]
 #![allow(unreachable_code)]
 
-// NOTE: use bincode::serialize instead
+// NOTE: use bincode::serialize instead !
+//       ? only working if obj in scope on server & client ?
 
 trait Protocol {
     fn to_bytes(&self) -> Vec<u8>;
