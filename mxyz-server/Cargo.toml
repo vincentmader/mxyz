@@ -9,6 +9,7 @@
     diesel = "1.4.8"
     mxyz-database = { path = "../mxyz-database" }
     mxyz-engine = { path = "../mxyz-engine" }
+    mxyz-network = { path = "../mxyz-network" }
     mxyz-universe = { path = "../mxyz-universe" }
     mxyz-utils = { path="../mxyz-utils" }
     rocket_contrib = "0.4.10"

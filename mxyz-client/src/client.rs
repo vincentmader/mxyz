@@ -60,7 +60,7 @@ impl SimulationClientV1 {
     /// Forwards Renderer to Next Time-Step
     pub fn step(&mut self) {
         let i = self.config.frame_id.0;
-        draw(i);
+        // draw(i); TODO
         self.config.frame_id.0 += 1;
     }
 }

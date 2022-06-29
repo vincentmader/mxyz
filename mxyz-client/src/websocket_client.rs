@@ -38,7 +38,7 @@ pub fn start_websocket() -> Result<(), JsValue> {
             cloned_ws.set_binary_type(web_sys::BinaryType::Blob);
             match cloned_ws.send_with_u8_array(&vec![5, 6, 7, 8]) {
                 Ok(_) => console_log!("binary message successfully sent"),
-                Err(err) => console_log!("error sending message: {:?}", err),
+                Err(err) => console_log!("ERROR sending message: {:?}", err),
                 _ => {}
             }
 
@@ -77,7 +77,7 @@ pub fn start_websocket() -> Result<(), JsValue> {
 
     // Create OnError Callback.
     let onerror_callback = Closure::wrap(Box::new(move |e: ErrorEvent| {
-        console_log!("error event: {:?}", e);
+        console_log!("ERROR Event: {:?}", e);
     }) as Box<dyn FnMut(ErrorEvent)>);
     // Set error event handler on WebSocket.
     ws.set_onerror(Some(onerror_callback.as_ref().unchecked_ref()));
@@ -87,15 +87,15 @@ pub fn start_websocket() -> Result<(), JsValue> {
     // Create OnOpen Callback.
     let cloned_ws = ws.clone();
     let onopen_callback = Closure::wrap(Box::new(move |_| {
-        console_log!("socket opened");
+        console_log!("TCP socket opened");
         match cloned_ws.send_with_str("ping") {
             Ok(_) => console_log!("message successfully sent"),
-            Err(err) => console_log!("error sending message: {:?}", err),
+            Err(err) => console_log!("ERROR sending message: {:?}", err),
         }
         // send off binary message
         match cloned_ws.send_with_u8_array(&vec![0, 1, 2, 3]) {
             Ok(_) => console_log!("binary message successfully sent"),
-            Err(err) => console_log!("error sending message: {:?}", err),
+            Err(err) => console_log!("ERROR sending message: {:?}", err),
             _ => {}
         }
     }) as Box<dyn FnMut(JsValue)>);

@@ -22,8 +22,9 @@
         id="simulation.js"
         src="../../static/js/simulation/base.js"
         category="{{ category }}"
-        sim_id="{{ sim_id }}">
-    </script>
+        sim_id="{{ sim_id }}"
+        client_id="{{ client_id }}"
+    ></script>
 
     <!-- ====== COLUMN VIEW (big screen only) ============= -->
     <div id="page-columns">

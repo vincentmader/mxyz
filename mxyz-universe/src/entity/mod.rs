@@ -3,7 +3,7 @@ pub mod field;
 pub mod object;
 // use crate::system::ToBytes;
 use attribute::*;
-// use serde::{Deserialize, Serialize};
+// use serde::{de::DeserializeOwned, Serialize};
 
 /// Entity Trait
 pub trait Entity:
@@ -18,6 +18,9 @@ pub trait Entity:
     + Force
     // + ToBytes
     + std::fmt::Debug
+    + Send
+    // + Serialize
+    // + DeserializeOwned
 {
 }
 pub trait EntityClone {

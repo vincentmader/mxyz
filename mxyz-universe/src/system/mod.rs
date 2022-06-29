@@ -1,6 +1,8 @@
 pub mod discrete_field;
 pub mod physical_objects;
 use super::entity::Entity;
+// use serde::{Deserialize, Serialize};
+// #[derive(Serialize, Deserialize, Debug, Clone)]
 
 /// System Variant Enumeration
 #[derive(Debug, Clone)]

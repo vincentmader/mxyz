@@ -3,8 +3,9 @@ import init, { SimulationClientV1 } from "../../../static/pkg/mxyz_client.js";
 let script = document.getElementById("simulation.js");
 let category = script.getAttribute("category");
 let sim_id = script.getAttribute("sim_id");
+let client_id = script.getAttribute("client_id");
+console.log("client-id: ", client_id);
 console.log("simulation-id: ", category, sim_id);
-let client_id = 0; // TODO
 
 (async () => {
   await init();
