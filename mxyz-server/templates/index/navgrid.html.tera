@@ -8,7 +8,7 @@
                   class="navgrid_cell"
                 > 
                     <img 
-                        {% if item.state == "active" %} class="navgrid_thumbnail" 
+                        {% if item.state_id == 1 %} class="navgrid_thumbnail" 
                         {% else %} class="navgrid_thumbnail-inactive" 
                         {% endif %}
                         src="{{ item.path_to_thumbnail }}" 
