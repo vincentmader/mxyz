@@ -1,67 +1,55 @@
 pub mod discrete_field;
 pub mod physical_objects;
+pub mod planets;
 use super::entity::Entity;
 // use serde::{Deserialize, Serialize};
 // #[derive(Serialize, Deserialize, Debug, Clone)]
 
-/// System Variant Enumeration
-#[derive(Debug, Clone)]
-pub enum SystemVariant {
-    DiscreteField,
-    PhysicalObjects,
-}
+// /// System Variant Enumeration
+// #[derive(Debug, Clone)]
+// pub enum SystemVariant {
+//     DiscreteField,
+//     PhysicalObjects,
+// }
+
+// /// System Structure
+// #[derive(Debug, Clone)]
+// pub struct System {
+//     pub id: usize,
+//     pub variant: SystemVariant,
+//     pub entities: Vec<Box<dyn Entity>>,
+// }
+// impl System {
+//     /// Creates a new System Struct Instance
+//     pub fn new(variant: SystemVariant) -> Self {
+//         let id = 0; // TODO safe?
+//         let entities = vec![];
+//         System {
+//             id,
+//             variant,
+//             entities,
+//         }
+//     }
+// }
 
 /// System Structure
 #[derive(Debug, Clone)]
 pub struct System {
-    pub id: usize,
+    pub system_id: usize,
     pub variant: SystemVariant,
-    pub entities: Vec<Box<dyn Entity>>,
 }
 impl System {
-    /// Creates a new System Struct Instance
-    pub fn new(variant: SystemVariant) -> Self {
-        let id = 0; // TODO safe?
-        let entities = vec![];
-        System {
-            id,
-            variant,
-            entities,
+    pub fn new(system_id: usize, variant: SystemVariant) -> Self {
+        System { system_id, variant }
+    }
+    pub fn step(self) {
+        match self.variant {
+            SystemVariant::Planets(sys) => {}
         }
     }
 }
-impl System {
-    pub fn get_variant_id(system_variant: &SystemVariant) -> usize {
-        match system_variant {
-            SystemVariant::PhysicalObjects => 0,
-            SystemVariant::DiscreteField => 1,
-            _ => todo!(),
-        }
-    }
+#[derive(Debug, Clone)]
+/// System Variant Enumeration
+pub enum SystemVariant {
+    Planets(planets::Planets),
 }
-
-// TODO move else-where
-// pub trait ToBytes {
-//     fn to_bytes(&self) -> Vec<u8>;
-// }
-// pub trait FromBytes {
-//     fn from_bytes(bytes: Vec<u8>) -> Self;
-// }
-
-//impl ToBytes for System {
-//    fn to_bytes(&self) -> Vec<u8> {
-//        let bytes = vec![];
-
-//        let _system_variant_id = match self.variant {
-//            SystemVariant::PhysicalObjects => 0,
-//            SystemVariant::DiscreteField => 1,
-//            _ => todo!(),
-//        };
-
-//        for entity in self.entities.iter() {
-//            let _foo = entity.to_bytes();
-//        }
-//        //...
-//        bytes
-//    }
-//}
