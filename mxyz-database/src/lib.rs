@@ -2,15 +2,16 @@
 extern crate diesel;
 extern crate dotenv;
 
+pub mod db_methods_v1;
 pub mod models;
 pub mod schema;
 
-use self::diesel::prelude::*;
-use self::models::*;
-use self::models::{NewPlanet, Planet};
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
+use diesel::prelude::*;
 use dotenv::dotenv;
+use models::*;
+use models::{NewPlanet, Planet};
 use schema::planets;
 use schema::planets::dsl::*;
 use std::env;

@@ -1,3 +1,14 @@
+CREATE TABLE states (
+  dbentry_id SERIAL PRIMARY KEY,
+  state_id INT NOT NULL
+);
+
+CREATE TABLE systems (
+  dbentry_id SERIAL PRIMARY KEY,
+  system_id INT NOT NULL,
+  state_id INT NOT NULL
+);
+
 CREATE TABLE planets (
   dbentry_id SERIAL PRIMARY KEY,
   step_id INT NOT NULL,
@@ -12,6 +23,7 @@ CREATE TABLE planets (
   vel_y   FLOAT NOT NULL,
   vel_z   FLOAT NOT NULL
 );
+
 CREATE TABLE fluid_cells (
   dbentry_id SERIAL PRIMARY KEY,
   step_id INT NOT NULL,
