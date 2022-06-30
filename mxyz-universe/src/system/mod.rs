@@ -1,9 +1,10 @@
 pub mod discrete_field;
 pub mod physical_objects;
 pub mod planets;
+use serde::{Deserialize, Serialize};
 
 /// System Structure
-#[derive(Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct System {
     pub system_id: usize,
     pub variant: SystemVariant,
@@ -31,7 +32,7 @@ impl System {
     //     next_system
     // }
 }
-#[derive(Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 /// System Variant Enumeration
 pub enum SystemVariant {
     Planets(planets::Planets),

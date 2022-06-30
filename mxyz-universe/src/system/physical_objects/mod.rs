@@ -1,3 +1,4 @@
+use serde::{Deserialize, Serialize};
 // use crate::config::EngineConfig;
 // use crate::entity::object::PhysicalObject;
 // use crate::entity::Entity as PhysicalObject;
@@ -6,7 +7,7 @@
 // use crate::system::discrete_field::DiscreteField;
 // use crate::entity::object::planet::Planet;
 
-#[derive(Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 /// System: Planets
 pub struct PhysicalObjects {
     // pub entities: Vec<PhysicalObject>,
