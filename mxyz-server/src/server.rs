@@ -1,4 +1,4 @@
-use crate::cors;
+use crate::misc;
 use crate::routes;
 use crate::tcp;
 use rocket::fs::{relative, FileServer};
@@ -33,7 +33,7 @@ impl RocketServer {
         rocket::build()
             .mount("/", self.routes)
             .mount("/static", self.file_server)
-            .attach(cors::CORS)
+            .attach(misc::cors::CORS)
             .attach(Template::fairing())
             .register("/", self.catchers)
             .launch()
