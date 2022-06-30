@@ -4,8 +4,14 @@ let script = document.getElementById("simulation.js");
 let category = script.getAttribute("category");
 let sim_id = script.getAttribute("sim_id");
 let client_id = script.getAttribute("client_id");
-console.log("client-id: ", client_id);
-console.log("simulation-id: ", category, sim_id);
+console.log(
+  "client-id: \t\t\t" +
+    client_id +
+    "\ncategory-id: \t\t" +
+    category +
+    "\nsimulation-id: \t" +
+    sim_id
+);
 
 (async () => {
   await init();
