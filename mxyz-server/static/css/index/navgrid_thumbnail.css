@@ -18,7 +18,7 @@
   outline: none;
 
   /* transition (with :hover) */
-  transition: border 0.35s, filter 0.35s, transform 0.35s ease-in-out;
+  transition: border 0.5s, filter 0.5s, transform 0.5s ease-in-out; /* TODO find out: why not working on un-hover? */
   filter: grayscale(100%);
   -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
 }
@@ -33,7 +33,7 @@
   padding-bottom: 100%;
 }
 .navgrid_thumbnail.active:hover {
-  border: var(--main-border-width) solid #777777;
+  border: var(--main-border-width) solid #555555;
   transform: scale(
     calc(var(--thumbnail_max_width) / var(--thumbnail_initial_width))
   );
