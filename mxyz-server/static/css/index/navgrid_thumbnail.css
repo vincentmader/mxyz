@@ -12,10 +12,10 @@
   display: block;
   margin-left: auto;
   margin-right: auto;
-  /* margin-top: var(--page_column_pad); */
-  /* margin-bottom: var(--page_column_pad); */
   margin-top: 7%; /* left & right done autom. through align */
   margin-bottom: 7%; /* TODO use page_column_pad */
+  /* margin-top: calc(2 * var(--page_column_pad)); */
+  /* margin-bottom: var(--page_column_pad); */
 
   outline: none;
 

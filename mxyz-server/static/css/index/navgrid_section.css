@@ -3,8 +3,8 @@
   text-align: center;
   font-weight: bold;
   /* border: var(--debug-border); */
-  margin-top: 0.5em;
-  margin-bottom: 0.5em;
+  padding-top: 1em;
+  padding-bottom: 1em;
   /* text-decoration: underline; */
   font-size: var(--font-size-navgrid-section);
   /* font-weight: 690; */

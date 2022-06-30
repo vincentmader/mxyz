@@ -34,7 +34,7 @@
                 <canvas id="canvas_0" width="1000px"> </canvas>
                 <script> 
                     let cnv = document.getElementById("canvas_0");
-                    cnv.height = cnv.width;  // TODO make changeable: width=900px & height=width
+                    cnv.height = cnv.width;  // TODO make changeable
                 </script>
             </div>
         </div>
