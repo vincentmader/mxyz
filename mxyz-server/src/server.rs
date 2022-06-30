@@ -1,5 +1,5 @@
+use crate::http;
 use crate::misc;
-use crate::routes;
 use crate::tcp;
 use rocket::fs::{relative, FileServer};
 use rocket::{catchers, Catcher, Route};
@@ -14,8 +14,8 @@ pub struct RocketServer {
 impl RocketServer {
     /// Creates a new Server instance
     pub fn new() -> Self {
-        let routes = routes::get_all_routes();
-        let catchers = catchers![routes::error::not_found::route,];
+        let routes = http::get_all_routes();
+        let catchers = catchers![http::error::not_found::route,];
         let file_server = FileServer::from(relative!("static"));
         RocketServer {
             routes,
