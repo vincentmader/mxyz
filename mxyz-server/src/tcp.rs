@@ -76,8 +76,12 @@ async fn accept_connection(stream: TcpStream) {
                             Package::Request(request) => match request {
                                 Request::GetUpdatedStates(state_id) => {
                                     mxyz_database::establish_connection();
-
                                     println!("hurra! {}", state_id);
+
+                                    let last_update = 0;
+                                    let states =
+                                        mxyz_engine::Engine::get_updated_states(last_update);
+                                    println!("{:?}", states);
                                 }
                             },
                             Package::Response(response) => {}

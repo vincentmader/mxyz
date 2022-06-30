@@ -8,12 +8,17 @@ pub mod schema;
 
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
-use diesel::prelude::*;
 use dotenv::dotenv;
 use models::*;
 use models::{NewPlanet, Planet};
+use models::{NewState, State};
+use models::{NewSystem, System};
 use schema::planets;
 use schema::planets::dsl::*;
+use schema::states;
+use schema::states::dsl::*;
+use schema::systems;
+use schema::systems::dsl::*;
 use std::env;
 
 pub fn establish_connection() -> PgConnection {
@@ -41,14 +46,21 @@ fn show_planets() -> Vec<Planet> {
     results
 }
 
-pub fn create_planet<'a>(
-    conn: &PgConnection,
-    new_planet: NewPlanet,
-    // planet: mxyz_universe::entity::object::planet::Planet,
-) -> Planet {
-    // println!("{:?}", new_planet);
+pub fn create_planet<'a>(conn: &PgConnection, new_planet: NewPlanet) -> Planet {
     diesel::insert_into(planets::table)
         .values(&new_planet)
         .get_result(conn)
-        .expect("Error saving new post")
+        .expect("Error saving new planet")
+}
+pub fn create_system<'a>(conn: &PgConnection, new_system: NewSystem) -> System {
+    diesel::insert_into(systems::table)
+        .values(&new_system)
+        .get_result(conn)
+        .expect("Error saving new system")
+}
+pub fn create_state<'a>(conn: &PgConnection, new_state: NewState) -> State {
+    diesel::insert_into(states::table)
+        .values(&new_state)
+        .get_result(conn)
+        .expect("Error saving new state")
 }

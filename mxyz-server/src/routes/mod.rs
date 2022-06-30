@@ -86,7 +86,7 @@ fn test_db() -> content::Json<&'static str> {
 
     // add
     let new_planet = NewPlanet {
-        step_id: &0,
+        state_id: &0,
         planet_id: &((nr_of_planets + 1) as i32),
         system_id: &0,
         mass: &1.,
