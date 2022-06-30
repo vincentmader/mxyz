@@ -1,4 +1,8 @@
+use mxyz_engine::state::State;
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize)]
-pub enum Response {}
+#[derive(Debug, Serialize, Deserialize)]
+pub enum Response {
+    Empty,
+    StateVector(Vec<State>),
+}

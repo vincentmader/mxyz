@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 pub mod request;
 pub mod response;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub enum Package {
     Request(request::Request),
     Response(response::Response),

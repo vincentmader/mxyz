@@ -8,6 +8,7 @@
     bincode = "1.3.3"
     # mxyz-engine = { path = "../mxyz-engine" }  ! not working !
     mxyz-universe = { path = "../mxyz-universe" }
+    mxyz-engine = { path = "../mxyz-engine" }
 
 [dependencies.serde]
     features = ["derive"]
