@@ -25,7 +25,7 @@ pub fn establish_connection() -> PgConnection {
     conn
 }
 
-fn show_planets() {
+fn show_planets() -> Vec<Planet> {
     let connection = establish_connection();
     let results = planets
         // .filter(published.eq(true))
@@ -34,9 +34,10 @@ fn show_planets() {
         .expect("Error loading planets");
 
     println!("Displaying {} planets", results.len());
-    for planet in results {
+    for planet in results.iter() {
         println!("{}", planet.mass);
     }
+    results
 }
 
 pub fn create_planet<'a>(

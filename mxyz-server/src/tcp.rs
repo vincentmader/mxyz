@@ -65,7 +65,24 @@ async fn accept_connection(stream: TcpStream) {
                     Message::Text(bar) => i,
                     Message::Binary(bar) => {
                         let foo: Vec<u8> = bar.clone();
-                        println!("{:?}", foo);
+                        println!("binary message: {:?}", foo);
+
+                        use mxyz_network::package::request::Request;
+                        use mxyz_network::package::Package;
+
+                        let foo = Package::from_bytes(foo);
+
+                        match foo {
+                            Package::Request(request) => match request {
+                                Request::GetUpdatedStates(state_id) => {
+                                    mxyz_database::establish_connection();
+
+                                    println!("hurra! {}", state_id);
+                                }
+                            },
+                            Package::Response(response) => {}
+                        };
+
                         let vec: Vec<u8> = vec![147, 255];
                         // TODO
                         // - append state (systems+entities+world) to vec

@@ -18,7 +18,7 @@ body {
   --font-size-navgrid-section: var(--font-size-main);
   --font-size-navgrid-thumbnail: var(--font-size-main);
   --main-header-height: 2em;
-  --page_column_pad: 25px;
+  --page_column_pad: 35px;
   /* TODO rename? -> atm only used for simulation */
   /* TODO why canvas-fitting not working when changing --page_column_pad ? */
 

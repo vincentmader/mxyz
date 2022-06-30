@@ -54,7 +54,7 @@
 @media only screen and (max-width: 1200px) {
   #page-column-left {
   }
-  #page-column-right {
+  #psage-column-right {
   }
   #page-column-right .section {
   }
@@ -68,12 +68,14 @@
   #page-column-left {
     float: left;
     padding-right: calc(0.5 * var(--page_column_pad));
+    /* background-color: red; */
   }
   #page-column-left .canvas_container {
   }
   #page-column-left canvas {
   }
   #page-column-right {
+    /* background-color: green; */
     overflow: scroll;
     float: right;
     width: calc(100% - var(--canvas-width) - 1 * var(--page_column_pad));

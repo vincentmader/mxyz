@@ -53,17 +53,30 @@ impl WebSocketClient {
         let onopen_callback = Closure::wrap(Box::new(move |_| {
             console_log!("TCP socket opened");
             {
-                // send off string message
-                match cloned_ws.send_with_str("ping") {
-                    Ok(_) => console_log!("message successfully sent"),
-                    Err(err) => console_log!("ERROR sending message: {:?}", err),
-                }
-                // send off binary message
-                match cloned_ws.send_with_u8_array(&vec![0, 1, 2, 3]) {
-                    Ok(_) => console_log!("binary message successfully sent"),
-                    Err(err) => console_log!("ERROR sending message: {:?}", err),
+                use mxyz_network::package::request;
+                use mxyz_network::package::Package;
+                let state_id = 0; // TODO
+                let request = request::Request::GetUpdatedStates(state_id);
+                let request = Package::Request(request);
+                let request = request.to_bytes();
+                dom::console_log(&format!("{:?}", request));
+
+                match cloned_ws.send_with_u8_array(&request) {
+                    Ok(_) => console_log!("state-vector binary message successfully sent"),
+                    Err(err) => console_log!("state-vector ERROR sending message: {:?}", err),
                     _ => {}
                 }
+                // // send off string message
+                // match cloned_ws.send_with_str("ping") {
+                //     Ok(_) => console_log!("message successfully sent"),
+                //     Err(err) => console_log!("ERROR sending message: {:?}", err),
+                // }
+                // // send off binary message
+                // match cloned_ws.send_with_u8_array(&vec![0, 1, 2, 3]) {
+                //     Ok(_) => console_log!("binary message successfully sent"),
+                //     Err(err) => console_log!("ERROR sending message: {:?}", err),
+                //     _ => {}
+                // }
             }
         }) as Box<dyn FnMut(JsValue)>);
 
@@ -100,14 +113,14 @@ impl WebSocketClient {
 
                 // here you can for example use Serde Deserialize decode the message
                 // for demo purposes we switch back to Blob-type and send off another binary message
-                cloned_ws.set_binary_type(web_sys::BinaryType::Blob);
-                match cloned_ws.send_with_u8_array(&vec![5, 6, 7, 8]) {
-                    Ok(_) => console_log!("binary message successfully sent"),
-                    Err(err) => console_log!("ERROR sending message: {:?}", err),
-                    _ => {}
-                }
+                // cloned_ws.set_binary_type(web_sys::BinaryType::Blob);
+                // match cloned_ws.send_with_u8_array(&vec![5, 6, 7, 8]) {
+                //     Ok(_) => console_log!("binary message successfully sent"),
+                //     Err(err) => console_log!("ERROR sending message: {:?}", err),
+                //     _ => {}
+                // }
 
-            // Handle Blob.
+                // Handle Blob.
             } else if let Ok(blob) = e.data().dyn_into::<web_sys::Blob>() {
                 console_log!("message event, received blob: {:?}", blob);
 

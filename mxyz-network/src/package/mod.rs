@@ -11,7 +11,7 @@ impl Package {
     pub fn to_bytes(self) -> Vec<u8> {
         bincode::serialize(&self).unwrap()
     }
-    pub fn from_bytes(self, bytes: Vec<u8>) -> Self {
+    pub fn from_bytes(bytes: Vec<u8>) -> Self {
         bincode::deserialize(&bytes[..]).unwrap()
     }
 }
