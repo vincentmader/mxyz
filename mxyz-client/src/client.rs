@@ -13,7 +13,6 @@ use web_sys::TcpSocket;
 pub struct SimulationClientV1 {
     config: ClientConfig,
     renderer: Renderer,
-    // http_client: reqwest::Client,
     // TODO server -> bytestream -> client
 }
 #[wasm_bindgen]
@@ -22,7 +21,6 @@ impl SimulationClientV1 {
     pub fn new(client_id: usize) -> Self {
         let config = ClientConfig::new(client_id);
         let renderer = Renderer::new();
-        // let http_client = reqwest::Client::new();
         SimulationClientV1 {
             config,
             renderer,
@@ -60,7 +58,7 @@ impl SimulationClientV1 {
     /// Forwards Renderer to Next Time-Step
     pub fn step(&mut self) {
         let i = self.config.frame_id.0;
-        // draw(i); TODO
+        draw(i); // TODO
         self.config.frame_id.0 += 1;
     }
 }
