@@ -4,10 +4,10 @@
 body {
   --main-bg-color: #111111;
   --main-section-color: #222222;
-  --main-border-color: #555555;
+  --main-border-color: #333333;
   --main-text-color: #bbbbbb;
   --main-font-family: Arial, Verdana, Trebuchet MS, Helvetica, sans-serif; /* TODO choose font */
-  --main-border-width: 2px;
+  --main-border-width: 3px;
   --main-border: var(--main-border-width) solid var(--main-border-color);
   --main-border-radius: 25px;
   --debug-border: 1px solid #333333;

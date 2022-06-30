@@ -12,71 +12,116 @@ pub struct NavGridSection {
 impl NavGridSection {
     pub fn new(section_id: &str, title: &str) -> Self {
         let items: Vec<NavGridItem> = match section_id {
-            "gravity" => Vec::from([
+            "newtonian-gravity" => Vec::from([
                 // intro
-                // NavGridItem::new("nbody-solar", "solar system"),
+                NavGridItem::new("newtonian-gravity", "solar-system", "solar system", 0),
                 // basics
-                // NavGridItem::new("2body-kepler", "Kepler's laws"),
-                NavGridItem::new("3body-moon", "Moon", 1),
-                // NavGridItem::new("3body-lagrange", "Lagrange points"),
-                // NavGridItem::new("nbody-flowers", "sym. constellations"),
+                NavGridItem::new("newtonian-gravity", "2body-kepler", "laws of kepler", 0),
+                NavGridItem::new("newtonian-gravity", "3body-moon", "moons", 1),
+                NavGridItem::new("newtonian-gravity", "3body-lagrange", "lagrange points", 0),
+                NavGridItem::new(
+                    "newtonian-gravity",
+                    "nbody-satellites",
+                    "satellite constellations",
+                    0,
+                ),
                 // more complex systems
-                // NavGridItem::new("nbody-binary", "stellar binary"),
-                // NavGridItem::new("nbody-asteroids", "asteroids"),
-                // NavGridItem::new("nbody-galaxy", "galaxy"),
-                // NavGridItem::new("nbody-cluster", "stellar cluster (3D)"),
+                NavGridItem::new(
+                    "newtonian-gravity",
+                    "nbody-binary",
+                    "binary star systems",
+                    0,
+                ),
+                // NavGridItem::new("newtonian-gravity", "nbody-asteroids", "asteroids", 0),
+                // NavGridItem::new("newtonian-gravity", "nbody-galaxy", "galaxy", 0),
+                NavGridItem::new(
+                    "newtonian-gravity",
+                    "nbody-cluster",
+                    "stellar cluster (3d)",
+                    0,
+                ),
                 // stable 3-body
-                NavGridItem::new("nbody-random", "nbody-random", 1),
-                // NavGridItem::new("3body-fig8", "figure-8", "active"),
-                // NavGridItem::new("nbody-cloud", "stellar cloud", "inactive"),
-                // NavGridItem::new("nbody-misc", "misc"),
-                // NavGridItem::new("3body-broucke", "broucke"),
-                // NavGridItem::new("3body-liao", "liao"),
-                // NavGridItem::new("3body-freefall", "free-fall"),
-                // NavGridItem::new("3body-moth", "moth"),
+                // NavGridItem::new("newtonian-gravity", "nbody-random", "nbody-random", 0),
+                NavGridItem::new("newtonian-gravity", "3body-fig8", "figure-8 orbit", 0),
+                // NavGridItem::new("newtonian-gravity", "nbody-cloud", "stellar cloud", 0),
+                // NavGridItem::new("newtonian-gravity", "nbody-misc", "misc", 0),
+                // NavGridItem::new("newtonian-gravity", "3body-broucke", "broucke", 0),
+                // NavGridItem::new("newtonian-gravity", "3body-liao", "liao", 0),
+                // NavGridItem::new("newtonian-gravity", "3body-freefall", "free-fall", 0),
+                // NavGridItem::new("newtonian-gravity", "3body-moth", "moth", 0),
             ]),
             "oscillators" => Vec::from([
-                //     NavGridItem::new("harmonic-oscillator", "harmonic oscillator"),
-                //     NavGridItem::new("single-pendulum", "single pendulum"),
-                NavGridItem::new("double-pendulum", "double pendulum", 0),
-                //     NavGridItem::new("lissajous", "Lissajous figures"),
-                //     NavGridItem::new("fourier", "fourier"),  // ...?
+                NavGridItem::new(
+                    "oscillators",
+                    "harmonic-oscillator",
+                    "harmonic oscillator",
+                    0,
+                ),
+                NavGridItem::new("oscillators", "single-pendulum", "single pendulum", 1),
+                NavGridItem::new("oscillators", "double-pendulum", "double pendulum", 1),
+                NavGridItem::new("oscillators", "lissajous-figures", "lissajous figures", 1),
+                // NavGridItem::new("oscillators", "fourier", "fourier", 0), // ...?
             ]),
             "electro-magnetism" => Vec::from([
-                NavGridItem::new("charge-interaction", "charge interaction", 0),
-                NavGridItem::new("charge-field-interaction", "charge-field interaction", 0),
-                NavGridItem::new("magnet", "magnet", 0), // TODO rename? (multiple entries)
-                NavGridItem::new("wien-filter", "Wien filter", 0),
-                NavGridItem::new("field-field-interaction", "waves", 0),
-                NavGridItem::new("electric-motor", "electric-motor", 0),
+                NavGridItem::new(
+                    "electro-magnetism",
+                    "nbody-charges",
+                    "charge interaction",
+                    0,
+                ),
+                NavGridItem::new(
+                    "gravity",
+                    "charge-field-interaction",
+                    "charge-field interaction",
+                    0,
+                ),
+                NavGridItem::new("electro-magnetism", "magnet", "magnet", 0), // TODO rename? (multiple entries)
+                NavGridItem::new("electro-magnetism", "wien-filter", "Wien filter", 1),
+                NavGridItem::new("electro-magnetism", "field-field-interaction", "waves", 0),
+                // NavGridItem::new("electro-magnetism", "electric-motor", "electric-motor", 0),
             ]),
             "thermo-dynamics" => Vec::from([
-                NavGridItem::new("ising-model", "Ising model", 0),
-                // NavGridItem::new("thermal-motion", "thermal motion"),
-                // NavGridItem::new("brownian-motion", "Brownian motion"),
-                // NavGridItem::new("heat-conduction", "heat conduction"),
-                // NavGridItem::new("melting", "ice cubes"), // ?
+                NavGridItem::new("thermo-dynamics", "ising-model", "ising model", 0),
+                NavGridItem::new("thermo-dynamics", "thermal-motion", "thermal motion", 1),
+                NavGridItem::new("thermo-dynamics", "brownian-motion", "brownian motion", 1),
+                NavGridItem::new("thermo-dynamics", "heat-conduction", "heat conduction", 0),
+                // NavGridItem::new("thermo-dynamics", "melting", "ice cubes", 0), // ?
             ]),
             "fluid-dynamics" => Vec::from([
-                NavGridItem::new("diffusion", "Diffusion", 0),
-                // NavGridItem::new("incompressible-fluid", "incompressible fluid"),
-                // NavGridItem::new("raptor-flow", "raptor engine"),
+                NavGridItem::new("fluid-dynamics", "diffusion", "Diffusion", 0),
+                NavGridItem::new(
+                    "fluid-dynamics",
+                    "incompressible-fluid",
+                    "incompressible fluid",
+                    0,
+                ),
+                // NavGridItem::new("fluid-dynamics", "raptor-flow", "raptor engine", 0),
             ]),
             "quantum-mechanics" => Vec::from([
-                //     NavGridItem::new("double-slit", "double slit experiment"),
-                //     NavGridItem::new("feynman-graphs", "Feynman graphs"),
-                // NavGridItem::new("lennard-jones", "Lennard-Jones potential"),
+                NavGridItem::new(
+                    "quantum-mechanics",
+                    "double-slit",
+                    "double slit experiment",
+                    0,
+                ),
+                // NavGridItem::new("quantum-mechanics", "feynman-graphs", "Feynman graphs", 0),
+                NavGridItem::new(
+                    "quantum-mechanics",
+                    "lennard-jones",
+                    "lennard-jones interaction",
+                    0,
+                ),
             ]),
             "emergent-behavior" => Vec::from([
-                NavGridItem::new("boids", "boids", 0),
-                //     NavGridItem::new("ants", "ants"),
-                // NavGridItem::new("game-of-life", "game of life"),
+                NavGridItem::new("emergent-behavior", "nbody-boids", "boids", 1),
+                NavGridItem::new("emergent-behavior", "nbody-ants", "ants", 0),
+                NavGridItem::new("emergent-behavior", "game-of-life", "game of life", 0),
             ]),
             "various" => Vec::from([
-                // NavGridItem::new("rock-paper-scissors", "rock-paper-scissors"),
-                    // NavGridItem::new("ca-rulemaker", "cell.aut. rule-maker"),
-                // NavGridItem::new("mc-pi", "Monte Carlo pi"),
-                // NavGridItem::new("hsl-colors", "HSL colors"),
+                NavGridItem::new("various", "rock-paper-scissors", "rock-paper-scissors", 0),
+                // NavGridItem::new("various", "ca-rulemaker", "cell.aut. rule-maker", 0),
+                NavGridItem::new("various", "pi-calculation", "Monte Carlo pi", 0),
+                // NavGridItem::new("various", "hsl-colors", "HSL colors", 0),
             ]),
             _ => Vec::new(),
         };

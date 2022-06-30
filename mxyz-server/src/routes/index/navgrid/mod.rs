@@ -10,15 +10,15 @@ pub struct NavGrid {
 impl NavGrid {
     pub fn new() -> Self {
         let grid_section_titles: Vec<(&str, &str)> = Vec::from([
-            ("gravity", "gravitational n-body dynamics"),
+            ("newtonian-gravity", "newtonian gravity"),
             ("oscillators", "oscillators"),
             ("thermo-dynamics", "thermo-dynamics"),
             ("fluid-dynamics", "fluid dynamics"),
             ("electro-magnetism", "electro-magnetism"),
             ("emergent-behavior", "emergent behavior"),
-            // ("quantum-mechanics", "quantum mechanics"),
-            // ("various", "various"),
-            // ("optics", "optics"), // ?
+            ("quantum-mechanics", "quantum mechanics"),
+            ("various", "various"),
+            ("optics", "optics"), // ?
         ]);
 
         let mut sections: Vec<NavGridSection> = Vec::new();

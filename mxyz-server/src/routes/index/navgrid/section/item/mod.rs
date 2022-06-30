@@ -8,8 +8,11 @@ pub struct NavGridItem {
     state_id: usize,
 }
 impl NavGridItem {
-    pub fn new(item_id: &str, title: &str, state_id: usize) -> Self {
-        let path_to_thumbnail = format!("/static/img/simulations/{}/thumbnail.png", item_id);
+    pub fn new(section_id: &str, item_id: &str, title: &str, state_id: usize) -> Self {
+        let path_to_thumbnail = format!(
+            "/static/img/simulations/{}/{}/{}.png",
+            section_id, item_id, item_id
+        );
         let item_id = String::from(item_id);
         let title = String::from(title);
 

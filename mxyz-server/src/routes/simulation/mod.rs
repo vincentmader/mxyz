@@ -54,7 +54,7 @@ pub fn get_sim_id_from_str(sim_id: &str) -> Option<SimulationId> {
 
 pub fn get_title_from_sim_id(category: &str, sim_id: &str) -> String {
     match category {
-        "gravity" => match sim_id {
+        "newtonian-gravity" => match sim_id {
             "3body-moon" => "star + planet + moon",
             _ => todo!("TODO: define title for simulation-id \"{}\"", sim_id),
         },

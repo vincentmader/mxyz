@@ -1,30 +1,9 @@
-.navgrid_thumbnail-inactive {
-  width: calc(
-    var(--thumbnail_initial_width) * 100%
-  ); /* make square (with :after) */
-  border: 2px solid #555555;
-  border-radius: 30px;
-  box-shadow: inset 0px 0px 0px 0px black;
-  box-sizing: border-box;
-
-  /* center */
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 7%; /* left & right done autom. through align */
-  margin-bottom: 7%;
-
-  /* grayscale */
-  filter: grayscale(100%);
-  -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
-}
-
 .navgrid_thumbnail {
   width: calc(
     var(--thumbnail_initial_width) * 100%
   ); /* make square (with :after) */
-  border: 2px solid #555555;
-  border-radius: 30px;
+  border: var(--main-border);
+  border-radius: var(--main-border-radius);
   box-shadow: inset 0px 0px 0px 0px black;
   box-sizing: border-box;
   cursor: pointer;
@@ -40,25 +19,35 @@
 
   /* transition (with :hover) */
   transition: border 0.35s, filter 0.35s, transform 0.35s ease-in-out;
-  /* grayscale */
   filter: grayscale(100%);
   -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
 }
-@media only screen and (max-width: 551px) {
-  .navgrid_thumbnail {
-    filter: grayscale(0%);
-  }
+.navgrid_thumbnail.inactive {
+  filter: grayscale(100%);
+  -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
 }
-.navgrid_thumbnail:after {
+
+.navgrid_thumbnail.active:after {
   content: "";
   display: block;
   padding-bottom: 100%;
 }
-.navgrid_thumbnail:hover {
-  border: 2px solid #555555;
+.navgrid_thumbnail.active:hover {
+  border: var(--main-border-width) solid #777777;
   transform: scale(
     calc(var(--thumbnail_max_width) / var(--thumbnail_initial_width))
   );
   -webkit-filter: grayscale(0%); /* Safari 6.0 - 9.0 */
   filter: grayscale(0%);
+}
+@media only screen and (max-width: 551px) {
+  .navgrid_thumbnail.inactive,
+  /* { */
+    /* transition: border 2.5s, filter 2.5s, transform 2.5s ease-in-out; */
+    /* filter: grayscale(100%); */
+  /* } */
+  .navgrid_thumbnail.active {
+    /* transition: border 2.5s, filter 2.5s, transform 2.5s ease-in-out; */
+    filter: grayscale(0%);
+  }
 }
