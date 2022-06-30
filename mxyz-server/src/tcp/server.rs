@@ -7,18 +7,6 @@ use std::io::Error;
 use tokio::net::{TcpListener, TcpStream};
 use tokio_tungstenite::tungstenite::Message;
 
-const HOST: &'static str = "127.0.0.1";
-const PORT: u16 = 1234;
-
-#[tokio::main]
-pub async fn start_tcp_listener() -> Result<(), Error> {
-    let tcp_server = TcpServer::new(HOST, PORT);
-    tcp_server.start_tcp_listener().await.unwrap();
-    Ok(())
-}
-
-// ============================================================================
-
 pub struct TcpServer {
     address: String,
 }
@@ -90,43 +78,39 @@ pub fn handle_message(msg: MessageResult) -> MessageResult {
 
 pub fn handle_binary_message(bytes: Vec<u8>) -> MessageResult {
     let bytes: Vec<u8> = bytes.clone();
+    println!("incoming binary message: {:?}", bytes);
     let package = Package::from_bytes(bytes);
-    // println!("incoming binary message: {:?}", bytes);
     // println!("incoming package: {:?}", package);
 
     match package {
         Package::Request(request) => handle_request(request),
         Package::Response(response) => handle_response(response),
     }
-
-    // let vec: Vec<u8> = vec![147, 255];
-    // Result::Ok(tokio_tungstenite::tungstenite::Message::Binary(vec))
 }
 
 pub fn handle_request(request: Request) -> MessageResult {
     let package = match request {
-        Request::GetUpdatedStates(state_id) => {
-            mxyz_database::establish_connection();
-            println!("hurra! {}", state_id);
-
-            let last_update = 0;
+        Request::GetUpdatedStates(last_update) => {
+            println!("Incoming: get updated states (since state {})", last_update);
+            // Load states from database.
             let states = mxyz_engine::Engine::get_updated_states(last_update);
-            println!("{:?}", states);
-
-            let states = vec![]; // TODO
+            println!("Loaded {} states from database!", states.len());
+            // Return state-vector response
             let response = Response::StateVector(states);
             Package::Response(response)
         }
     };
+    // Convert package to bytes and return.
     let bytes = package.to_bytes();
     Ok(Message::Binary(bytes))
 }
 
 pub fn handle_response(response: Response) -> MessageResult {
     match response {
-        Empty => {}
-        StateVector => {}
+        Response::Empty => {}
+        Response::StateVector(_) => {}
     }
+    // Convert package to bytes and return.
     let bytes = vec![]; // TODO
     Ok(Message::Binary(bytes))
 }

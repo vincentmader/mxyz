@@ -25,13 +25,11 @@ impl RocketServer {
     }
     /// Starts the Server aynchronously
     pub async fn start(self) -> Result<(), rocket::Error> {
-        // Start TCP Listener in separate thread.
-        // TODO test if client can get/post data
-        // TODO `move` needed?
+        // Starts TCP Listener in separate thread.
         std::thread::spawn(move || {
             tcp::start_tcp_listener().unwrap();
         });
-        // Launch Rocket.
+        // Launches Rocket.
         rocket::build()
             .mount("/", self.routes)
             .mount("/static", self.file_server)
