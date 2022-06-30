@@ -1,7 +1,7 @@
 pub mod planet;
 use crate::entity::attribute::*;
 
-pub trait PhysicalObject: Mass + Position + Velocity + Charge {}
+pub trait Object: Mass + Position + Velocity + Charge {}
 
 // /// Entity Trait: Physical Object
 // pub trait PhysicalObject: PhysicalObjectClone + Position + Velocity + Mass + Charge {}
