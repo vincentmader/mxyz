@@ -16,6 +16,7 @@ canvas {
   width: 100%;
   /* height: 100vh; */
   /* overflow: hidden; */
-  /* box-shadow: inset 0px 0px 0px 0px black; */
+  /* --x: var(--main-border-width); */
+  /* box-shadow: inset var(--x) var(--x) var(--x) var(--x) red; */
   box-sizing: border-box;
 }

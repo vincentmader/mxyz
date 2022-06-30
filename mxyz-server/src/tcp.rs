@@ -46,65 +46,57 @@ async fn accept_connection(stream: TcpStream) {
 
     let contents = read
         .try_filter(|msg| future::ready(msg.is_text() || msg.is_binary()))
-        // contents.map(|i| {
-        //     let j = i.clone().unwrap();
-        //     println!("{}", j);
-        // });
-        // for i in contents {
-        //     let j = i.unwrap();
-        //     println!("{}", i);
-        // }
-        // .map(|i| {
-        //     println!("{}", &i.unwrap());
-        //     i
-        // })
-        .map(|i| match &i {
-            Ok(e) => {
-                // println!("{:?}", e);
-                match e {
-                    Message::Text(bar) => i,
-                    Message::Binary(bar) => {
-                        let foo: Vec<u8> = bar.clone();
-                        println!("binary message: {:?}", foo);
-
-                        use mxyz_network::package::request::Request;
-                        use mxyz_network::package::Package;
-
-                        let foo = Package::from_bytes(foo);
-
-                        match foo {
-                            Package::Request(request) => match request {
-                                Request::GetUpdatedStates(state_id) => {
-                                    mxyz_database::establish_connection();
-                                    println!("hurra! {}", state_id);
-
-                                    let last_update = 0;
-                                    let states =
-                                        mxyz_engine::Engine::get_updated_states(last_update);
-                                    println!("{:?}", states);
-                                }
-                            },
-                            Package::Response(response) => {}
-                        };
-
-                        let vec: Vec<u8> = vec![147, 255];
-                        // TODO
-                        // - append state (systems+entities+world) to vec
-                        Result::Ok(tokio_tungstenite::tungstenite::Message::Binary(vec))
-                    }
-                    Message::Ping(bar) => i,
-                    Message::Pong(bar) => i,
-                    Message::Close(bar) => i,
-                    Message::Frame(bar) => i,
-                }
-            }
-            Err(e) => {
-                println!("{:?}", e);
-                i
-            }
-        })
+        .map(|i| handle_message(i))
         .forward(write)
         .await
         .expect("Failed to forward messages");
     contents
+}
+
+pub fn handle_message(
+    i: Result<Message, tokio_tungstenite::tungstenite::Error>,
+) -> Result<Message, tokio_tungstenite::tungstenite::Error> {
+    match &i {
+        Ok(e) => {
+            match e {
+                Message::Text(bar) => i,
+                Message::Binary(bar) => {
+                    let foo: Vec<u8> = bar.clone();
+                    println!("binary message: {:?}", foo);
+
+                    use mxyz_network::package::request::Request;
+                    use mxyz_network::package::Package;
+
+                    let foo = Package::from_bytes(foo);
+
+                    match foo {
+                        Package::Request(request) => match request {
+                            Request::GetUpdatedStates(state_id) => {
+                                mxyz_database::establish_connection();
+                                println!("hurra! {}", state_id);
+
+                                let last_update = 0;
+                                let states = mxyz_engine::Engine::get_updated_states(last_update);
+                                println!("{:?}", states);
+                            }
+                        },
+                        Package::Response(response) => {}
+                    };
+
+                    let vec: Vec<u8> = vec![147, 255];
+                    // TODO
+                    // - append state (systems+entities+world) to vec
+                    Result::Ok(tokio_tungstenite::tungstenite::Message::Binary(vec))
+                }
+                Message::Ping(bar) => i,
+                Message::Pong(bar) => i,
+                Message::Close(bar) => i,
+                Message::Frame(bar) => i,
+            }
+        }
+        Err(e) => {
+            println!("{:?}", e);
+            i
+        }
+    }
 }

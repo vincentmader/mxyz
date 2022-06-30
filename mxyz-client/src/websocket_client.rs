@@ -62,8 +62,8 @@ impl WebSocketClient {
                 dom::console_log(&format!("{:?}", request));
 
                 match cloned_ws.send_with_u8_array(&request) {
-                    Ok(_) => console_log!("state-vector binary message successfully sent"),
-                    Err(err) => console_log!("state-vector ERROR sending message: {:?}", err),
+                    Ok(_) => console_log!("get-state-vector binary message successfully sent"),
+                    Err(err) => console_log!("get-state-vector ERROR sending message: {:?}", err),
                     _ => {}
                 }
                 // // send off string message

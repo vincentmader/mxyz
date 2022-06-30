@@ -21,14 +21,10 @@ impl SimulationClientV1 {
     pub fn new(client_id: usize) -> Self {
         let config = ClientConfig::new(client_id);
         let renderer = Renderer::new();
-        SimulationClientV1 {
-            config,
-            renderer,
-            // http_client,
-        }
+        SimulationClientV1 { config, renderer }
     }
     /// Initializes Renderer-Client
-    pub fn init(&mut self, sim_id: &str) {
+    pub fn init(&mut self, simulation_id: &str) {
         dom::set_panic_hook();
         self.renderer.init();
     }
