@@ -2,7 +2,7 @@ import init, { SimulationClientV1 } from "../../../static/pkg/mxyz_client.js";
 
 let script = document.getElementById("simulation.js");
 let category = script.getAttribute("category");
-let sim_id = script.getAttribute("sim_id");
+let simulation_variant = script.getAttribute("sim_id");
 let client_id = script.getAttribute("client_id");
 console.log(
   "client-id: \t\t\t" +
@@ -10,13 +10,13 @@ console.log(
     "\ncategory-id: \t\t" +
     category +
     "\nsimulation-id: \t" +
-    sim_id
+    simulation_variant
 );
 
 (async () => {
   await init();
   let simulation = SimulationClientV1.new(client_id);
-  simulation.init(sim_id);
+  simulation.init(simulation_variant);
   simulation.run();
 })();
 
