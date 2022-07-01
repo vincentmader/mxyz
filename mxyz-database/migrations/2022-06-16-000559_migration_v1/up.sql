@@ -1,25 +1,44 @@
+-- ...
+
+-- CLIENTS
+CREATE TABLE clients (
+  dbentry_id SERIAL PRIMARY KEY,
+  client_id INT NOT NULL
+);
+
+-- ENGINES
 CREATE TABLE engines (
   dbentry_id SERIAL PRIMARY KEY,
+  client_id INT NOT NULL,
   engine_id INT NOT NULL
 );
 
+-- STATES
 CREATE TABLE states (
   dbentry_id SERIAL PRIMARY KEY,
+  client_id INT NOT NULL,
+  engine_id INT NOT NULL,
   state_id INT NOT NULL
 );
 
+-- SYSTEMS
 CREATE TABLE systems (
   dbentry_id SERIAL PRIMARY KEY,
-  system_id INT NOT NULL,
+  client_id INT NOT NULL,
+  engine_id INT NOT NULL,
   state_id INT NOT NULL,
+  system_id INT NOT NULL,
   entity_variant_id INT NOT NULL
 );
 
+-- PLANETS
 CREATE TABLE planets (
   dbentry_id SERIAL PRIMARY KEY,
+  client_id INT NOT NULL,
+  engine_id INT NOT NULL,
   state_id INT NOT NULL,
-  planet_id INT NOT NULL,
   system_id INT NOT NULL,
+  planet_id INT NOT NULL,
   -- physical attributes
   mass    FLOAT NOT NULL,
   pos_x   FLOAT NOT NULL,
@@ -30,14 +49,3 @@ CREATE TABLE planets (
   vel_z   FLOAT NOT NULL
 );
 
-CREATE TABLE fluid_cells (
-  dbentry_id SERIAL PRIMARY KEY,
-  state_id INT NOT NULL,
-  cell_id INT NOT NULL,
-  system_id INT NOT NULL,
-  -- physical attributes
-  density FLOAT NOT NULL,
-  vel_x   FLOAT NOT NULL,
-  vel_y   FLOAT NOT NULL,
-  vel_z   FLOAT NOT NULL
-);
