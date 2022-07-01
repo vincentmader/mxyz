@@ -3,5 +3,6 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum Response {
+    Empty,
     StateVector(Vec<State>),
 }

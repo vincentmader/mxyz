@@ -82,14 +82,17 @@ pub fn handle_binary_message(bytes: Vec<u8>) -> MessageResult {
     let package = Package::from_bytes(bytes);
     // println!("incoming package: {:?}", package);
 
-    match package {
+    let response = match package {
         Package::Request(request) => handle_request(request),
         Package::Response(response) => handle_response(response),
-    }
+    };
+    // Convert package to bytes and return.
+    let bytes = response.to_bytes();
+    Ok(Message::Binary(bytes))
 }
 
-pub fn handle_request(request: Request) -> MessageResult {
-    let package = match request {
+pub fn handle_request(request: Request) -> Package {
+    match request {
         Request::GetUpdatedStates(last_update) => {
             println!("Incoming: get updated states (since state {})", last_update);
             // Load states from database.
@@ -99,17 +102,12 @@ pub fn handle_request(request: Request) -> MessageResult {
             let response = Response::StateVector(states);
             Package::Response(response)
         }
-    };
-    // Convert package to bytes and return.
-    let bytes = package.to_bytes();
-    Ok(Message::Binary(bytes))
+    }
 }
 
-pub fn handle_response(response: Response) -> MessageResult {
+pub fn handle_response(response: Response) -> Package {
     match response {
-        Response::StateVector(_) => {}
+        Response::Empty => Package::Response(Response::Empty),
+        Response::StateVector(_) => Package::Response(Response::Empty),
     }
-    // Convert package to bytes and return.
-    let bytes = vec![]; // TODO
-    Ok(Message::Binary(bytes))
 }
