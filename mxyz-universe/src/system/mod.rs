@@ -1,3 +1,4 @@
+pub mod cellular_automata;
 pub mod discrete_field;
 pub mod physical_objects;
 pub mod planets;
@@ -37,4 +38,5 @@ impl System {
 pub enum SystemVariant {
     Planets(planets::Planets),
     PhysicalObjects(physical_objects::PhysicalObjects),
+    CellularAutomata(cellular_automata::CellularAutomata),
 }

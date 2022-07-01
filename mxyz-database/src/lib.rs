@@ -1,3 +1,4 @@
+#![allow(unused_imports)]
 #[macro_use]
 extern crate diesel;
 extern crate dotenv;
@@ -30,7 +31,7 @@ pub fn establish_connection() -> PgConnection {
     conn
 }
 
-fn show_planets() -> Vec<Planet> {
+fn _show_planets() -> Vec<Planet> {
     let connection = establish_connection();
     let results = planets
         // .filter(published.eq(true))

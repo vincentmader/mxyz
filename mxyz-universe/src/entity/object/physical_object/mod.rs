@@ -3,22 +3,23 @@ use crate::entity::Entity;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Planet {
+pub struct PhysicalObject {}
     pub position: [f64; 3],
     pub velocity: [f64; 3],
     pub mass: f64,
+    pub charge: f64,
 }
-impl Entity for Planet {}
-impl Planet {
+impl Entity for PhysicalObject {}
+impl PhysicalObject {
     pub fn new(mass: f64, position: [f64; 3], velocity: [f64; 3]) -> Self {
-        Planet {
+        PhysicalObject {
             position,
             velocity,
             mass,
         }
     }
 }
-impl Mass for Planet {
+impl Mass for PhysicalObject {
     fn get_mass(&self) -> f64 {
         self.mass
     }
@@ -26,7 +27,7 @@ impl Mass for Planet {
         self.mass = mass;
     }
 }
-impl Position for Planet {
+impl Position for PhysicalObject {
     fn get_position(&self) -> &[f64; 3] {
         &self.position
     }
@@ -34,7 +35,7 @@ impl Position for Planet {
         self.position = *position;
     }
 }
-impl Velocity for Planet {
+impl Velocity for PhysicalObject {
     fn get_velocity(&self) -> &[f64; 3] {
         &self.velocity
     }
@@ -42,6 +43,14 @@ impl Velocity for Planet {
         self.velocity = *velocity;
     }
 }
-impl Charge for Planet {}
-impl Force for Planet {}
-impl Density for Planet {}
+impl Charge for PhysicalObject {
+    fn get_charge(&self) -> f64 {
+        self.charge
+    }
+    fn set_charge(&mut self, charge: f64) {
+        self.charge = charge;
+    }
+
+}
+impl Force for PhysicalObject {}
+impl Density for PhysicalObject {}

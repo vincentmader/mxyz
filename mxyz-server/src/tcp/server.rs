@@ -107,7 +107,6 @@ pub fn handle_request(request: Request) -> MessageResult {
 
 pub fn handle_response(response: Response) -> MessageResult {
     match response {
-        Response::Empty => {}
         Response::StateVector(_) => {}
     }
     // Convert package to bytes and return.

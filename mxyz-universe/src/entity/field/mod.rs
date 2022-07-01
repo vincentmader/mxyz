@@ -1,3 +1,4 @@
+pub mod cellular_automaton;
 pub mod fluid_cell;
 use crate::entity::attribute::*;
 
