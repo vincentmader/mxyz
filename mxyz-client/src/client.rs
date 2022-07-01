@@ -24,7 +24,7 @@ impl SimulationClientV1 {
         SimulationClientV1 { config, renderer }
     }
     /// Initializes Renderer-Client
-    pub fn init(&mut self, simulation_id: &str) {
+    pub fn init(&mut self, simulation_variant: &str) {
         dom::set_panic_hook();
         self.renderer.init();
     }

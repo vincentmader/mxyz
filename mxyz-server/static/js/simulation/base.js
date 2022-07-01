@@ -2,14 +2,14 @@ import init, { SimulationClientV1 } from "../../../static/pkg/mxyz_client.js";
 
 let script = document.getElementById("simulation.js");
 let category = script.getAttribute("category");
-let simulation_variant = script.getAttribute("sim_id");
+let simulation_variant = script.getAttribute("simulation_variant");
 let client_id = script.getAttribute("client_id");
 console.log(
   "client-id: \t\t\t" +
     client_id +
     "\ncategory-id: \t\t" +
     category +
-    "\nsimulation-id: \t" +
+    "\nsimulation-variant: \t" +
     simulation_variant
 );
 

@@ -39,5 +39,7 @@ impl RocketServer {
             .register("/", self.catchers)
             .launch()
             .await
+            .expect("failed to launch Rocket");
+        Ok(()) // TODO
     }
 }

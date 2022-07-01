@@ -34,7 +34,7 @@ pub fn get_all_routes() -> Vec<rocket::Route> {
 // ============================================================================
 
 #[get("/test_engine")]
-fn test_engine() -> content::Json<&'static str> {
+fn test_engine() -> content::RawJson<&'static str> {
     todo!();
     // let foo = "{ 'hi': 'world' }"; // TODO get from engine's state-vec (or db?)
     // content::Json(foo)
@@ -42,9 +42,9 @@ fn test_engine() -> content::Json<&'static str> {
 
 // WORKS! =====================================================================
 #[get("/test_json")]
-fn test_json() -> content::Json<&'static str> {
+fn test_json() -> content::RawJson<&'static str> {
     let foo = "{ 'hi': 'world' }"; // TODO get from engine's state-vec (or db?)
-    content::Json(foo)
+    content::RawJson(foo)
 }
 
 // WORKS! =====================================================================
@@ -67,7 +67,7 @@ use mxyz_database::schema::planets::dsl::*;
 
 #[get("/test_db")]
 // fn test_bytes() -> content::Json<&'static str> {
-fn test_db() -> content::Json<&'static str> {
+fn test_db() -> content::RawJson<&'static str> {
     let connection = mxyz_database::establish_connection();
 
     // show
@@ -103,7 +103,7 @@ fn test_db() -> content::Json<&'static str> {
         .expect("Error saving new post");
 
     let foo = "{ 'hello': 'world' }"; // TODO get from engine's state-vec (or db?)
-    content::Json(foo)
+    content::RawJson(foo)
 }
 
 // ==== ? =====================================================================
@@ -116,10 +116,10 @@ fn _test_bytes() -> Vec<u8> {
 
 // ==== ? =====================================================================
 #[get("/test_tcp")]
-fn _test_tcp() -> content::Json<&'static str> {
+fn _test_tcp() -> content::RawJson<&'static str> {
     _tcp().unwrap();
     let foo = "{}"; // TODO bytes!
-    content::Json(foo)
+    content::RawJson(foo)
 }
 
 use std::net::{TcpListener, TcpStream};
