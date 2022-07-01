@@ -3,6 +3,7 @@ use std::collections::HashMap;
 extern crate rocket_dyn_templates;
 use rocket::get;
 use rocket_dyn_templates::Template;
+use std::sync::mpsc;
 
 #[get("/simulations/<category>/<sim_id>")]
 pub async fn route(category: &str, sim_id: &str) -> Template {
@@ -31,8 +32,9 @@ pub async fn route(category: &str, sim_id: &str) -> Template {
 use mxyz_engine::Engine;
 
 pub async fn start_engine(sim_id: &str) {
+    let (tx, rx) = mpsc::channel();
     let sim_id = get_sim_id_from_str(sim_id);
-    let mut engine = Engine::new();
+    let mut engine = Engine::new(rx, tx);
     engine.init(&sim_id);
 
     println!("Starting Engine...");
