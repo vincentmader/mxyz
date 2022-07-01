@@ -22,7 +22,7 @@
         id="simulation.js"
         src="../../static/js/simulation/base.js"
         category="{{ category }}"
-        simulation_variant="{{ simulation_variant }}"
+        sim_id="{{ sim_id }}"
         client_id="{{ client_id }}"
     ></script>
 
