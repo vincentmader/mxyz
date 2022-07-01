@@ -2,6 +2,7 @@ engine:
 	./scripts/rebuild_db
 	cargo run -p mxyz-engine # --release
 server:
+	./scripts/rebuild_db
 	cargo run -p mxyz-server # --release
 client:
 	cd ./mxyz-client && cargo build --target wasm32-unknown-unknown # --release
