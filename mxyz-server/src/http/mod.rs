@@ -57,7 +57,7 @@ fn _test_download() -> Vec<u8> {
 // WORKS! =====================================================================
 use diesel::prelude::*;
 // use mxyz_database::models::*;
-use mxyz_database::models::{NewPlanet, Planet};
+use mxyz_database::models::planet::{NewPlanet, Planet};
 use mxyz_database::schema::planets;
 use mxyz_database::schema::planets::dsl::*;
 // use mxyz_database::*;

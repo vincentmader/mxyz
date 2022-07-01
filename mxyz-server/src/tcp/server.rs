@@ -96,7 +96,8 @@ pub fn handle_request(request: Request) -> Package {
         Request::GetUpdatedStates(last_update) => {
             println!("Incoming: get updated states (since state {})", last_update);
             // Load states from database.
-            let states = mxyz_engine::Engine::get_updated_states(last_update);
+            let states = vec![];
+            // let states = mxyz_engine::Engine::get_updated_states(last_update);
             println!("Loaded {} states from database!", states.len());
             // Return state-vector response
             let response = Response::StateVector(states);

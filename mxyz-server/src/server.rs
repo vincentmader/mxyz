@@ -11,6 +11,7 @@ pub struct RocketServer {
     catchers: Vec<Catcher>,
     file_server: FileServer,
 }
+
 impl RocketServer {
     /// Creates a new Server instance
     pub fn new() -> Self {
@@ -23,6 +24,7 @@ impl RocketServer {
             file_server,
         }
     }
+
     /// Starts the Server aynchronously
     pub async fn start(self) -> Result<(), rocket::Error> {
         // Server-Client Communication: Start TCP-Listener in separate thread.
@@ -40,6 +42,7 @@ impl RocketServer {
             .launch()
             .await
             .expect("failed to launch Rocket");
+
         Ok(()) // TODO
     }
 }

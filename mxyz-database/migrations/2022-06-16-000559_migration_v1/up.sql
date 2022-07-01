@@ -1,3 +1,8 @@
+CREATE TABLE engines (
+  dbentry_id SERIAL PRIMARY KEY,
+  engine_id INT NOT NULL
+);
+
 CREATE TABLE states (
   dbentry_id SERIAL PRIMARY KEY,
   state_id INT NOT NULL
