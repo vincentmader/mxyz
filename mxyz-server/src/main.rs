@@ -6,5 +6,5 @@ use mxyz_server::server::RocketServer;
 #[rocket::main]
 pub async fn main() -> Result<(), rocket::Error> {
     let server = RocketServer::new();
-    server.start().await
+    server.init().await
 }

@@ -1,26 +1,34 @@
 use futures_util::{future, StreamExt, TryStreamExt};
 use log::info;
+use mxyz_network::message::Message as MpscMessage;
 use mxyz_network::package::request::Request;
 use mxyz_network::package::response::Response;
 use mxyz_network::package::Package;
 use std::io::Error;
+use std::sync::mpsc;
 use tokio::net::{TcpListener, TcpStream};
 use tokio_tungstenite::tungstenite::Message;
 
+/// TCP Server
 pub struct TcpServer {
     address: String,
+    tx: mpsc::Sender<MpscMessage>,
 }
 impl TcpServer {
-    pub fn new(host: &str, port: u16) -> Self {
+    /// Creates new TCP Server instance
+    pub fn new(host: &str, port: u16, tx: mpsc::Sender<MpscMessage>) -> Self {
         let address = format!("{}:{}", host, port);
-        TcpServer { address }
+        TcpServer { address, tx }
     }
-    pub async fn start_tcp_listener(self) -> Result<(), Error> {
+
+    /// Starts TCP Listener
+    pub async fn init(self) -> Result<(), Error> {
         let try_socket = TcpListener::bind(&self.address).await;
         let listener = try_socket.expect("Failed to bind");
         info!("Listening on: {}", self.address);
 
         while let Ok((stream, _)) = listener.accept().await {
+            // tokio::spawn(accept_connection(stream, self.tx));
             tokio::spawn(accept_connection(stream));
         }
         Ok(())
@@ -29,6 +37,7 @@ impl TcpServer {
 
 // ============================================================================
 
+// async fn accept_connection(stream: TcpStream, tx: mpsc::Sender<MpscMessage>) {
 async fn accept_connection(stream: TcpStream) {
     // Gets address.
     let address = stream
@@ -63,6 +72,7 @@ pub fn handle_message(msg: MessageResult) -> MessageResult {
     match &msg {
         Ok(e) => match e {
             Message::Binary(bytes) => handle_binary_message(bytes.to_vec()),
+            // TODO implement below
             Message::Text(_) => msg,
             Message::Ping(_) => Ok(Message::Pong(vec![7, 4, 1])),
             Message::Pong(_) => Ok(Message::Ping(vec![1, 4, 7])),
@@ -78,7 +88,7 @@ pub fn handle_message(msg: MessageResult) -> MessageResult {
 
 pub fn handle_binary_message(bytes: Vec<u8>) -> MessageResult {
     let bytes: Vec<u8> = bytes.clone();
-    println!("incoming binary message: {:?}", bytes);
+    // println!("incoming binary message: {:?}", bytes);
     let package = Package::from_bytes(bytes);
     // println!("incoming package: {:?}", package);
 
@@ -103,12 +113,19 @@ pub fn handle_request(request: Request) -> Package {
             let response = Response::StateVector(states);
             Package::Response(response)
         }
+        Request::AddEngine => {
+            let response = Response::AddedEngine;
+            Package::Response(response)
+        }
     }
 }
 
 pub fn handle_response(response: Response) -> Package {
     match response {
         Response::Empty => Package::Response(Response::Empty),
+        // TODO
         Response::StateVector(_) => Package::Response(Response::Empty),
+        // TODO
+        Response::AddedEngine => Package::Response(Response::Empty),
     }
 }

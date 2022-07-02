@@ -1,9 +1,32 @@
+use crate::engine;
 use crate::http;
 use crate::misc;
 use crate::tcp;
+use mxyz_network::message::Message;
 use rocket::fs::{relative, FileServer};
 use rocket::{catchers, Catcher, Route};
 use rocket_dyn_templates::Template;
+use std::sync::mpsc;
+
+// ============================================================================
+
+// type M = Message; // MPSC message type
+
+// use mxyz_engine::Engine;
+
+// pub async fn start_engine(simulation_variant: &str) {
+//     let (tx, rx) = mpsc::channel();
+//     let simulation_variant = get_simulation_variant_from_str(simulation_variant);
+//     let mut engine = Engine::new(rx, tx);
+//     engine.init(&simulation_variant);
+
+//     println!("Starting Engine...");
+//     std::thread::spawn(move || engine.run());
+// }
+
+// TCP address TODO rename/move
+const HOST: &'static str = "127.0.0.1";
+const PORT: u16 = 1234;
 
 /// Rocket Server
 pub struct RocketServer {
@@ -26,10 +49,18 @@ impl RocketServer {
     }
 
     /// Starts the Server aynchronously
-    pub async fn start(self) -> Result<(), rocket::Error> {
+    pub async fn init(self) -> Result<(), rocket::Error> {
+        // Create MPSC channel for Server-Engine Communication
+        let (tx, rx) = mpsc::channel::<Message>();
+
         // Server-Client Communication: Start TCP-Listener in separate thread.
         std::thread::spawn(move || {
-            tcp::start_tcp_listener().unwrap();
+            tcp::start_tcp_listener(tx).unwrap();
+        });
+
+        // Start Engine-Runner in separate thread.
+        std::thread::spawn(move || {
+            engine::start_engine_runner(rx).unwrap();
         });
 
         // Launch Rocket.
