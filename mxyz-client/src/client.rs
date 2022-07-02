@@ -1,8 +1,8 @@
-use super::components::canvas::Canvas;
 use super::config::ClientConfig;
 use super::renderer::Renderer;
 use super::utils::dom;
-use crate::websocket_client;
+use crate::tmp;
+use crate::websocket::client as websocket_client;
 use std::cell::RefCell;
 use std::rc::Rc;
 use wasm_bindgen::prelude::*;
@@ -54,20 +54,7 @@ impl SimulationClientV1 {
     /// Forwards Renderer to Next Time-Step
     pub fn step(&mut self) {
         let i = self.config.frame_id.0;
-        draw(i); // TODO
+        tmp::draw(i); // TODO create renderer with loop over systems & entities
         self.config.frame_id.0 += 1;
     }
-}
-
-// TODO create renderer with loop over systems & entities
-pub fn draw(i: usize) {
-    let r = i as f64 * 0.3;
-    let phi = i as f64 * 0.1;
-    let pos = (r * phi.cos(), r * phi.sin());
-    let pos = (pos.0 + 500., pos.1 + 500.);
-
-    let mut canvas = Canvas::new(0);
-    canvas.set_stroke_style("blue");
-    canvas.set_fill_style("blue");
-    canvas.draw_circle(pos, 4., true);
 }
