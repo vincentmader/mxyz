@@ -36,7 +36,8 @@ impl WebSocketClient {
 
         // For small binary messages, like CBOR, Arraybuffer is more efficient than Blob handling
         ws.set_binary_type(web_sys::BinaryType::Arraybuffer);
-        dom::console_log("Starting WebSocket Client...");
+
+        // dom::console_log("Starting WebSocket Client...");
 
         self.create_onmessage_callback();
         self.create_onerror_callback();
@@ -52,6 +53,7 @@ impl WebSocketClient {
         let cloned_ws = ws.clone();
         let onopen_callback = Closure::wrap(Box::new(move |_| {
             console_log!("TCP socket opened");
+
             {
                 use mxyz_network::package::request;
                 use mxyz_network::package::Package;
@@ -59,7 +61,7 @@ impl WebSocketClient {
                 let request = request::Request::GetUpdatedStates(state_id);
                 let request = Package::Request(request);
                 let request = request.to_bytes();
-                dom::console_log(&format!("{:?}", request));
+                // dom::console_log(&format!("{:?}", request));
 
                 match cloned_ws.send_with_u8_array(&request) {
                     Ok(_) => console_log!("get-state-vector binary message successfully sent"),
@@ -106,10 +108,10 @@ impl WebSocketClient {
         let onmessage_callback = Closure::wrap(Box::new(move |e: MessageEvent| {
             // Handle ArrayBuffer.
             if let Ok(abuf) = e.data().dyn_into::<js_sys::ArrayBuffer>() {
-                console_log!("message event, received arraybuffer: {:?}", abuf);
+                // console_log!("message event, received arraybuffer: {:?}", abuf);
                 let array = js_sys::Uint8Array::new(&abuf);
                 let len = array.byte_length() as usize;
-                console_log!("Arraybuffer received {}bytes: {:?}", len, array.to_vec());
+                console_log!("Arraybuffer received {} bytes: {:?}", len, array.to_vec());
 
                 // here you can for example use Serde Deserialize decode the message
                 // for demo purposes we switch back to Blob-type and send off another binary message
