@@ -44,6 +44,7 @@ impl SimulationClientV1 {
                 let _ = f.borrow_mut().take();
                 return;
             }
+            // std::thread::spawn(|| {});
             self.step(); //
             dom::request_animation_frame(f.borrow().as_ref().unwrap());
         }) as Box<dyn FnMut()>));

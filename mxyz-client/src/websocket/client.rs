@@ -56,6 +56,7 @@ impl WebSocketClient {
             let request = Package::Request(request);
             let request = request.to_bytes();
             cloned_ws.send_with_u8_array(&request).unwrap();
+            console_log!("get-client binary msg successfully sent");
 
             // Add new engine. TODO move to separate function (or match input)
             let simulation_variant = SimulationVariant::ThreeBodyMoon;
@@ -63,6 +64,7 @@ impl WebSocketClient {
             let request = Package::Request(request);
             let request = request.to_bytes();
             cloned_ws.send_with_u8_array(&request).unwrap();
+            console_log!("add-engine binary msg successfully sent");
 
             // Get states. // TODO move to loop
             let state_id = 0; // TODO
@@ -70,11 +72,8 @@ impl WebSocketClient {
             let request = Package::Request(request);
             let request = request.to_bytes();
 
-            match cloned_ws.send_with_u8_array(&request) {
-                Ok(_) => console_log!("get-state-vector binary message successfully sent"),
-                Err(err) => console_log!("get-state-vector ERROR sending message: {:?}", err),
-                _ => {}
-            }
+            cloned_ws.send_with_u8_array(&request).unwrap();
+            console_log!("get-state-vector binary msg successfully sent");
 
             // // send off string message
             // match cloned_ws.send_with_str("ping") {
