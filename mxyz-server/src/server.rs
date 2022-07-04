@@ -1,8 +1,10 @@
 use crate::engine;
 use crate::http;
 use crate::misc;
-use crate::tcp;
 use mxyz_network::message::Message;
+use mxyz_network::mpsc::MpscReceiver;
+use mxyz_network::mpsc::MpscSender;
+use mxyz_network::tcp;
 use rocket::fs::{relative, FileServer};
 use rocket::{catchers, Catcher, Route};
 use rocket_dyn_templates::Template;
@@ -52,15 +54,16 @@ impl RocketServer {
 
         // Create MPSC channel for Server-Engine Communication
         let (tx, rx) = mpsc::channel::<Message>();
+        let (mpsc_sender, mpsc_receiver) = mxyz_network::mpsc::create_channel();
 
         // Server-Client Communication: Start TCP-Listener in separate thread.
         std::thread::spawn(move || {
-            tcp::start_tcp_listener(tx).unwrap();
+            tcp::start_tcp_listener(mpsc_sender).unwrap();
         });
 
         // Start Engine-Runner in separate thread.
         std::thread::spawn(move || {
-            engine::start_engine_runner(rx).unwrap();
+            engine::start_engine_runner(mpsc_receiver).unwrap();
         });
 
         // Launch Rocket.
