@@ -13,6 +13,14 @@ pub struct NewEngine<'a> {
     pub client_id: &'a i32,
     pub engine_id: &'a i32,
 }
+// impl<'a> std::convert::From<&'a mxyz_engine::Engine> for NewEngine<'a> {
+//     fn from(engine: &'a mxyz_engine::Engine) -> Self {
+//         NewEngine {
+//             client_id: &(engine.client_id as i32),
+//             engine_id: &(engine.engine_id as i32),
+//         }
+//     }
+// }
 
 // ============================================================================
 
@@ -25,4 +33,19 @@ pub fn get_db_engines() -> Vec<Engine> {
     engines
         .load::<Engine>(&connection)
         .expect("Error loading states")
+}
+
+pub fn create_engine<'a>(conn: &PgConnection, engine: NewEngine) -> Engine {
+    let other_client_id = 0; // TODO
+    let other_engine_id = engine.engine_id;
+
+    let new_post = NewEngine {
+        engine_id: &(*other_engine_id as i32),
+        client_id: &(other_client_id as i32),
+    };
+
+    diesel::insert_into(engines::table)
+        .values(&new_post)
+        .get_result(conn)
+        .expect("Error saving new post")
 }

@@ -18,7 +18,7 @@ use crate::establish_connection;
 use crate::schema::clients::dsl::*;
 use diesel::prelude::*;
 
-pub fn get_db_states(client_query: i32) -> Vec<Client> {
+pub fn get_db_clients() -> Vec<Client> {
     let connection = crate::establish_connection();
 
     clients
