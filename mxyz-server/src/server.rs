@@ -25,8 +25,6 @@ use std::sync::mpsc;
 // }
 
 // TCP address TODO rename/move
-const HOST: &'static str = "127.0.0.1";
-const PORT: u16 = 1234;
 
 /// Rocket Server
 pub struct RocketServer {
@@ -50,6 +48,8 @@ impl RocketServer {
 
     /// Starts the Server aynchronously
     pub async fn init(self) -> Result<(), rocket::Error> {
+        let db_conn = mxyz_database::establish_connection();
+
         // Create MPSC channel for Server-Engine Communication
         let (tx, rx) = mpsc::channel::<Message>();
 
