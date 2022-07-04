@@ -7,13 +7,14 @@ use std::sync::mpsc;
 
 pub struct EngineRunner {
     rx: mpsc::Receiver<Package>,
+    tx: mpsc::Sender<Package>,
     engines: Vec<Engine>,
 }
 impl EngineRunner {
     /// Creates a new Engine-Runner instance
-    pub fn new(rx: mpsc::Receiver<Package>) -> Self {
+    pub fn new(tx: mpsc::Sender<Package>, rx: mpsc::Receiver<Package>) -> Self {
         let engines = vec![];
-        EngineRunner { rx, engines }
+        EngineRunner { rx, tx, engines }
     }
 
     /// Initializes MPSC Receiver

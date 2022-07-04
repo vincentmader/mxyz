@@ -1,7 +1,11 @@
 use crate::utils::dom;
+use mxyz_network::package::request;
+use mxyz_network::package::Package;
+use mxyz_network::package::Package;
 use mxyz_universe::preset::SimulationVariant;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
+use web_sys::BinaryType::Arraybuffer;
 use web_sys::{ErrorEvent, MessageEvent, WebSocket};
 
 macro_rules! console_log {
@@ -30,17 +34,11 @@ impl WebSocketClient {
 
     /// Initializes Web Socket Client
     pub fn init(&mut self) -> Result<(), JsValue> {
-        let ws = &mut self.socket;
-
-        // For small binary messages, like CBOR, Arraybuffer is more efficient than Blob handling
-        ws.set_binary_type(web_sys::BinaryType::Arraybuffer);
-
-        // dom::console_log("Starting WebSocket Client...");
-
+        dom::console_log("Starting WebSocket Client...");
+        self.socket.set_binary_type(Arraybuffer); // for small bin. msgs, like CBOR, Arraybuffer is more efficient than Blob handling
         self.create_onmessage_callback();
         self.create_onerror_callback();
         self.create_onopen_callback();
-
         Ok(())
     }
 
@@ -52,41 +50,36 @@ impl WebSocketClient {
         let onopen_callback = Closure::wrap(Box::new(move |_| {
             console_log!("TCP socket opened");
 
-            {
-                use mxyz_network::package::request;
-                use mxyz_network::package::Package;
+            // Add new engine. TODO move to separate function (or match input)
+            let simulation_variant = SimulationVariant::ThreeBodyMoon;
+            let request = request::Request::AddEngine(simulation_variant);
+            let request = Package::Request(request);
+            let request = request.to_bytes();
+            cloned_ws.send_with_u8_array(&request).unwrap();
 
-                // Add new engine. TODO move to separate function (or match input)
-                let simulation_variant = SimulationVariant::ThreeBodyMoon;
-                let request = request::Request::AddEngine(simulation_variant);
-                let request = Package::Request(request);
-                let request = request.to_bytes();
-                cloned_ws.send_with_u8_array(&request).unwrap();
+            // Get states. // TODO move to loop
+            let state_id = 0; // TODO
+            let request = request::Request::GetUpdatedStates(state_id);
+            let request = Package::Request(request);
+            let request = request.to_bytes();
 
-                // Get states. // TODO move to loop
-                let state_id = 0; // TODO
-                let request = request::Request::GetUpdatedStates(state_id);
-                let request = Package::Request(request);
-                let request = request.to_bytes();
-
-                match cloned_ws.send_with_u8_array(&request) {
-                    Ok(_) => console_log!("get-state-vector binary message successfully sent"),
-                    Err(err) => console_log!("get-state-vector ERROR sending message: {:?}", err),
-                    _ => {}
-                }
-
-                // // send off string message
-                // match cloned_ws.send_with_str("ping") {
-                //     Ok(_) => console_log!("message successfully sent"),
-                //     Err(err) => console_log!("ERROR sending message: {:?}", err),
-                // }
-                // // send off binary message
-                // match cloned_ws.send_with_u8_array(&vec![0, 1, 2, 3]) {
-                //     Ok(_) => console_log!("binary message successfully sent"),
-                //     Err(err) => console_log!("ERROR sending message: {:?}", err),
-                //     _ => {}
-                // }
+            match cloned_ws.send_with_u8_array(&request) {
+                Ok(_) => console_log!("get-state-vector binary message successfully sent"),
+                Err(err) => console_log!("get-state-vector ERROR sending message: {:?}", err),
+                _ => {}
             }
+
+            // // send off string message
+            // match cloned_ws.send_with_str("ping") {
+            //     Ok(_) => console_log!("message successfully sent"),
+            //     Err(err) => console_log!("ERROR sending message: {:?}", err),
+            // }
+            // // send off binary message
+            // match cloned_ws.send_with_u8_array(&vec![0, 1, 2, 3]) {
+            //     Ok(_) => console_log!("binary message successfully sent"),
+            //     Err(err) => console_log!("ERROR sending message: {:?}", err),
+            //     _ => {}
+            // }
         }) as Box<dyn FnMut(JsValue)>);
 
         ws.set_onopen(Some(onopen_callback.as_ref().unchecked_ref()));

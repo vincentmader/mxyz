@@ -12,13 +12,19 @@ use tokio_tungstenite::tungstenite::Message;
 /// TCP Server
 pub struct TcpServer {
     address: String,
+    rx: mpsc::Receiver<Package>,
     tx: mpsc::Sender<Package>,
 }
 impl TcpServer {
     /// Creates new TCP Server instance
-    pub fn new(host: &str, port: u16, tx: mpsc::Sender<Package>) -> Self {
+    pub fn new(
+        host: &str,
+        port: u16,
+        tx: mpsc::Sender<Package>,
+        rx: mpsc::Receiver<Package>,
+    ) -> Self {
         let address = format!("{}:{}", host, port);
-        TcpServer { address, tx }
+        TcpServer { address, rx, tx }
     }
 
     /// Starts TCP Listener
