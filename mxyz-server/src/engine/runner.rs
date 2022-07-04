@@ -1,16 +1,20 @@
 use mxyz_engine::state::preset::SimulationVariant;
 use mxyz_engine::Engine;
 use mxyz_network::message::Message;
+use mxyz_network::mpsc::MpscReceiver;
 use std::sync::mpsc;
 
 pub struct EngineRunner {
-    rx: mpsc::Receiver<Message>,
+    mpsc_receiver: MpscReceiver,
     engines: Vec<Engine>,
 }
 impl EngineRunner {
-    pub fn new(rx: mpsc::Receiver<Message>) -> Self {
+    pub fn new(mpsc_receiver: MpscReceiver) -> Self {
         let engines = vec![];
-        EngineRunner { rx, engines }
+        EngineRunner {
+            engines,
+            mpsc_receiver,
+        }
     }
     pub fn init(&mut self) {
         println!("Initializing Engine Runner...");
@@ -20,7 +24,7 @@ impl EngineRunner {
     }
     pub fn receive(&mut self) {
         println!("Engine Runner listening...");
-        let msg = self.rx.recv().unwrap();
+        let msg = self.mpsc_receiver.rx.recv().unwrap();
         println!("Engine Runner received msg: {:?}", msg);
         match &msg {
             Message::AddEngine(simulation_variant) => self.add_engine(simulation_variant),

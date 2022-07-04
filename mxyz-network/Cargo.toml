@@ -8,9 +8,15 @@
     bincode = "1.3.3"
     # mxyz-engine = { path = "../mxyz-engine" }  ! not working !
     mxyz-universe = { path = "../mxyz-universe" }
+    log = "0.4"
     mxyz-engine = { path = "../mxyz-engine" }
+    futures-util = { version = "0.3", default-features = false, features = ["sink", "std"] }
+    tokio-tungstenite = "0.17.1"
 
 [dependencies.serde]
     features = ["derive"]
     version = "1.0"
 
+[dependencies.tokio]
+    features = ["macros", "sync"]
+    version = "1.19.2"
