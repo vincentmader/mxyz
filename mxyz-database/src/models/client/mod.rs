@@ -25,3 +25,13 @@ pub fn get_db_clients() -> Vec<Client> {
         .load::<Client>(&connection)
         .expect("Error loading states")
 }
+pub fn create_client<'a>(conn: &PgConnection, other_client_id: usize) -> Client {
+    let new_post = NewClient {
+        client_id: &(other_client_id as i32),
+    };
+
+    diesel::insert_into(clients::table)
+        .values(&new_post)
+        .get_result(conn)
+        .expect("Error saving new post")
+}

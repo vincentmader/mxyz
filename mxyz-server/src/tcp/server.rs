@@ -1,5 +1,6 @@
 use futures_util::{future, StreamExt, TryStreamExt};
 use log::info;
+use mxyz_engine::state::State;
 use mxyz_network::package::request::Request;
 use mxyz_network::package::response::Response;
 use mxyz_network::package::Package;
@@ -110,8 +111,9 @@ pub fn handle_request(request: Request, tx: &mpsc::Sender<Package>) -> Package {
         Request::GetUpdatedStates(last_update) => {
             println!("Incoming: get updated states (since state {})", last_update);
             // Load states from database.
-            let states = vec![];
-            // let states = mxyz_engine::Engine::get_updated_states(last_update);
+            // - TODO
+            let states = vec![State::new()]; // TODO
+                                             // let states = mxyz_engine::Engine::get_updated_states(last_update);
             println!("Loaded {} states from database!", states.len());
             // Return state-vector response
             let response = Response::StateVector(states);
@@ -130,6 +132,14 @@ pub fn handle_request(request: Request, tx: &mpsc::Sender<Package>) -> Package {
             let response = Response::Empty;
             Package::Response(response)
         }
+        Request::AddClient => {
+            let client_id = mxyz_database::models::client::get_db_clients().len();
+            // let client_id = std::cmp::max(0, client_id); // TODO needed?
+            let db_conn = mxyz_database::establish_connection();
+            mxyz_database::models::client::create_client(&db_conn, client_id);
+            let response = Response::AddedClient(client_id);
+            Package::Response(response)
+        }
     }
 }
 
@@ -140,5 +150,7 @@ pub fn handle_response(response: Response) -> Package {
         Response::StateVector(_) => Package::Response(Response::Empty),
         // TODO
         Response::AddedEngine => Package::Response(Response::Empty),
+        // TODO
+        Response::AddedClient(client_id) => Package::Response(Response::Empty),
     }
 }

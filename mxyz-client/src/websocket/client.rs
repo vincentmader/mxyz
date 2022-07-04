@@ -1,6 +1,7 @@
 use crate::utils::dom;
 use mxyz_network::package::request;
-use mxyz_network::package::Package;
+use mxyz_network::package::request::Request;
+use mxyz_network::package::response::Response;
 use mxyz_network::package::Package;
 use mxyz_universe::preset::SimulationVariant;
 use wasm_bindgen::prelude::*;
@@ -49,6 +50,12 @@ impl WebSocketClient {
         let cloned_ws = ws.clone();
         let onopen_callback = Closure::wrap(Box::new(move |_| {
             console_log!("TCP socket opened");
+
+            // Add new client. TODO move to separate function (or match input)
+            let request = request::Request::AddClient;
+            let request = Package::Request(request);
+            let request = request.to_bytes();
+            cloned_ws.send_with_u8_array(&request).unwrap();
 
             // Add new engine. TODO move to separate function (or match input)
             let simulation_variant = SimulationVariant::ThreeBodyMoon;
@@ -112,6 +119,33 @@ impl WebSocketClient {
                 let array = js_sys::Uint8Array::new(&abuf);
                 let len = array.byte_length() as usize;
                 console_log!("Arraybuffer received {} bytes: {:?}", len, array.to_vec());
+
+                let package = Package::from_bytes(array.to_vec());
+                console_log!("{:?}", &package);
+                match package {
+                    Package::Request(req) => match req {
+                        Request::AddEngine(_simulation_variant) => { // Do nothing.
+                        }
+                        Request::GetUpdatedStates(_last_update) => { // Do nothing.
+                        }
+                        Request::RemoveEngine(_engine_id) => { // Do nothing.
+                        }
+                        Request::AddClient => { // Do nothing.
+                        }
+                    },
+                    Package::Response(res) => match res {
+                        Response::AddedEngine => {}
+                        Response::AddedClient(client_id) => {
+                            println!("Received client-id: {}", client_id);
+                            // TODO
+                        }
+                        Response::StateVector(state_vector) => {
+                            // TODO
+                            println!("Received state vector: {:?}", state_vector);
+                        }
+                        Response::Empty => {}
+                    },
+                }
 
                 // here you can for example use Serde Deserialize decode the message
                 // for demo purposes we switch back to Blob-type and send off another binary message

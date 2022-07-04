@@ -36,7 +36,7 @@ pub fn get_db_engines() -> Vec<Engine> {
 }
 
 pub fn create_engine<'a>(conn: &PgConnection, engine: NewEngine) -> Engine {
-    let other_client_id = 0; // TODO
+    let other_client_id = crate::models::client::get_db_clients().len() - 1;
     let other_engine_id = engine.engine_id;
 
     let new_post = NewEngine {

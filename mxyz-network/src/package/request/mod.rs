@@ -5,5 +5,6 @@ use serde::{Deserialize, Serialize};
 pub enum Request {
     GetUpdatedStates(usize),
     AddEngine(SimulationVariant),
+    AddClient,
     RemoveEngine(usize),
 }

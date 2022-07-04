@@ -6,4 +6,5 @@ pub enum Response {
     Empty,
     StateVector(Vec<State>),
     AddedEngine,
+    AddedClient(usize),
 }
