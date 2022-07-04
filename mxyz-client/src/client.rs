@@ -2,8 +2,11 @@ use super::config::ClientConfig;
 use super::renderer::Renderer;
 use super::utils::dom;
 use crate::tmp;
+use mxyz_network::package::command::Command;
+use mxyz_network::package::Package;
 use std::cell::RefCell;
 use std::rc::Rc;
+use std::sync::mpsc;
 use wasm_bindgen::prelude::*;
 use web_sys::TcpSocket;
 
@@ -29,11 +32,14 @@ impl SimulationClientV1 {
     }
     /// Runs Renderer-Client in Animation Loop
     pub async fn run(mut self) -> Result<(), JsValue> {
+        // let (tx, rx) = mpsc::channel::<Package>();
+
         // TCP Client
         // TODO test get-request to server
         // - TCP get-requests (bytestream? -> decode)
         // - move inside animation loop (async?)
         crate::websocket::start_client().unwrap();
+        // crate::websocket::start_client(rx).unwrap();
 
         // ANIMATION LOOP
         // TODO move to utils/dom/mod.rs (?)
@@ -45,6 +51,7 @@ impl SimulationClientV1 {
                 return;
             }
             // std::thread::spawn(|| {});
+            // self.step(&tx); //
             self.step(); //
             dom::request_animation_frame(f.borrow().as_ref().unwrap());
         }) as Box<dyn FnMut()>));
@@ -52,9 +59,14 @@ impl SimulationClientV1 {
         Ok(())
     }
     /// Forwards Renderer to Next Time-Step
+    // pub fn step(&mut self, tx: &mpsc::Sender<Package>) {
     pub fn step(&mut self) {
-        let i = self.config.frame_id.0;
+        let frame_id = self.config.frame_id.0;
         // tmp::draw(i); // TODO create renderer with loop over systems & entities
+        if frame_id % 100 == 0 {
+            // let package = Package::Command(Command::SaveStatesToDatabase);
+            // tx.send(package).unwrap();
+        }
         self.config.frame_id.0 += 1;
     }
 }

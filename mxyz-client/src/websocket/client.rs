@@ -1,4 +1,5 @@
 use crate::utils::dom;
+use mxyz_network::package::command::Command;
 use mxyz_network::package::request;
 use mxyz_network::package::request::Request;
 use mxyz_network::package::response::Response;
@@ -143,6 +144,9 @@ impl WebSocketClient {
                             println!("Received state vector: {:?}", state_vector);
                         }
                         Response::Empty => {}
+                    },
+                    Package::Command(cmd) => match cmd {
+                        Command::SaveStatesToDatabase => todo!(),
                     },
                 }
 

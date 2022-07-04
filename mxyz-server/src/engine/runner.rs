@@ -2,6 +2,7 @@ use mxyz_engine::config::EngineConfig;
 use mxyz_engine::config::ExportVariant;
 use mxyz_engine::state::State;
 use mxyz_engine::Engine;
+use mxyz_network::package::command::Command;
 use mxyz_network::package::request::Request;
 use mxyz_network::package::Package;
 use mxyz_universe::entity::attribute::*;
@@ -42,6 +43,9 @@ impl EngineRunner {
             },
             Package::Response(res) => match res {
                 _ => todo!(),
+            },
+            Package::Command(cmd) => match cmd {
+                Command::SaveStatesToDatabase => {}
             },
         };
         println!("Server received MPSC msg: {:#?}", msg);

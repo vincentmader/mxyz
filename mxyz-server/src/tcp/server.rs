@@ -1,6 +1,7 @@
 use futures_util::{future, StreamExt, TryStreamExt};
 use log::info;
 use mxyz_engine::state::State;
+use mxyz_network::package::command::Command;
 use mxyz_network::package::request::Request;
 use mxyz_network::package::response::Response;
 use mxyz_network::package::Package;
@@ -100,6 +101,7 @@ pub fn handle_binary_message(bytes: Vec<u8>, tx: &mpsc::Sender<Package>) -> Mess
     let response = match package {
         Package::Request(request) => handle_request(request, &tx),
         Package::Response(response) => handle_response(response),
+        Package::Command(command) => handle_command(command),
     };
     // Convert package to bytes and return.
     let bytes = response.to_bytes();
@@ -152,5 +154,11 @@ pub fn handle_response(response: Response) -> Package {
         Response::AddedEngine => Package::Response(Response::Empty),
         // TODO
         Response::AddedClient(client_id) => Package::Response(Response::Empty),
+    }
+}
+
+pub fn handle_command(command: Command) -> Package {
+    match command {
+        Command::SaveStatesToDatabase => Package::Response(Response::Empty),
     }
 }

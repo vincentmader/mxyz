@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+pub mod command;
 pub mod request;
 pub mod response;
 
@@ -6,6 +7,7 @@ pub mod response;
 pub enum Package {
     Request(request::Request),
     Response(response::Response),
+    Command(command::Command),
 }
 impl Package {
     pub fn to_bytes(self) -> Vec<u8> {
