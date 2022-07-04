@@ -3,9 +3,6 @@ use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::{ErrorEvent, MessageEvent, WebSocket};
 
-const HOST: &str = "127.0.0.1";
-const PORT: u16 = 1234;
-
 macro_rules! console_log {
     ($($t:tt)*) => (log(&format_args!($($t)*).to_string()))
 }
@@ -54,6 +51,7 @@ impl WebSocketClient {
         let onopen_callback = Closure::wrap(Box::new(move |_| {
             console_log!("TCP socket opened");
 
+            // get states
             {
                 use mxyz_network::package::request;
                 use mxyz_network::package::Package;
@@ -156,11 +154,4 @@ impl WebSocketClient {
         // Forget the callback to keep it alive.
         onmessage_callback.forget();
     }
-}
-
-#[wasm_bindgen]
-pub fn start_websocket() -> Result<(), JsValue> {
-    let mut client = WebSocketClient::new(HOST, PORT);
-    client.init()?;
-    Ok(())
 }

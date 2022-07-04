@@ -2,7 +2,6 @@ use super::config::ClientConfig;
 use super::renderer::Renderer;
 use super::utils::dom;
 use crate::tmp;
-use crate::websocket::client as websocket_client;
 use std::cell::RefCell;
 use std::rc::Rc;
 use wasm_bindgen::prelude::*;
@@ -34,7 +33,7 @@ impl SimulationClientV1 {
         // TODO test get-request to server
         // - TCP get-requests (bytestream? -> decode)
         // - move inside animation loop (async?)
-        websocket_client::start_websocket().unwrap();
+        crate::websocket::start_client().unwrap();
 
         // ANIMATION LOOP
         // TODO move to utils/dom/mod.rs (?)
@@ -54,7 +53,7 @@ impl SimulationClientV1 {
     /// Forwards Renderer to Next Time-Step
     pub fn step(&mut self) {
         let i = self.config.frame_id.0;
-        tmp::draw(i); // TODO create renderer with loop over systems & entities
+        // tmp::draw(i); // TODO create renderer with loop over systems & entities
         self.config.frame_id.0 += 1;
     }
 }
