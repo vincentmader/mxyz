@@ -1,29 +1,24 @@
-use crate::message::Message as MpscMessage;
-use crate::mpsc::MpscSender;
-use crate::package::request::Request;
-use crate::package::response::Response;
-use crate::package::Package;
 use futures_util::{future, StreamExt, TryStreamExt};
 use log::info;
+use mxyz_network::message::Message as MpscMessage;
+use mxyz_network::package::request::Request;
+use mxyz_network::package::response::Response;
+use mxyz_network::package::Package;
 use std::io::Error;
-use std::sync::{mpsc, Arc, Mutex, MutexGuard};
+use std::sync::mpsc;
 use tokio::net::{TcpListener, TcpStream};
 use tokio_tungstenite::tungstenite::Message;
 
 /// TCP Server
 pub struct TcpServer {
     address: String,
-    mpsc_sender: Arc<Mutex<MpscSender>>,
+    tx: mpsc::Sender<MpscMessage>,
 }
 impl TcpServer {
     /// Creates new TCP Server instance
-    pub fn new(host: &str, port: u16, mpsc_sender: MpscSender) -> Self {
+    pub fn new(host: &str, port: u16, tx: mpsc::Sender<MpscMessage>) -> Self {
         let address = format!("{}:{}", host, port);
-        let mpsc_sender = Arc::new(Mutex::new(mpsc_sender));
-        TcpServer {
-            address,
-            mpsc_sender,
-        }
+        TcpServer { address, tx }
     }
 
     /// Starts TCP Listener
@@ -32,13 +27,9 @@ impl TcpServer {
         let listener = try_socket.expect("Failed to bind");
         info!("Listening on: {}", self.address);
 
-        let mpsc_sender = Arc::clone(&self.mpsc_sender);
         while let Ok((stream, _)) = listener.accept().await {
-            // let mpsc_sender = mpsc_sender.lock().unwrap().take();
-            // tokio::spawn(accept_connection(stream, mpsc_sender));
-            accept_connection(stream, &mpsc_sender).await;
-
-            // tokio::spawn(accept_connection(stream));
+            // tokio::spawn(accept_connection(stream, self.tx));
+            tokio::spawn(accept_connection(stream));
         }
         Ok(())
     }
@@ -46,10 +37,8 @@ impl TcpServer {
 
 // ============================================================================
 
-// async fn accept_connection(stream: TcpStream) {
-// async fn accept_connection(stream: TcpStream, tx: MutexGuard<'_, mpsc::Sender<MpscMessage>>) {
-// async fn accept_connection(stream: TcpStream, mpsc_sender: MpscSender) {
-async fn accept_connection(stream: TcpStream, mpsc_sender: &Arc<Mutex<MpscSender>>) {
+// async fn accept_connection(stream: TcpStream, tx: mpsc::Sender<MpscMessage>) {
+async fn accept_connection(stream: TcpStream) {
     // Gets address.
     let address = stream
         .peer_addr()

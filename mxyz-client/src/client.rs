@@ -1,12 +1,12 @@
 use super::config::ClientConfig;
 use super::renderer::Renderer;
-// use super::utils::dom;
+use super::utils::dom;
 use crate::tmp;
-// use crate::websocket::client as websocket_client;
+use crate::websocket::client as websocket_client;
 use std::cell::RefCell;
 use std::rc::Rc;
 use wasm_bindgen::prelude::*;
-// use web_sys::TcpSocket;
+use web_sys::TcpSocket;
 
 #[wasm_bindgen]
 /// Simulation-Client: Renderer
@@ -25,7 +25,7 @@ impl SimulationClientV1 {
     }
     /// Initializes Renderer-Client
     pub fn init(&mut self, simulation_variant: &str) {
-        // dom::set_panic_hook();
+        dom::set_panic_hook();
         self.renderer.init();
     }
     /// Runs Renderer-Client in Animation Loop
@@ -34,21 +34,21 @@ impl SimulationClientV1 {
         // TODO test get-request to server
         // - TCP get-requests (bytestream? -> decode)
         // - move inside animation loop (async?)
-        // websocket_client::start_websocket().unwrap();
+        websocket_client::start_websocket().unwrap();
 
         // ANIMATION LOOP
         // TODO move to utils/dom/mod.rs (?)
-        // let f = Rc::new(RefCell::new(None));
-        // let g = f.clone();
-        // *g.borrow_mut() = Some(Closure::wrap(Box::new(move || {
-        //     if self.config.frame_id.0 > self.config.frame_id.1 {
-        //         let _ = f.borrow_mut().take();
-        //         return;
-        //     }
-        //     self.step(); //
-        //     dom::request_animation_frame(f.borrow().as_ref().unwrap());
-        // }) as Box<dyn FnMut()>));
-        // dom::request_animation_frame(g.borrow().as_ref().unwrap());
+        let f = Rc::new(RefCell::new(None));
+        let g = f.clone();
+        *g.borrow_mut() = Some(Closure::wrap(Box::new(move || {
+            if self.config.frame_id.0 > self.config.frame_id.1 {
+                let _ = f.borrow_mut().take();
+                return;
+            }
+            self.step(); //
+            dom::request_animation_frame(f.borrow().as_ref().unwrap());
+        }) as Box<dyn FnMut()>));
+        dom::request_animation_frame(g.borrow().as_ref().unwrap());
         Ok(())
     }
     /// Forwards Renderer to Next Time-Step
