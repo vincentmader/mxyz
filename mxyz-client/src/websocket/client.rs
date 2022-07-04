@@ -1,4 +1,5 @@
 use crate::utils::dom;
+use mxyz_universe::preset::SimulationVariant;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::{ErrorEvent, MessageEvent, WebSocket};
@@ -51,21 +52,29 @@ impl WebSocketClient {
         let onopen_callback = Closure::wrap(Box::new(move |_| {
             console_log!("TCP socket opened");
 
-            // get states
             {
                 use mxyz_network::package::request;
                 use mxyz_network::package::Package;
+
+                // Add new engine. TODO move to separate function (or match input)
+                let simulation_variant = SimulationVariant::ThreeBodyMoon;
+                let request = request::Request::AddEngine(simulation_variant);
+                let request = Package::Request(request);
+                let request = request.to_bytes();
+                cloned_ws.send_with_u8_array(&request).unwrap();
+
+                // Get states. // TODO move to loop
                 let state_id = 0; // TODO
                 let request = request::Request::GetUpdatedStates(state_id);
                 let request = Package::Request(request);
                 let request = request.to_bytes();
-                // dom::console_log(&format!("{:?}", request));
 
                 match cloned_ws.send_with_u8_array(&request) {
                     Ok(_) => console_log!("get-state-vector binary message successfully sent"),
                     Err(err) => console_log!("get-state-vector ERROR sending message: {:?}", err),
                     _ => {}
                 }
+
                 // // send off string message
                 // match cloned_ws.send_with_str("ping") {
                 //     Ok(_) => console_log!("message successfully sent"),
