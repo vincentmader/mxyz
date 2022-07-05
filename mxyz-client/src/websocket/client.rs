@@ -5,6 +5,7 @@ use mxyz_network::package::request::Request;
 use mxyz_network::package::response::Response;
 use mxyz_network::package::Package;
 use mxyz_universe::preset::SimulationVariant;
+use std::sync::mpsc;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::BinaryType::Arraybuffer;
@@ -20,26 +21,31 @@ extern "C" {
     fn log(s: &str);
 }
 
-#[wasm_bindgen]
+// #[wasm_bindgen]
 pub struct WebSocketClient {
     client_id: usize,
     socket: WebSocket,
+    tx_web_to_render: mpsc::Sender<Package>,
 }
-#[wasm_bindgen]
+// #[wasm_bindgen]
 impl WebSocketClient {
     /// Creates new instance of Web Socket Client
-    pub fn new(host: &str, port: u16) -> Self {
+    pub fn new(host: &str, port: u16, tx_web_to_render: mpsc::Sender<Package>) -> Self {
         let client_id = 0; // TODO
         let address = format!("ws://{}:{}", host, port);
         let socket = WebSocket::new(&address).unwrap();
-        WebSocketClient { client_id, socket }
+        WebSocketClient {
+            client_id,
+            socket,
+            tx_web_to_render,
+        }
     }
 
     /// Initializes Web Socket Client
     pub fn init(&mut self) -> Result<(), JsValue> {
         dom::console_log("Starting WebSocket Client...");
         self.socket.set_binary_type(Arraybuffer); // for small bin. msgs, like CBOR, Arraybuffer is more efficient than Blob handling
-        self.create_onmessage_callback();
+        self.create_onmessage_callback(self.tx_web_to_render.clone());
         self.create_onerror_callback();
         self.create_onopen_callback();
         Ok(())
@@ -74,14 +80,17 @@ impl WebSocketClient {
     }
 
     /// Creates OnMessage Callback.
-    pub fn create_onmessage_callback(&mut self) {
+    pub fn create_onmessage_callback(
+        &mut self,
+        tx_web_to_render: std::sync::mpsc::Sender<Package>,
+    ) {
         let ws = &mut self.socket;
 
         let mut cloned_ws = ws.clone();
         let onmessage_callback = Closure::wrap(Box::new(move |e: MessageEvent| {
             // Handle ArrayBuffer.
             if let Ok(abuf) = e.data().dyn_into::<js_sys::ArrayBuffer>() {
-                handle_arraybuffer(&mut cloned_ws, abuf);
+                handle_arraybuffer(&mut cloned_ws, abuf, tx_web_to_render.clone());
             // Handle Blob.
             } else if let Ok(blob) = e.data().dyn_into::<web_sys::Blob>() {
                 handle_blob(&mut cloned_ws, blob);
@@ -99,13 +108,17 @@ impl WebSocketClient {
     }
 }
 
-pub fn handle_arraybuffer(ws: &mut WebSocket, abuf: js_sys::ArrayBuffer) {
+pub fn handle_arraybuffer(
+    ws: &mut WebSocket,
+    abuf: js_sys::ArrayBuffer,
+    tx_web_to_render: std::sync::mpsc::Sender<Package>,
+) {
     let array = js_sys::Uint8Array::new(&abuf);
     let len = array.byte_length() as usize;
     let package = Package::from_bytes(array.to_vec());
     console_log!("\nArraybuffer received {} bytes", len);
     // console_log!("\nArraybuffer received {} bytes -> {:?}", len, &package);
-    handle_onmessage_package(ws, package);
+    handle_onmessage_package(ws, package, tx_web_to_render.clone());
 }
 
 pub fn handle_blob(_ws: &mut WebSocket, blob: web_sys::Blob) {
@@ -127,7 +140,11 @@ pub fn handle_blob(_ws: &mut WebSocket, blob: web_sys::Blob) {
     onloadend_cb.forget();
 }
 
-pub fn handle_onmessage_package(ws: &mut WebSocket, package: Package) {
+pub fn handle_onmessage_package(
+    ws: &mut WebSocket,
+    package: Package,
+    tx_web_to_render: std::sync::mpsc::Sender<Package>,
+) {
     match package {
         Package::Response(res) => match res {
             Response::AddedClient(client_id) => {
@@ -160,6 +177,9 @@ pub fn handle_onmessage_package(ws: &mut WebSocket, package: Package) {
                     );
                     state_vector[state_vector.len() - 1].state_id // last update
                 };
+
+                // let package = Package::StateVec(state_vec);
+                // tx_web_to_render.send(package);
 
                 let request = request::Request::GetUpdatedStates(engine_id, state_id);
                 let request = Package::Request(request).to_bytes();

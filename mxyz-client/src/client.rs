@@ -1,31 +1,45 @@
-use super::config::ClientConfig;
-use super::renderer::Renderer;
-use super::utils::dom;
+use crate::config::ClientConfig;
+use crate::renderer::Renderer;
+use crate::utils::dom;
+use crate::websocket::client::WebSocketClient;
 use std::cell::RefCell;
 use std::rc::Rc;
 use std::sync::mpsc;
 use wasm_bindgen::prelude::*;
+
+const HOST: &str = "127.0.0.1";
+const PORT: u16 = 1234;
 
 #[wasm_bindgen]
 /// Simulation-Client: Renderer
 pub struct SimulationClientV1 {
     config: ClientConfig,
     renderer: Renderer,
-    // confi
+    websocket: WebSocketClient,
+    // TODO add mpsc channel between websocket & config?
 }
 #[wasm_bindgen]
 impl SimulationClientV1 {
     /// Creates new Simulation-Renderer-Client
     pub fn new(client_id: usize) -> Self {
-        let (tx, rx) = mpsc::channel();
-        let config = ClientConfig::new(client_id, rx);
+        let channel_ws_to_rndr = mpsc::channel();
+        let (tx_web_to_render, rx_web_to_render) = channel_ws_to_rndr;
+
+        let config = ClientConfig::new(client_id);
         let renderer = Renderer::new();
-        SimulationClientV1 { config, renderer }
+        let websocket = WebSocketClient::new(HOST, PORT, tx_web_to_render);
+
+        SimulationClientV1 {
+            config,
+            renderer,
+            websocket,
+        }
     }
     /// Initializes Renderer-Client
     pub fn init(&mut self, simulation_variant: &str) {
         dom::set_panic_hook();
         self.renderer.init();
+        self.websocket.init().unwrap();
     }
     /// Runs Renderer-Client in Animation Loop
     pub async fn run(mut self) -> Result<(), JsValue> {
@@ -35,8 +49,8 @@ impl SimulationClientV1 {
         // TODO test get-request to server
         // - TCP get-requests (bytestream? -> decode)
         // - move inside animation loop (async?)
-        crate::websocket::start_client().unwrap();
-        // crate::websocket::start_client(rx).unwrap();
+        // crate::websocket::start_client().unwrap();
+        // let mut client = crate::websocket::client::WebSocketClient::new(HOST, PORT);
 
         // ANIMATION LOOP
         // TODO move to utils/dom/mod.rs (?)
@@ -56,14 +70,9 @@ impl SimulationClientV1 {
         Ok(())
     }
     /// Forwards Renderer to Next Time-Step
-    // pub fn step(&mut self, tx: &mpsc::Sender<Package>) {
     pub fn step(&mut self) {
         let frame_id = self.config.frame_id.0;
         // tmp::draw(i); // TODO create renderer with loop over systems & entities
-        if frame_id % 100 == 0 {
-            // let package = Package::Command(Command::SaveStatesToDatabase);
-            // tx.send(package).unwrap();
-        }
         self.config.frame_id.0 += 1;
     }
 }
