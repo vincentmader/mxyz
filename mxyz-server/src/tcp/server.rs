@@ -1,16 +1,16 @@
 use futures_util::{future, StreamExt, TryStreamExt};
 use log::info;
 use mxyz_database::models::state::StateQuery;
-use mxyz_engine::state::State;
 use mxyz_network::package::command::Command;
 use mxyz_network::package::request::Request;
 use mxyz_network::package::response::Response;
 use mxyz_network::package::Package;
-use mxyz_universe::preset::SimulationVariant;
 use std::io::Error;
 use std::sync::mpsc;
 use tokio::net::{TcpListener, TcpStream};
 use tokio_tungstenite::tungstenite::Message;
+// use mxyz_universe::preset::SimulationVariant;
+// use mxyz_engine::state::State;
 
 /// TCP Server
 pub struct TcpServer {
@@ -79,12 +79,12 @@ pub fn handle_message(msg: MessageResult, tx: &mpsc::Sender<Package>) -> Message
     match &msg {
         Ok(e) => match e {
             Message::Binary(bytes) => handle_binary_message(bytes.to_vec(), tx),
-            // TODO implement below
-            Message::Text(_) => msg,
-            Message::Ping(_) => Ok(Message::Pong(vec![7, 4, 1])),
-            Message::Pong(_) => Ok(Message::Ping(vec![1, 4, 7])),
-            Message::Close(_) => msg,
-            Message::Frame(_) => msg,
+            _ => todo!("handle non-binary messages")
+            // Message::Text(_) => msg,
+            // Message::Ping(_) => Ok(Message::Pong(vec![7, 4, 1])),
+            // Message::Pong(_) => Ok(Message::Ping(vec![1, 4, 7])),
+            // Message::Close(_) => msg,
+            // Message::Frame(_) => msg,
         },
         Err(e) => {
             println!("{:?}", e);
@@ -111,51 +111,51 @@ pub fn handle_binary_message(bytes: Vec<u8>, tx: &mpsc::Sender<Package>) -> Mess
 
 pub fn handle_request(request: Request, tx: &mpsc::Sender<Package>) -> Package {
     match request {
-        Request::GetUpdatedStates(last_update) => {
+        Request::AddClient => {
+            let db_conn = mxyz_database::establish_connection();
+            let client = mxyz_database::models::client::create_client(&db_conn);
+            let client_id = client.client_id as usize;
+            let response = Response::AddedClient(client_id);
+            Package::Response(response)
+        }
+
+        Request::AddEngine(client_id, simulation_variant) => {
+            let db_conn = mxyz_database::establish_connection();
+            let engine = mxyz_database::models::engine::create_engine(&db_conn, client_id);
+            let engine_id = engine.engine_id as usize;
+
+            let request = Request::AddEngine(client_id, simulation_variant);
+            let package = Package::Request(request);
+            tx.send(package).unwrap(); // TODO do this differently, it's just forwarding the msg
+
+            let response = Response::AddedEngine(engine_id);
+            Package::Response(response)
+        }
+
+        Request::RemoveEngine(_engine_id) => todo!("remove engine"),
+
+        Request::GetUpdatedStates(engine_id, last_update) => {
             println!("Incoming: get updated states (since state {})", last_update);
             // Load states from database.
             // - TODO
-            let engine_id = 0; // TODO
-            let last_sync = 0; //TODO
-            let state_query = StateQuery::Since(last_sync);
+            let state_query = StateQuery::Since(last_update as i32);
+            // let mut states = vec![];
 
-            let nr_of_steps = 10;
-            while mxyz_database::models::state::get_states(engine_id, &state_query).len()
-                < nr_of_steps
-            {}
+            // // wait with sending back states, until computes are finished (tmp)
+            // let nr_of_steps = 10;
+            // std::thread::spawn(move || loop {
+            // if mxyz_database::models::state::get_states(engine_id as i32, &state_query).len()
+            //     == nr_of_steps
+            // {
+            let states = mxyz_database::models::state::get_states(engine_id as i32, &state_query);
+            // }
+            // });
 
-            let states = mxyz_database::models::state::get_states(engine_id, &state_query);
-            // let states = mxyz_engine::Engine::get_updated_states(last_update);
+            // let states = mxyz_database::models::state::get_states(engine_id as i32, &state_query);
+            // // let states = mxyz_engine::Engine::get_updated_states(last_update);
             println!("Loaded {} states from database!", states.len());
             // Return state-vector response
             let response = Response::StateVector(states);
-            Package::Response(response)
-        }
-        Request::AddEngine(client_id, simulation_variant) => {
-            // let tx = tx.clone();
-            // let simulation_variant = SimulationVariant::ThreeBodyMoon;
-            tx.send(Package::Request(Request::AddEngine(
-                client_id,
-                simulation_variant,
-            )))
-            .unwrap(); // TODO do this differently, it's just forwarding the msg
-
-            // tx.send(Package::Request(request.clone())).unwrap();
-            // tx.send(Package::Request(request)).unwrap();
-
-            let response = Response::AddedEngine;
-            Package::Response(response)
-        }
-        Request::RemoveEngine(engine_id) => {
-            let response = Response::Empty;
-            Package::Response(response)
-        }
-        Request::AddClient => {
-            let client_id = mxyz_database::models::client::get_db_clients().len();
-            // let client_id = std::cmp::max(0, client_id); // TODO needed?
-            let db_conn = mxyz_database::establish_connection();
-            mxyz_database::models::client::create_client(&db_conn, client_id);
-            let response = Response::AddedClient(client_id);
             Package::Response(response)
         }
     }
@@ -163,18 +163,17 @@ pub fn handle_request(request: Request, tx: &mpsc::Sender<Package>) -> Package {
 
 pub fn handle_response(response: Response) -> Package {
     match response {
-        Response::Empty => Package::Response(Response::Empty),
-        // TODO
-        Response::StateVector(_) => Package::Response(Response::Empty),
-        // TODO
-        Response::AddedEngine => Package::Response(Response::Empty),
-        // TODO
-        Response::AddedClient(client_id) => Package::Response(Response::Empty),
+        _ => todo!("handle responses"),
+        // Response::Empty => Package::Response(Response::Empty),
+        // Response::StateVector(_) => Package::Response(Response::Empty),
+        // Response::AddedEngine => Package::Response(Response::Empty),
+        // Response::AddedClient(client_id) => Package::Response(Response::Empty),
     }
 }
 
 pub fn handle_command(command: Command) -> Package {
     match command {
-        Command::SaveStatesToDatabase => Package::Response(Response::Empty),
+        // Command::SaveStatesToDatabase => Package::Response(Response::Empty),
+        _ => todo!("handle commands"),
     }
 }

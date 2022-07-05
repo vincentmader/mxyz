@@ -25,11 +25,17 @@ pub fn get_db_clients() -> Vec<Client> {
         .load::<Client>(&connection)
         .expect("Error loading states")
 }
-pub fn create_client<'a>(conn: &PgConnection, other_client_id: usize) -> Client {
+pub fn create_client<'a>(conn: &PgConnection) -> Client {
+    // Get Nr of Clients already in Database.
+    let nr_of_clients = get_db_clients().len();
+    // Determine ID of new Client.
+    // - start counting at 1 (Diesel default)
+    // - if e.g. 5 Engines in DB  ->  new ID: 6
+    let other_client_id = std::cmp::max(1, nr_of_clients + 1);
+    // Create new DB Entry.
     let new_post = NewClient {
         client_id: &(other_client_id as i32),
     };
-
     diesel::insert_into(clients::table)
         .values(&new_post)
         .get_result(conn)

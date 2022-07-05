@@ -1,6 +1,4 @@
-use mxyz_engine::config::EngineConfig;
 use mxyz_engine::config::ExportVariant;
-use mxyz_engine::state::State;
 use mxyz_engine::Engine;
 use mxyz_network::package::command::Command;
 use mxyz_network::package::request::Request;
@@ -9,17 +7,17 @@ use mxyz_universe::entity::attribute::*;
 use mxyz_universe::preset::SimulationVariant;
 use mxyz_universe::system::SystemVariant;
 use std::sync::mpsc;
+// use mxyz_engine::config::EngineConfig;
+// use mxyz_engine::state::State;
 
 pub struct EngineRunner {
     rx: mpsc::Receiver<Package>,
     tx: mpsc::Sender<Package>,
-    engines: Vec<Engine>,
 }
 impl EngineRunner {
     /// Creates a new Engine-Runner instance
     pub fn new(tx: mpsc::Sender<Package>, rx: mpsc::Receiver<Package>) -> Self {
-        let engines = vec![];
-        EngineRunner { rx, tx, engines }
+        EngineRunner { rx, tx }
     }
 
     /// Initializes MPSC Receiver
@@ -55,20 +53,14 @@ impl EngineRunner {
     pub fn add_engine(&mut self, client_id: usize, simulation_variant: &SimulationVariant) {
         let simulation_variant = simulation_variant.clone();
 
-        // Connect to database & determine ID of new Engine.
+        // Save Engine to Database. (actually: only ID)
         let db_conn = mxyz_database::establish_connection();
-        let engine_id = mxyz_database::models::engine::get_db_engines().len();
-
-        // Create MPSC channel.
-        // - TODO change message type
-        let (tx, rx) = mpsc::channel::<usize>();
+        let db_engine = mxyz_database::models::engine::create_engine(&db_conn, client_id);
+        let engine_id = db_engine.engine_id as usize;
 
         // Create & initialize new Simulation Engine.
-        let mut engine = Engine::new(client_id, engine_id, rx, tx);
+        let mut engine = Engine::new(client_id, engine_id);
         engine.init(&Some(simulation_variant));
-
-        // Save Engine to Database. (actually: only ID)
-        mxyz_database::models::engine::create_engine(&db_conn, client_id, engine_id);
 
         // Run Engine in new thread.
         std::thread::spawn(move || {

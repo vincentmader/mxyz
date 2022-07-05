@@ -35,18 +35,21 @@ pub fn get_db_engines() -> Vec<Engine> {
 pub fn create_engine<'a>(
     conn: &PgConnection,
     other_client_id: usize,
-    other_engine_id: usize,
+    // other_engine_id: usize,
 ) -> Engine {
-    // Get Nr. of Engines already in Database.
-    let nr_of_engines_in_db = crate::models::engine::get_db_engines().len();
-
-    // Determine new Engine-ID.
+    // let nr_of_clients = get_db_engines().len();
+    // Determine ID of new Client.
     // - start counting at 1 (Diesel default)
     // - if e.g. 5 Engines in DB  ->  new ID: 6
-    let new_engine_id = std::cmp::max(1, nr_of_engines_in_db + 1);
-    if new_engine_id == other_engine_id {
-        panic!("engine-id setup faulty");
-    }
+    // let other_client_id = std::cmp::max(1, nr_of_clients + 1);
+
+    // Get Nr. of Engines already in Database.
+    let nr_of_engines_in_db = get_db_engines().len();
+    // Determine new Engine-ID.
+    let other_engine_id = std::cmp::max(1, nr_of_engines_in_db + 1);
+    // if new_engine_id == other_engine_id {
+    //     panic!("engine-id setup faulty");
+    // }
 
     // Create new Database entry.
     let new_post = NewEngine {

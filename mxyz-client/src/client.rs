@@ -1,21 +1,15 @@
 use super::config::ClientConfig;
 use super::renderer::Renderer;
 use super::utils::dom;
-use crate::tmp;
-use mxyz_network::package::command::Command;
-use mxyz_network::package::Package;
 use std::cell::RefCell;
 use std::rc::Rc;
-use std::sync::mpsc;
 use wasm_bindgen::prelude::*;
-use web_sys::TcpSocket;
 
 #[wasm_bindgen]
 /// Simulation-Client: Renderer
 pub struct SimulationClientV1 {
     config: ClientConfig,
     renderer: Renderer,
-    // TODO server -> bytestream -> client
 }
 #[wasm_bindgen]
 impl SimulationClientV1 {

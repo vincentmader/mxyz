@@ -9,6 +9,6 @@ pub enum Request {
     AddEngine(usize, SimulationVariant),
     /// Removes Engine
     RemoveEngine(usize),
-    /// Gets States since given Time-Step
-    GetUpdatedStates(usize),
+    /// Gets States since last Update
+    GetUpdatedStates(usize, usize), // engine-id, state-id
 }

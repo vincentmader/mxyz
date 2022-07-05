@@ -27,18 +27,24 @@ impl RocketServer {
 
     /// Starts the Server aynchronously
     pub async fn init(self) -> Result<(), rocket::Error> {
-        let db_conn = mxyz_database::establish_connection();
+        // Establish Connection to Database.
+        // - TODO long-term: load db-conn from here, pass to other processes?
+        let _db_conn = mxyz_database::establish_connection();
+
         // Create MPSC channel for Server-Engine Communication.
         let (tx_1, rx_1) = mpsc::channel::<Package>();
         let (tx_2, rx_2) = mpsc::channel::<Package>();
+
         // Server-Client Communication: Start TCP-Listener in separate thread.
         std::thread::spawn(move || {
             crate::tcp::start_tcp_listener(tx_1, rx_2).unwrap();
         });
+
         // Server-Engine Communication: Create Engine-Runner w/ MPSC streaming channel.
         std::thread::spawn(move || {
             crate::engine::start_engine_runner(tx_2, rx_1).unwrap();
         });
+
         // Launch Rocket.
         rocket::build()
             .mount("/", self.routes)

@@ -1,7 +1,7 @@
 use wasm_bindgen::prelude::*;
 pub mod client;
-use mxyz_network::package::Package;
-use std::sync::mpsc::Receiver;
+// use mxyz_network::package::Package;
+// use std::sync::mpsc::Receiver;
 
 const HOST: &str = "127.0.0.1";
 const PORT: u16 = 1234;

@@ -5,6 +5,6 @@ use serde::{Deserialize, Serialize};
 pub enum Response {
     Empty,
     StateVector(Vec<State>),
-    AddedEngine,
+    AddedEngine(usize),
     AddedClient(usize),
 }

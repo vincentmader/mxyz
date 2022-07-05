@@ -12,7 +12,7 @@ impl std::convert::Into<mxyz_engine::state::State> for State {
         let mut state = mxyz_engine::state::State::new();
         state.state_id = self.state_id as usize;
         state.systems = crate::system::get_systems(self.client_id, self.engine_id);
-        // println!("{:?}", state.systems);
+        println!("Converting {:?}", state.systems);
         state
     }
 }
@@ -25,6 +25,7 @@ pub struct NewState<'a> {
     pub state_id: &'a i32,
 }
 
+#[derive(Debug)]
 pub enum StateQuery {
     Since(i32),
     Between(i32, i32),
@@ -39,6 +40,7 @@ use diesel::prelude::*;
 
 pub fn get_db_states(engine_query: i32, state_query: &StateQuery) -> Vec<State> {
     let connection = crate::establish_connection();
+    println!("engine {:?}, state {:?}", engine_query, state_query);
 
     match state_query {
         StateQuery::Since(id) => states
@@ -57,6 +59,7 @@ pub fn get_db_states(engine_query: i32, state_query: &StateQuery) -> Vec<State> 
 }
 pub fn get_states(engine_query: i32, state_query: &StateQuery) -> Vec<mxyz_engine::state::State> {
     let db_states = get_db_states(engine_query, &state_query);
+    println!("{:?}", db_states);
     db_states
         .into_iter()
         .map(|db_state| {
