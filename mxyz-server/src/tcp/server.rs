@@ -120,9 +120,14 @@ pub fn handle_request(request: Request, tx: &mpsc::Sender<Package>) -> Package {
         }
 
         Request::AddEngine(client_id, simulation_variant) => {
-            let db_conn = mxyz_database::establish_connection();
-            let engine = mxyz_database::models::engine::create_engine(&db_conn, client_id);
-            let engine_id = engine.engine_id as usize;
+            // let db_conn = mxyz_database::establish_connection();
+            // let engine = mxyz_database::models::engine::create_engine(&db_conn, client_id);
+            // let engine_id = engine.engine_id as usize;
+
+            // TODO do differently
+            // - get engine-id from channel somehow (2nd channel? request-response instead?)
+            // - or: see above (add to db from here, only start engine through mpsc)
+            let engine_id = mxyz_database::models::engine::get_db_engines().len() + 1;
 
             let request = Request::AddEngine(client_id, simulation_variant);
             let package = Package::Request(request);
@@ -134,28 +139,14 @@ pub fn handle_request(request: Request, tx: &mpsc::Sender<Package>) -> Package {
 
         Request::RemoveEngine(_engine_id) => todo!("remove engine"),
 
-        Request::GetUpdatedStates(engine_id, last_update) => {
-            println!("Incoming: get updated states (since state {})", last_update);
-            // Load states from database.
-            // - TODO
-            let state_query = StateQuery::Since(last_update as i32);
-            // let mut states = vec![];
-
-            // // wait with sending back states, until computes are finished (tmp)
-            // let nr_of_steps = 10;
-            // std::thread::spawn(move || loop {
-            // if mxyz_database::models::state::get_states(engine_id as i32, &state_query).len()
-            //     == nr_of_steps
-            // {
+        Request::GetUpdatedStates(engine_id, last_sync_id) => {
+            let state_query = StateQuery::Since(last_sync_id as i32);
+            println!("Incoming: get-updated-states: {:?}", state_query);
             let states = mxyz_database::models::state::get_states(engine_id as i32, &state_query);
-            // }
-            // });
-
-            // let states = mxyz_database::models::state::get_states(engine_id as i32, &state_query);
-            // // let states = mxyz_engine::Engine::get_updated_states(last_update);
             println!("Loaded {} states from database!", states.len());
+
             // Return state-vector response
-            let response = Response::StateVector(states);
+            let response = Response::StateVector(engine_id, states);
             Package::Response(response)
         }
     }

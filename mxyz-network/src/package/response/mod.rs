@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Serialize, Deserialize)]
 pub enum Response {
     Empty,
-    StateVector(Vec<State>),
+    StateVector(usize, Vec<State>), // engine-id, state-vec
     AddedEngine(usize),
     AddedClient(usize),
 }

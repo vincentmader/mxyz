@@ -16,7 +16,6 @@ CREATE TABLE engines (
 -- STATES
 CREATE TABLE states (
   dbentry_id SERIAL PRIMARY KEY,
-  client_id INT NOT NULL,
   engine_id INT NOT NULL,
   state_id INT NOT NULL
 );
@@ -24,18 +23,15 @@ CREATE TABLE states (
 -- SYSTEMS
 CREATE TABLE systems (
   dbentry_id SERIAL PRIMARY KEY,
-  client_id INT NOT NULL,
   engine_id INT NOT NULL,
   state_id INT NOT NULL,
   system_id INT NOT NULL,
-  system_variant_id INT NOT NULL,
-  entity_variant_id INT NOT NULL
+  system_variant_id INT NOT NULL
 );
 
 -- PLANETS
 CREATE TABLE planets (
   dbentry_id SERIAL PRIMARY KEY,
-  client_id INT NOT NULL,
   engine_id INT NOT NULL,
   state_id INT NOT NULL,
   system_id INT NOT NULL,

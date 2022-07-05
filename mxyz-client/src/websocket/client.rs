@@ -45,27 +45,6 @@ impl WebSocketClient {
         Ok(())
     }
 
-    // TODO
-    // pub fn get_states(&mut self) {
-    //     let ws = &mut self.socket;
-    //     let cloned_ws = ws.clone();
-    //     let client_id = self.client_id.clone();
-    //     let onopen_callback = Closure::wrap(Box::new(move |_| {
-    //         console_log!("\nTCP socket opened"); // why no new line?
-
-    //         // Get states. // TODO move to loop
-    //         let state_id = 0; // TODO
-    //         let request = request::Request::GetUpdatedStates(engine_id, client_id, state_id);
-    //         let request = Package::Request(request);
-    //         let request = request.to_bytes();
-    //         cloned_ws.send_with_u8_array(&request).unwrap();
-    //         console_log!("get-state-vector binary msg successfully sent");
-    //     }) as Box<dyn FnMut(JsValue)>);
-
-    //     ws.set_onopen(Some(onopen_callback.as_ref().unchecked_ref()));
-    //     onopen_callback.forget();
-    // }
-
     /// Creates OnOpen Callback.
     pub fn create_onopen_callback(&mut self) {
         let ws = &mut self.socket;
@@ -73,26 +52,9 @@ impl WebSocketClient {
         let cloned_ws = ws.clone();
         let onopen_callback = Closure::wrap(Box::new(move |_| {
             console_log!("TCP socket opened");
-
-            // Add new client. TODO move to separate function (or match input)
-            let request = request::Request::AddClient;
-            let request = Package::Request(request);
-            let request = request.to_bytes();
+            // Add new client.
+            let request = Package::Request(request::Request::AddClient).to_bytes();
             cloned_ws.send_with_u8_array(&request).unwrap();
-            console_log!("add-client binary msg successfully sent");
-
-            // let client_id = 0; // TODO
-            // // send off string message
-            // match cloned_ws.send_with_str("ping") {
-            //     Ok(_) => console_log!("message successfully sent"),
-            //     Err(err) => console_log!("ERROR sending message: {:?}", err),
-            // }
-            // // send off binary message
-            // match cloned_ws.send_with_u8_array(&vec![0, 1, 2, 3]) {
-            //     Ok(_) => console_log!("binary message successfully sent"),
-            //     Err(err) => console_log!("ERROR sending message: {:?}", err),
-            //     _ => {}
-            // }
         }) as Box<dyn FnMut(JsValue)>);
 
         ws.set_onopen(Some(onopen_callback.as_ref().unchecked_ref()));
@@ -107,9 +69,7 @@ impl WebSocketClient {
             console_log!("ERROR Event: {:?}", e);
         }) as Box<dyn FnMut(ErrorEvent)>);
 
-        // Set error event handler on WebSocket.
         ws.set_onerror(Some(onerror_callback.as_ref().unchecked_ref()));
-        // Forget the callback to keep it alive.
         onerror_callback.forget();
     }
 
@@ -134,9 +94,7 @@ impl WebSocketClient {
             }
         }) as Box<dyn FnMut(MessageEvent)>);
 
-        // Set message event handler on WebSocket.
         ws.set_onmessage(Some(onmessage_callback.as_ref().unchecked_ref()));
-        // Forget the callback to keep it alive.
         onmessage_callback.forget();
     }
 }
@@ -145,7 +103,8 @@ pub fn handle_arraybuffer(ws: &mut WebSocket, abuf: js_sys::ArrayBuffer) {
     let array = js_sys::Uint8Array::new(&abuf);
     let len = array.byte_length() as usize;
     let package = Package::from_bytes(array.to_vec());
-    console_log!("\nArraybuffer received {} bytes -> {:?}", len, &package);
+    console_log!("\nArraybuffer received {} bytes", len);
+    // console_log!("\nArraybuffer received {} bytes -> {:?}", len, &package);
     handle_onmessage_package(ws, package);
 }
 
@@ -172,57 +131,51 @@ pub fn handle_onmessage_package(ws: &mut WebSocket, package: Package) {
     match package {
         Package::Response(res) => match res {
             Response::AddedClient(client_id) => {
+                // TODO get simulation-variant from html/js
                 let sim_variant = SimulationVariant::ThreeBodyMoon;
 
                 // Request Engine to be started on Server.
                 let request = request::Request::AddEngine(client_id, sim_variant);
-                let request = Package::Request(request);
-                let request = request.to_bytes();
-
+                let request = Package::Request(request).to_bytes();
                 ws.send_with_u8_array(&request).unwrap();
             }
 
             Response::AddedEngine(engine_id) => {
-                let state_id = 0; // TODO
-
                 // Start Sync-Loop for this Engine's States.
-                let request = request::Request::GetUpdatedStates(engine_id, state_id);
-                let request = Package::Request(request);
-                let request = request.to_bytes();
-
+                let last_sync_id = 0; // should be fine like this
+                let request = request::Request::GetUpdatedStates(engine_id, last_sync_id);
+                let request = Package::Request(request).to_bytes();
                 ws.send_with_u8_array(&request).unwrap();
             }
 
-            Response::StateVector(state_vector) => {
+            Response::StateVector(engine_id, state_vector) => {
+                // console_log!("Received states, {}", state_vector.len());
                 let state_id = if state_vector.len() == 0 {
                     0
                 } else {
-                    // console_log!(
-                    //     "Received states: {:?} to {:?}",
-                    //     state_vector[0].state_id,
-                    //     state_vector[state_vector.len() - 1].state_id
-                    // );
+                    console_log!(
+                        "Received states: {:?} to {:?}",
+                        state_vector[0].state_id,
+                        state_vector[state_vector.len() - 1].state_id
+                    );
                     state_vector[state_vector.len() - 1].state_id // last update
                 };
 
-                let engine_id = 1; // TODO
                 let request = request::Request::GetUpdatedStates(engine_id, state_id);
-                let request = Package::Request(request);
-                let request = request.to_bytes();
+                let request = Package::Request(request).to_bytes();
+                ws.send_with_u8_array(&request).unwrap();
 
                 // let (secs, nanos) = (1, 0);
                 // let duration = core::time::Duration::new(secs, nanos);
                 // wasm_timer::Delay::new(duration);
                 // wasm_timer::sleep(duration);
-                ws.send_with_u8_array(&request).unwrap();
 
-                use gloo_timers::callback::Timeout;
-
-                let timeout = Timeout::new(1_000, move || {
-                    // Do something after the one second timeout is up!
-                });
+                // use gloo_timers::callback::Timeout;
+                // let timeout = Timeout::new(1_000, move || {
+                // Do something after the one second timeout is up!
+                // });
                 // Since we don't plan on cancelling the timeout, call `forget`.
-                timeout.forget();
+                // timeout.forget();
             }
 
             Response::Empty => {}

@@ -40,9 +40,9 @@ fn _show_planets() -> Vec<Planet> {
         .expect("Error loading planets");
 
     println!("Displaying {} planets", results.len());
-    for planet in results.iter() {
-        println!("{}", planet.mass);
-    }
+    // for planet in results.iter() {
+    // println!("{}", planet.mass);
+    // }
     results
 }
 

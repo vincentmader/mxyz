@@ -3,6 +3,7 @@ use super::renderer::Renderer;
 use super::utils::dom;
 use std::cell::RefCell;
 use std::rc::Rc;
+use std::sync::mpsc;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -10,12 +11,14 @@ use wasm_bindgen::prelude::*;
 pub struct SimulationClientV1 {
     config: ClientConfig,
     renderer: Renderer,
+    // confi
 }
 #[wasm_bindgen]
 impl SimulationClientV1 {
     /// Creates new Simulation-Renderer-Client
     pub fn new(client_id: usize) -> Self {
-        let config = ClientConfig::new(client_id);
+        let (tx, rx) = mpsc::channel();
+        let config = ClientConfig::new(client_id, rx);
         let renderer = Renderer::new();
         SimulationClientV1 { config, renderer }
     }
