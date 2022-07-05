@@ -118,20 +118,32 @@ pub fn handle_request(request: Request, tx: &mpsc::Sender<Package>) -> Package {
             let engine_id = 0; // TODO
             let last_sync = 0; //TODO
             let state_query = StateQuery::Since(last_sync);
-            let states = mxyz_database::models::state::get_states(engine_id, state_query);
+
+            let nr_of_steps = 10;
+            while mxyz_database::models::state::get_states(engine_id, &state_query).len()
+                < nr_of_steps
+            {}
+
+            let states = mxyz_database::models::state::get_states(engine_id, &state_query);
             // let states = mxyz_engine::Engine::get_updated_states(last_update);
             println!("Loaded {} states from database!", states.len());
             // Return state-vector response
             let response = Response::StateVector(states);
             Package::Response(response)
         }
-        Request::AddEngine(simulation_variant) => {
-            let response = Response::AddedEngine;
+        Request::AddEngine(client_id, simulation_variant) => {
             // let tx = tx.clone();
-            let simulation_variant = SimulationVariant::ThreeBodyMoon;
-            tx.send(Package::Request(Request::AddEngine(simulation_variant)))
-                .unwrap();
+            // let simulation_variant = SimulationVariant::ThreeBodyMoon;
+            tx.send(Package::Request(Request::AddEngine(
+                client_id,
+                simulation_variant,
+            )))
+            .unwrap(); // TODO do this differently, it's just forwarding the msg
 
+            // tx.send(Package::Request(request.clone())).unwrap();
+            // tx.send(Package::Request(request)).unwrap();
+
+            let response = Response::AddedEngine;
             Package::Response(response)
         }
         Request::RemoveEngine(engine_id) => {

@@ -37,7 +37,7 @@ use crate::establish_connection;
 use crate::schema::states::dsl::*;
 use diesel::prelude::*;
 
-pub fn get_db_states(engine_query: i32, state_query: StateQuery) -> Vec<State> {
+pub fn get_db_states(engine_query: i32, state_query: &StateQuery) -> Vec<State> {
     let connection = crate::establish_connection();
 
     match state_query {
@@ -55,8 +55,8 @@ pub fn get_db_states(engine_query: i32, state_query: StateQuery) -> Vec<State> {
         StateQuery::FromIds(_ids) => todo!("db-states from state-id list"),
     }
 }
-pub fn get_states(engine_query: i32, state_query: StateQuery) -> Vec<mxyz_engine::state::State> {
-    let db_states = get_db_states(engine_query, state_query);
+pub fn get_states(engine_query: i32, state_query: &StateQuery) -> Vec<mxyz_engine::state::State> {
+    let db_states = get_db_states(engine_query, &state_query);
     db_states
         .into_iter()
         .map(|db_state| {

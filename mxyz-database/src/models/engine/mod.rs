@@ -6,6 +6,11 @@ pub struct Engine {
     pub client_id: i32,
     pub engine_id: i32,
 }
+// impl std::convert::From<mxyz_engine::Engine> for Engine {
+//     fn from(engine: mxyz_engine::Engine) -> Self {
+//         Engine {}
+//     }
+// }
 
 #[derive(Insertable, Debug)]
 #[table_name = "engines"]
@@ -13,14 +18,6 @@ pub struct NewEngine<'a> {
     pub client_id: &'a i32,
     pub engine_id: &'a i32,
 }
-// impl<'a> std::convert::From<&'a mxyz_engine::Engine> for NewEngine<'a> {
-//     fn from(engine: &'a mxyz_engine::Engine) -> Self {
-//         NewEngine {
-//             client_id: &(engine.client_id as i32),
-//             engine_id: &(engine.engine_id as i32),
-//         }
-//     }
-// }
 
 // ============================================================================
 
@@ -35,12 +32,25 @@ pub fn get_db_engines() -> Vec<Engine> {
         .expect("Error loading states")
 }
 
-pub fn create_engine<'a>(conn: &PgConnection, engine: NewEngine) -> Engine {
-    let other_client_id = crate::models::client::get_db_clients().len() - 1;
-    let other_engine_id = engine.engine_id;
+pub fn create_engine<'a>(
+    conn: &PgConnection,
+    other_client_id: usize,
+    other_engine_id: usize,
+) -> Engine {
+    // Get Nr. of Engines already in Database.
+    let nr_of_engines_in_db = crate::models::engine::get_db_engines().len();
 
+    // Determine new Engine-ID.
+    // - start counting at 1 (Diesel default)
+    // - if e.g. 5 Engines in DB  ->  new ID: 6
+    let new_engine_id = std::cmp::max(1, nr_of_engines_in_db + 1);
+    if new_engine_id == other_engine_id {
+        panic!("engine-id setup faulty");
+    }
+
+    // Create new Database entry.
     let new_post = NewEngine {
-        engine_id: &(*other_engine_id as i32),
+        engine_id: &(other_engine_id as i32),
         client_id: &(other_client_id as i32),
     };
 

@@ -37,42 +37,39 @@ impl EngineRunner {
         println!("Engine Runner received msg: {:?}", msg);
         match &msg {
             Package::Request(req) => match req {
-                Request::AddEngine(simulation_variant) => self.add_engine(simulation_variant),
+                Request::AddEngine(client_id, simulation_variant) => {
+                    self.add_engine(*client_id, simulation_variant)
+                }
                 Request::RemoveEngine(engine_id) => self.remove_engine(engine_id),
-                _ => todo!(),
-            },
-            Package::Response(res) => match res {
                 _ => todo!(),
             },
             Package::Command(cmd) => match cmd {
                 Command::SaveStatesToDatabase => {}
             },
+            _ => todo!(),
         };
         println!("Server received MPSC msg: {:#?}", msg);
     }
 
     /// Adds Engine
-    pub fn add_engine(&mut self, simulation_variant: &SimulationVariant) {
-        let engine_id = 0;
-
+    pub fn add_engine(&mut self, client_id: usize, simulation_variant: &SimulationVariant) {
         let simulation_variant = simulation_variant.clone();
-        // std::thread::spawn(move || {
-        // Connect to database & determine Client- & Engine-ID.
+
+        // Connect to database & determine ID of new Engine.
         let db_conn = mxyz_database::establish_connection();
         let engine_id = mxyz_database::models::engine::get_db_engines().len();
-        let client_id = mxyz_database::models::client::get_db_clients().len();
+
         // Create MPSC channel.
         // - TODO change message type
         let (tx, rx) = mpsc::channel::<usize>();
+
         // Create & initialize new Simulation Engine.
         let mut engine = Engine::new(client_id, engine_id, rx, tx);
         engine.init(&Some(simulation_variant));
+
         // Save Engine to Database. (actually: only ID)
-        let db_engine = mxyz_database::models::engine::NewEngine {
-            client_id: &(client_id as i32),
-            engine_id: &(engine_id as i32),
-        };
-        mxyz_database::models::engine::create_engine(&db_conn, db_engine);
+        mxyz_database::models::engine::create_engine(&db_conn, client_id, engine_id);
+
         // Run Engine in new thread.
         std::thread::spawn(move || {
             for _ in 0..engine.config.step_id.1 {
@@ -83,8 +80,6 @@ impl EngineRunner {
             }
         });
         std::thread::spawn(|| loop {});
-        // });
-        //...
         println!("Engine-Runner added engine {}", engine_id);
     }
 

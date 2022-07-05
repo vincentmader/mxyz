@@ -49,7 +49,8 @@ impl WebSocketClient {
         let ws = &mut self.socket;
         let cloned_ws = ws.clone();
         let onopen_callback = Closure::wrap(Box::new(move |_| {
-            console_log!("TCP socket opened");
+            console_log!("\nTCP socket opened"); // why no new line?
+
             // Get states. // TODO move to loop
             let state_id = 0; // TODO
             let request = request::Request::GetUpdatedStates(state_id);
@@ -75,12 +76,19 @@ impl WebSocketClient {
             let request = request::Request::AddClient;
             let request = Package::Request(request);
             let request = request.to_bytes();
-            cloned_ws.send_with_u8_array(&request).unwrap();
+            match cloned_ws.send_with_u8_array(&request) {
+                Ok(bytes) => {
+                    // let package = bytes.
+                }
+                Err(err) => console_log!("ERROR sending message: {:?}", err),
+            };
             console_log!("get-client binary msg successfully sent");
+
+            let client_id = 0; // TODO
 
             // Add new engine. TODO move to separate function (or match input)
             let simulation_variant = SimulationVariant::ThreeBodyMoon;
-            let request = request::Request::AddEngine(simulation_variant);
+            let request = request::Request::AddEngine(client_id, simulation_variant);
             let request = Package::Request(request);
             let request = request.to_bytes();
             cloned_ws.send_with_u8_array(&request).unwrap();
@@ -136,13 +144,14 @@ impl WebSocketClient {
                 // console_log!("message event, received arraybuffer: {:?}", abuf);
                 let array = js_sys::Uint8Array::new(&abuf);
                 let len = array.byte_length() as usize;
-                console_log!("Arraybuffer received {} bytes: {:?}", len, array.to_vec());
+                // console_log!("Arraybuffer received {} bytes: {:?}", len, array.to_vec());
+                console_log!("\nArraybuffer received {} bytes", len);
 
                 let package = Package::from_bytes(array.to_vec());
                 console_log!("Package: {:?}", &package);
                 match package {
                     Package::Request(req) => match req {
-                        Request::AddEngine(_simulation_variant) => { // Do nothing.
+                        Request::AddEngine(client_id, _simulation_variant) => { // Do nothing.
                         }
                         Request::GetUpdatedStates(_last_update) => { // Do nothing.
                         }
@@ -154,12 +163,20 @@ impl WebSocketClient {
                     Package::Response(res) => match res {
                         Response::AddedEngine => {}
                         Response::AddedClient(client_id) => {
-                            println!("Received client-id: {}", client_id);
+                            console_log!("Received client-id: {}", client_id);
                             // TODO
                         }
                         Response::StateVector(state_vector) => {
                             // TODO
-                            println!("Received state vector: {:?}", state_vector);
+                            println!("Received state vector {:?}", state_vector);
+                            if state_vector.len() == 0 {
+                                return;
+                            }
+                            console_log!(
+                                "Received states: {:?} to {:?}",
+                                state_vector[0].state_id,
+                                state_vector[state_vector.len() - 1].state_id
+                            );
                         }
                         Response::Empty => {}
                     },
