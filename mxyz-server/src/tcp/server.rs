@@ -1,5 +1,6 @@
 use futures_util::{future, StreamExt, TryStreamExt};
 use log::info;
+use mxyz_database::models::state::StateQuery;
 use mxyz_engine::state::State;
 use mxyz_network::package::command::Command;
 use mxyz_network::package::request::Request;
@@ -114,8 +115,11 @@ pub fn handle_request(request: Request, tx: &mpsc::Sender<Package>) -> Package {
             println!("Incoming: get updated states (since state {})", last_update);
             // Load states from database.
             // - TODO
-            let states = vec![State::new()]; // TODO
-                                             // let states = mxyz_engine::Engine::get_updated_states(last_update);
+            let engine_id = 0; // TODO
+            let last_sync = 0; //TODO
+            let state_query = StateQuery::Since(last_sync);
+            let states = mxyz_database::models::state::get_states(engine_id, state_query);
+            // let states = mxyz_engine::Engine::get_updated_states(last_update);
             println!("Loaded {} states from database!", states.len());
             // Return state-vector response
             let response = Response::StateVector(states);

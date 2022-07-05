@@ -44,6 +44,25 @@ impl WebSocketClient {
         Ok(())
     }
 
+    // TODO
+    pub fn get_states(&mut self) {
+        let ws = &mut self.socket;
+        let cloned_ws = ws.clone();
+        let onopen_callback = Closure::wrap(Box::new(move |_| {
+            console_log!("TCP socket opened");
+            // Get states. // TODO move to loop
+            let state_id = 0; // TODO
+            let request = request::Request::GetUpdatedStates(state_id);
+            let request = Package::Request(request);
+            let request = request.to_bytes();
+            cloned_ws.send_with_u8_array(&request).unwrap();
+            console_log!("get-state-vector binary msg successfully sent");
+        }) as Box<dyn FnMut(JsValue)>);
+
+        ws.set_onopen(Some(onopen_callback.as_ref().unchecked_ref()));
+        onopen_callback.forget();
+    }
+
     /// Creates OnOpen Callback.
     pub fn create_onopen_callback(&mut self) {
         let ws = &mut self.socket;
@@ -72,7 +91,6 @@ impl WebSocketClient {
             let request = request::Request::GetUpdatedStates(state_id);
             let request = Package::Request(request);
             let request = request.to_bytes();
-
             cloned_ws.send_with_u8_array(&request).unwrap();
             console_log!("get-state-vector binary msg successfully sent");
 
@@ -121,7 +139,7 @@ impl WebSocketClient {
                 console_log!("Arraybuffer received {} bytes: {:?}", len, array.to_vec());
 
                 let package = Package::from_bytes(array.to_vec());
-                console_log!("{:?}", &package);
+                console_log!("Package: {:?}", &package);
                 match package {
                     Package::Request(req) => match req {
                         Request::AddEngine(_simulation_variant) => { // Do nothing.

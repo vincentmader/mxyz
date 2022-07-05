@@ -40,3 +40,23 @@ pub enum SystemVariant {
     PhysicalObjects(physical_objects::PhysicalObjects),
     CellularAutomata(cellular_automata::CellularAutomata),
 }
+impl std::convert::Into<usize> for SystemVariant {
+    fn into(self) -> usize {
+        match self {
+            SystemVariant::Planets(planets) => 0,
+            _ => todo!(),
+        }
+    }
+}
+impl std::convert::From<usize> for SystemVariant {
+    fn from(system_variant: usize) -> SystemVariant {
+        match system_variant {
+            0 => {
+                let system = crate::system::planets::Planets::new();
+                let system_variant = SystemVariant::Planets(system);
+                system_variant
+            }
+            _ => todo!(),
+        }
+    }
+}

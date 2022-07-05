@@ -28,6 +28,7 @@ CREATE TABLE systems (
   engine_id INT NOT NULL,
   state_id INT NOT NULL,
   system_id INT NOT NULL,
+  system_variant_id INT NOT NULL,
   entity_variant_id INT NOT NULL
 );
 

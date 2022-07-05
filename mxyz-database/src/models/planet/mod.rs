@@ -16,6 +16,15 @@ pub struct Planet {
     pub vel_y: f64,
     pub vel_z: f64,
 }
+impl std::convert::Into<mxyz_universe::entity::object::planet::Planet> for Planet {
+    fn into(self) -> mxyz_universe::entity::object::planet::Planet {
+        mxyz_universe::entity::object::planet::Planet {
+            mass: self.mass,
+            position: [self.pos_x, self.pos_y, self.pos_z],
+            velocity: [self.vel_x, self.vel_y, self.vel_z],
+        }
+    }
+}
 
 #[derive(Insertable, Debug)]
 #[table_name = "planets"]
@@ -48,4 +57,15 @@ pub fn get_db_planets(engine_query: i32, state_query: i32, system_query: i32) ->
         .filter(system_id.eq(system_query))
         .load::<Planet>(&connection)
         .expect("Error loading systems")
+}
+pub fn get_planets(
+    engine_query: i32,
+    state_query: i32,
+    system_query: i32,
+) -> Vec<mxyz_universe::entity::object::planet::Planet> {
+    let db_planets = get_db_planets(engine_query, state_query, system_query);
+    db_planets
+        .into_iter()
+        .map(|db_planet| db_planet.into())
+        .collect()
 }
