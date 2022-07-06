@@ -1,11 +1,8 @@
 [package]
-    name = "mxyz-utils"
+    name = "mxyz-config"
     authors = ["Vincent C. Mader <vincent@mader.xyz>"]
     edition = "2018"
     version = "0.1.0"
 
 [dependencies]
-    mxyz-config = { path = "../mxyz-config" }
-    # rand = "0.8.4"
-    # bytestream = "0.4"
-
+    mxyz-universe = { path = "../mxyz-universe" }

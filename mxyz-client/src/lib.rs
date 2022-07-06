@@ -1,4 +1,4 @@
-extern crate reqwest;
+// extern crate reqwest;
 pub mod client;
 pub mod components;
 pub mod config;

@@ -1,3 +1,4 @@
+#![allow(unreachable_patterns)]
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

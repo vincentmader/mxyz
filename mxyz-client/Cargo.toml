@@ -15,6 +15,7 @@
     getrandom = { version = "0.2", features = ["js"] }
     gloo-timers = "0.2.4"
     js-sys = "0.3.51"
+    mxyz-config = { path = "../mxyz-config" }
     mxyz-network = { path = "../mxyz-network" }
     mxyz-universe = { path = "../mxyz-universe" }
     # mxyz-engine = { path = "../mxyz-engine" }
