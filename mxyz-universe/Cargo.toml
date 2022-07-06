@@ -5,7 +5,6 @@
     version = "0.1.0"
 
 [dependencies]
-    mxyz-config = { path="../mxyz-config" }
 
 [dependencies.serde]
     version = "1.0"
