@@ -13,48 +13,47 @@
 [dependencies]
     console_error_panic_hook = { version = "0.1.6", optional = true }
     getrandom = { version = "0.2", features = ["js"] }
-    gloo-timers = "0.2.4"
+    # gloo-timers = "0.2.4"
     js-sys = "0.3.51"
     mxyz-config = { path = "../mxyz-config" }
     mxyz-network = { path = "../mxyz-network" }
     mxyz-universe = { path = "../mxyz-universe" }
-    # mxyz-engine = { path = "../mxyz-engine" }
-    # mxyz-utils = { path = "../mxyz-utils" }
-    rand = "0.8.5"
-    # rayon = "1.5"
-    reqwest = "0.11.11"
+    # rand = "0.8.5"
+    rayon = "1.5"
+    # reqwest = "0.11.11"
     wasm-bindgen = { version = "^0.2", features = ["nightly", "serde-serialize"] }
     wasm-bindgen-futures = "0.4"
-    # wasm-bindgen-rayon = "1.0.3"
-    wasm-timer = "0.2.5"
+    wasm-futures-executor = "0.2.0"
+    wasm-bindgen-rayon = "1.0.3"
+    # wasm-timer = "0.2.5"
     wee_alloc = { version = "0.4.2", optional = true }
 
 [dependencies.web-sys]
     version = "0.3.55"
     features = [
-        'CanvasRenderingContext2d',
-        # 'CssStyleDeclaration',
-        'Document',
-        'Element',
-        # 'EventListener',
-        # 'EventTarget',
-        # 'HtmlButtonElement',
-        'HtmlCanvasElement',
-        'HtmlElement',
-        # 'HtmlOptionElement',
-        # 'HtmlParagraphElement',
-        # 'MouseEvent',
-        'Node',
-        'Window',
-        'console',
-        'WebSocket',
         "BinaryType",
         "Blob",
+        "CanvasRenderingContext2d",
+        # "CssStyleDeclaration",
+        "Document",
+        # "Element",
         "ErrorEvent",
+        # "EventListener",
+        # "EventTarget",
         "FileReader",
+        # "HtmlButtonElement",
+        "HtmlCanvasElement",
+        "HtmlElement",
+        # "HtmlOptionElement",
+        # "HtmlParagraphElement",
         "MessageEvent",
+        # "MouseEvent",
+        # "Node",
         "ProgressEvent",
         "TcpSocket",
+        "WebSocket",
+        "Window",
+        "console",
     ]
 
 [features]
