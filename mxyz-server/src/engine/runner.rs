@@ -1,10 +1,10 @@
-use mxyz_config::ExportVariant;
-use mxyz_config::SimulationVariant;
+use mxyz_engine::config::ExportVariant;
 use mxyz_engine::Engine;
 use mxyz_network::package::command::Command;
 use mxyz_network::package::request::Request;
 use mxyz_network::package::Package;
 use mxyz_universe::entity::attribute::*;
+use mxyz_universe::preset::SimulationVariant;
 use mxyz_universe::system::SystemVariant;
 use std::sync::mpsc;
 
@@ -57,7 +57,7 @@ impl EngineRunner {
         let engine_id = db_engine.engine_id as usize;
 
         // Create & initialize new Simulation Engine.
-        let mut engine = Engine::new(engine_id);
+        let mut engine = Engine::new(client_id, engine_id);
         engine.init(Some(simulation_variant));
 
         // Run Engine in new thread.

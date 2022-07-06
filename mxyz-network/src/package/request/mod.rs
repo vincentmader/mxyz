@@ -1,4 +1,4 @@
-use mxyz_config::SimulationVariant;
+use mxyz_universe::preset::SimulationVariant;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]

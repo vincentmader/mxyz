@@ -1,4 +1,4 @@
-use mxyz_universe::state::State;
+use mxyz_engine::state::State;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]

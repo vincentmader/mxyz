@@ -1,4 +1,4 @@
-use mxyz_config::SimulationVariant;
+use mxyz_universe::preset::SimulationVariant;
 // use mxyz_network::package::Package;
 // use std::sync::mpsc::Receiver;
 
