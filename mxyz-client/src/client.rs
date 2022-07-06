@@ -2,7 +2,7 @@ use crate::config::ClientConfig;
 use crate::renderer::Renderer;
 use crate::utils::dom;
 use crate::websocket::client::WebSocketClient;
-use mxyz_universe::preset::SimulationVariant;
+use mxyz_config::SimulationVariant;
 use std::cell::RefCell;
 use std::rc::Rc;
 use wasm_bindgen::prelude::*;

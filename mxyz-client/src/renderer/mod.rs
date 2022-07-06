@@ -4,7 +4,7 @@
 // use crate::utils::dom::console_log;
 // use mxyz_network::package::Package;
 // use std::sync::mpsc::Receiver;
-use mxyz_universe::preset::SimulationVariant;
+use mxyz_config::SimulationVariant;
 
 // const canvas_id: u8 = 0; // TODO
 
