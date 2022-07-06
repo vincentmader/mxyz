@@ -1,12 +1,12 @@
-use crate::renderer::Renderer;
+// use crate::renderer::Renderer;
 use crate::utils::dom;
 use mxyz_network::package::command::Command;
 use mxyz_network::package::request;
-use mxyz_network::package::request::Request;
+// use mxyz_network::package::request::Request;
 use mxyz_network::package::response::Response;
 use mxyz_network::package::Package;
 use mxyz_universe::preset::SimulationVariant;
-use std::sync::mpsc;
+// use std::sync::mpsc;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::BinaryType::Arraybuffer;
@@ -24,21 +24,25 @@ extern "C" {
 
 // #[wasm_bindgen]
 pub struct WebSocketClient {
-    client_id: usize,
+    // client_id: usize,
     socket: WebSocket,
-    tx_web_to_render: mpsc::Sender<Package>,
+    // tx_web_to_render: mpsc::Sender<Package>,
 }
 // #[wasm_bindgen]
 impl WebSocketClient {
     /// Creates new instance of Web Socket Client
-    pub fn new(host: &str, port: u16, tx_web_to_render: mpsc::Sender<Package>) -> Self {
-        let client_id = 0; // TODO
+    pub fn new(
+        host: &str,
+        port: u16,
+        // tx_web_to_render: mpsc::Sender<Package>
+    ) -> Self {
+        // let client_id = 0; // TODO
         let address = format!("ws://{}:{}", host, port);
         let socket = WebSocket::new(&address).unwrap();
         WebSocketClient {
-            client_id,
+            // client_id,
             socket,
-            tx_web_to_render,
+            // tx_web_to_render,
         }
     }
 
@@ -46,7 +50,9 @@ impl WebSocketClient {
     pub fn init(&mut self) -> Result<(), JsValue> {
         dom::console_log("Starting WebSocket Client...");
         self.socket.set_binary_type(Arraybuffer); // for small bin. msgs, like CBOR, Arraybuffer is more efficient than Blob handling
-        self.create_onmessage_callback(self.tx_web_to_render.clone());
+        self.create_onmessage_callback(
+            // self.tx_web_to_render.clone()
+            );
         self.create_onerror_callback();
         self.create_onopen_callback();
         Ok(())
@@ -83,7 +89,7 @@ impl WebSocketClient {
     /// Creates OnMessage Callback.
     pub fn create_onmessage_callback(
         &mut self,
-        tx_web_to_render: std::sync::mpsc::Sender<Package>,
+        // tx_web_to_render: std::sync::mpsc::Sender<Package>,
     ) {
         let ws = &mut self.socket;
 
@@ -91,7 +97,11 @@ impl WebSocketClient {
         let onmessage_callback = Closure::wrap(Box::new(move |e: MessageEvent| {
             // Handle ArrayBuffer.
             if let Ok(abuf) = e.data().dyn_into::<js_sys::ArrayBuffer>() {
-                handle_arraybuffer(&mut cloned_ws, abuf, tx_web_to_render.clone());
+                handle_arraybuffer(
+                    &mut cloned_ws,
+                    abuf,
+                    // tx_web_to_render.clone()
+                );
             // Handle Blob.
             } else if let Ok(blob) = e.data().dyn_into::<web_sys::Blob>() {
                 handle_blob(&mut cloned_ws, blob);
@@ -112,14 +122,17 @@ impl WebSocketClient {
 pub fn handle_arraybuffer(
     ws: &mut WebSocket,
     abuf: js_sys::ArrayBuffer,
-    tx_web_to_render: std::sync::mpsc::Sender<Package>,
+    // tx_web_to_render: std::sync::mpsc::Sender<Package>,
 ) {
     let array = js_sys::Uint8Array::new(&abuf);
     let len = array.byte_length() as usize;
     let package = Package::from_bytes(array.to_vec());
     console_log!("\nArraybuffer received {} bytes", len);
     // console_log!("\nArraybuffer received {} bytes -> {:?}", len, &package);
-    handle_onmessage_package(ws, package, tx_web_to_render.clone());
+    handle_onmessage_package(
+        ws, package,
+        // tx_web_to_render.clone()
+    );
 }
 
 pub fn handle_blob(_ws: &mut WebSocket, blob: web_sys::Blob) {
@@ -144,7 +157,7 @@ pub fn handle_blob(_ws: &mut WebSocket, blob: web_sys::Blob) {
 pub fn handle_onmessage_package(
     ws: &mut WebSocket,
     package: Package,
-    tx_web_to_render: std::sync::mpsc::Sender<Package>,
+    // tx_web_to_render: std::sync::mpsc::Sender<Package>,
 ) {
     match package {
         Package::Response(res) => match res {

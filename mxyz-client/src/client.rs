@@ -2,10 +2,11 @@ use crate::config::ClientConfig;
 use crate::renderer::Renderer;
 use crate::utils::dom;
 use crate::websocket::client::WebSocketClient;
+use mxyz_universe::preset::SimulationVariant;
 use std::cell::RefCell;
 use std::rc::Rc;
-use std::sync::mpsc;
 use wasm_bindgen::prelude::*;
+// use std::sync::mpsc;
 
 const HOST: &str = "127.0.0.1";
 const PORT: u16 = 1234;
@@ -21,13 +22,23 @@ pub struct SimulationClientV1 {
 #[wasm_bindgen]
 impl SimulationClientV1 {
     /// Creates new Simulation-Renderer-Client
-    pub fn new(client_id: usize) -> Self {
-        let channel_ws_to_rndr = mpsc::channel();
-        let (tx_web_to_render, rx_web_to_render) = channel_ws_to_rndr;
+    pub fn new(simulation_variant: &str) -> Self {
+        // let channel_ws_to_rndr = mpsc::channel();
+        // let (tx_web_to_render, rx_web_to_render) = channel_ws_to_rndr;
 
-        let config = ClientConfig::new(client_id);
-        let renderer = Renderer::new();
-        let websocket = WebSocketClient::new(HOST, PORT, tx_web_to_render);
+        let simulation_variant = SimulationVariant::from(simulation_variant);
+
+        let renderer = Renderer::new(
+            &simulation_variant,
+            // rx_web_to_render
+        );
+        let config = ClientConfig::new(simulation_variant);
+        let websocket = WebSocketClient::new(
+            HOST, PORT,
+            // tx_web_to_render
+        );
+
+        // let websocket = WebSocketClient::new(HOST, PORT, tx_web_to_render, &mut renderer);
 
         SimulationClientV1 {
             config,
@@ -36,7 +47,7 @@ impl SimulationClientV1 {
         }
     }
     /// Initializes Renderer-Client
-    pub fn init(&mut self, simulation_variant: &str) {
+    pub fn init(&mut self) {
         dom::set_panic_hook();
         self.renderer.init();
         self.websocket.init().unwrap();
@@ -71,7 +82,7 @@ impl SimulationClientV1 {
     }
     /// Forwards Renderer to Next Time-Step
     pub fn step(&mut self) {
-        let frame_id = self.config.frame_id.0;
+        let _frame_id = self.config.frame_id.0;
         // tmp::draw(i); // TODO create renderer with loop over systems & entities
         self.config.frame_id.0 += 1;
     }
