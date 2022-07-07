@@ -1,6 +1,10 @@
 # test:
 # 	make client
 # 	./scripts/build
+all:
+	make engine
+	make client
+	make server
 engine:
 	./scripts/rebuild_db
 	cargo run -p mxyz-engine # --release
