@@ -1,16 +1,16 @@
-// use super::interaction::Interaction;
-// use crate::state::State;
-use mxyz_universe::entity::attribute::Mass;
-use mxyz_universe::entity::attribute::Position;
-use mxyz_universe::entity::attribute::Velocity;
-use mxyz_universe::integrator::IntegratorVariant;
 use mxyz_universe::interaction::Interaction;
-use mxyz_universe::interaction::InteractionVariant;
 use mxyz_universe::state::State;
 use mxyz_universe::system::System;
-use mxyz_universe::system::SystemVariant;
+// use super::interaction::Interaction;
+// use crate::state::State;
+// use mxyz_universe::entity::attribute::Mass;
+// use mxyz_universe::entity::attribute::Position;
+// use mxyz_universe::entity::attribute::Velocity;
+// use mxyz_universe::integrator::IntegratorVariant;
+// use mxyz_universe::interaction::InteractionVariant;
+// use mxyz_universe::system::SystemVariant;
 
-const DT: f64 = 0.1; // TODO move else-where
+// const DT: f64 = 0.1; // TODO move else-where
 
 // #[derive(Debug)]
 // pub struct Integrator {

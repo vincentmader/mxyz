@@ -1,14 +1,14 @@
 #![allow(unreachable_code)]
 use mxyz_config::EngineConfig;
-// use crate::tmp;
 use mxyz_universe::entity::object::planet::Planet;
-use mxyz_universe::integrator::IntegratorVariant;
 use mxyz_universe::preset::SimulationVariant;
 use mxyz_universe::state::State;
 use mxyz_universe::system::planets::Planets;
 use mxyz_universe::system::System;
 use mxyz_universe::system::SystemVariant;
+// use crate::tmp;
 // use serde::{Deserialize, Serialize};
+// use mxyz_universe::integrator::IntegratorVariant;
 
 /// MXYZ Simulation Engine
 pub struct Engine {
@@ -18,7 +18,7 @@ pub struct Engine {
 }
 
 impl Engine {
-    /// Creates a new engine instance
+    /// Creates a new Engine instance
     pub fn new(engine_id: usize) -> Self {
         let config = EngineConfig::new();
         let states = vec![];
@@ -29,7 +29,27 @@ impl Engine {
         }
     }
 
-    /// Initializes state & config
+    /// Gets Initial State & sets up Configuration for a given Simulation Variant
+    pub fn initial_state(
+        simulation_variant: Option<SimulationVariant>,
+        cfg: &mut EngineConfig,
+    ) -> State {
+        match simulation_variant {
+            Some(simulation_variant) => match simulation_variant {
+                SimulationVariant::ThreeBodyMoon => {
+                    let mut state = State::new();
+                    let mut systems = vec![];
+                    crate::preset::three_body_moon::preset(&mut systems, cfg);
+                    state.systems = systems;
+                    state
+                }
+                _ => todo!(),
+            },
+            None => todo!("handle this earlier? (in str->enum sim-var conversion)"),
+        }
+    }
+
+    /// Initializes State & Config
     pub fn init(&mut self, simulation_variant: Option<SimulationVariant>) {
         println!("MXYZ-Engine: Initializing...");
         let initial_state = Self::initial_state(simulation_variant, &mut self.config);
@@ -37,7 +57,7 @@ impl Engine {
         self.states.push(initial_state);
     }
 
-    /// Runs engine
+    /// Runs Engine
     pub fn run(&mut self) {
         println!("MXYZ-Engine: Running...");
         for _ in 0..self.config.step_id.1 {
@@ -45,9 +65,9 @@ impl Engine {
         }
     }
 
-    /// Forwards engine by one time-step
+    /// Forwards Engine by one time-step
     pub fn step(&mut self) {
-        /// Forwards state
+        /// Forwards State
         let next_state = self.forward_state();
 
         // let mut next_state = State::new();
@@ -76,26 +96,6 @@ impl Engine {
 
         self.states.push(next_state);
         self.config.step_id.0 += 1;
-    }
-
-    /// Gets Initial State & sets up Configuration for a given Simulation Variant
-    pub fn initial_state(
-        simulation_variant: Option<SimulationVariant>,
-        cfg: &mut EngineConfig,
-    ) -> State {
-        match simulation_variant {
-            Some(simulation_variant) => match simulation_variant {
-                SimulationVariant::ThreeBodyMoon => {
-                    let mut state = State::new();
-                    let mut systems = vec![];
-                    crate::state::preset::three_body_moon::preset(&mut systems, cfg);
-                    state.systems = systems;
-                    state
-                }
-                _ => todo!(),
-            },
-            None => todo!("handle this earlier? (in str->enum sim-var conversion)"),
-        }
     }
 
     /// Forwards State
