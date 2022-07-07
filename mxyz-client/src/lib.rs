@@ -1,5 +1,4 @@
 pub mod client;
-pub mod components;
 pub mod config;
 pub mod renderer;
 pub mod tmp;

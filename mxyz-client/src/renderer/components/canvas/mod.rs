@@ -57,6 +57,13 @@ impl Canvas {
             context,
         }
     }
+
+    /// Initializes Canvas
+    pub fn init(&mut self) {
+        self.set_stroke_style("white");
+        self.set_fill_style("white");
+    }
+
     /// Clears Canvas
     pub fn clear(&mut self) {
         let w = self.dimensions.0;

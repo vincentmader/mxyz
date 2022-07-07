@@ -1,3 +1,4 @@
+pub mod components;
 // use super::components::canvas::Canvas;
 // use super::utils::dom;
 // use super::utils::dom::HTMLObject;

@@ -179,6 +179,30 @@ pub fn handle_onmessage_package(
                     state_vector[state_vector.len() - 1].state_id // last update
                 };
 
+                use crate::renderer::components::canvas::Canvas;
+                let mut canvas = Canvas::new(0);
+                let cnv_dim = canvas.dimensions;
+                canvas.init();
+
+                for state in state_vector.iter() {
+                    console_log!("{:#?}", state);
+                    for system in state.systems.iter() {
+                        match &system.variant {
+                            mxyz_universe::system::SystemVariant::Planets(system) => {
+                                for planet in system.entities.iter() {
+                                    let pos = planet.position;
+                                    let pos = (pos[0], pos[1]);
+                                    let pos = (pos.0 * cnv_dim.0 / 2., pos.1 * cnv_dim.1 / 2.);
+                                    let pos = (pos.0 + cnv_dim.0 / 2., pos.1 + cnv_dim.1 / 2.);
+                                    let r = 1.;
+                                    canvas.draw_circle(pos, r, true);
+                                }
+                            }
+                            _ => todo!(),
+                        }
+                    }
+                }
+
                 // let package = Package::StateVec(state_vec);
                 // tx_web_to_render.send(package);
 

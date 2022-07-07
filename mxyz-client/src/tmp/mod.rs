@@ -1,4 +1,4 @@
-use super::components::canvas::Canvas;
+use super::renderer::components::canvas::Canvas;
 
 pub fn draw(i: usize) {
     let r = i as f64 * 0.3;
