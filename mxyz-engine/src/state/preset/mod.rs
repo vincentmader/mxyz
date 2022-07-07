@@ -2,7 +2,7 @@
 
 pub mod three_body_figure_eight;
 pub mod three_body_moon;
-use crate::config::EngineConfig;
+use mxyz_config::EngineConfig;
 use mxyz_universe::preset::SimulationVariant;
 use mxyz_universe::system::System;
 

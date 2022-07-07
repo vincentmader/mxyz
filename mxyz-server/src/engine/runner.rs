@@ -1,4 +1,4 @@
-use mxyz_engine::config::ExportVariant;
+use mxyz_config::ExportVariant;
 use mxyz_engine::Engine;
 use mxyz_network::package::command::Command;
 use mxyz_network::package::request::Request;

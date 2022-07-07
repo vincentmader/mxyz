@@ -1,4 +1,4 @@
-use crate::config::EngineConfig;
+use mxyz_config::EngineConfig;
 // use crate::integrator::Integrator;
 use mxyz_universe::entity;
 use mxyz_universe::integrator::Integrator;
@@ -10,12 +10,12 @@ use mxyz_universe::interaction::InteractionVariant;
 use mxyz_universe::system::planets::Planets;
 use mxyz_universe::system::{System, SystemVariant};
 
-// const NR_OF_STEPS: usize = 10;
+const NR_OF_STEPS: usize = 10;
 
 pub fn preset(systems: &mut Vec<System>, config: &mut EngineConfig) {
     // I. SYSTEMS
     // ========================================================================
-    // config.step_id.1 = NR_OF_STEPS;
+    config.step_id.1 = NR_OF_STEPS;
     let M: f64 = 1.;
     let G = 1.;
     let r = 2.;

@@ -1,5 +1,5 @@
 #![allow(unreachable_code)]
-use super::config::EngineConfig;
+use mxyz_config::EngineConfig;
 // use crate::tmp;
 use mxyz_universe::entity::object::planet::Planet;
 use mxyz_universe::integrator::IntegratorVariant;

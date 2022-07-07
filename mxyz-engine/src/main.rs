@@ -1,5 +1,5 @@
 #![allow(unused_doc_comments)]
-use mxyz_engine::config::ExportVariant;
+use mxyz_config::ExportVariant;
 use mxyz_engine::Engine;
 use mxyz_universe::preset::SimulationVariant;
 mod dev_utils;
