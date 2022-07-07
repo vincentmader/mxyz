@@ -33,16 +33,15 @@ impl RocketServer {
 
         // Create MPSC channel for Server-Engine Communication.
         let (tx_1, rx_1) = mpsc::channel::<Package>();
-        let (tx_2, rx_2) = mpsc::channel::<Package>();
 
         // Server-Client Communication: Start TCP-Listener in separate thread.
         std::thread::spawn(move || {
-            crate::tcp::start_tcp_listener(tx_1, rx_2).unwrap();
+            crate::tcp::start_tcp_listener(tx_1).unwrap();
         });
 
         // Server-Engine Communication: Create Engine-Runner w/ MPSC streaming channel.
         std::thread::spawn(move || {
-            crate::engine::start_engine_runner(tx_2, rx_1).unwrap();
+            crate::engine::start_engine_runner(rx_1).unwrap();
         });
 
         // Launch Rocket.

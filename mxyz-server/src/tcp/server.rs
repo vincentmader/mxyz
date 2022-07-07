@@ -15,19 +15,13 @@ use tokio_tungstenite::tungstenite::Message;
 /// TCP Server
 pub struct TcpServer {
     address: String,
-    rx: mpsc::Receiver<Package>,
     tx: mpsc::Sender<Package>,
 }
 impl TcpServer {
     /// Creates new TCP Server instance
-    pub fn new(
-        host: &str,
-        port: u16,
-        tx: mpsc::Sender<Package>,
-        rx: mpsc::Receiver<Package>,
-    ) -> Self {
+    pub fn new(host: &str, port: u16, tx: mpsc::Sender<Package>) -> Self {
         let address = format!("{}:{}", host, port);
-        TcpServer { address, rx, tx }
+        TcpServer { address, tx }
     }
 
     /// Starts TCP Listener
@@ -37,7 +31,6 @@ impl TcpServer {
         info!("Listening on: {}", self.address);
 
         while let Ok((stream, _)) = listener.accept().await {
-            // let (tx, rx) = mpsc::channel::<Package>();
             let tx = self.tx.clone();
             tokio::spawn(accept_connection(stream, tx));
         }
@@ -75,6 +68,7 @@ async fn accept_connection(stream: TcpStream, tx: mpsc::Sender<Package>) {
 // ============================================================================
 
 type MessageResult = Result<Message, tokio_tungstenite::tungstenite::Error>;
+
 pub fn handle_message(msg: MessageResult, tx: &mpsc::Sender<Package>) -> MessageResult {
     match &msg {
         Ok(e) => match e {

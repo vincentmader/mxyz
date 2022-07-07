@@ -10,12 +10,11 @@ use std::sync::mpsc;
 
 pub struct EngineRunner {
     rx: mpsc::Receiver<Package>,
-    tx: mpsc::Sender<Package>,
 }
 impl EngineRunner {
     /// Creates a new Engine-Runner instance
-    pub fn new(tx: mpsc::Sender<Package>, rx: mpsc::Receiver<Package>) -> Self {
-        EngineRunner { rx, tx }
+    pub fn new(rx: mpsc::Receiver<Package>) -> Self {
+        EngineRunner { rx }
     }
 
     /// Initializes MPSC Receiver
@@ -57,7 +56,7 @@ impl EngineRunner {
         let engine_id = db_engine.engine_id as usize;
 
         // Create & initialize new Simulation Engine.
-        let mut engine = Engine::new(client_id, engine_id);
+        let mut engine = Engine::new(engine_id);
         engine.init(Some(simulation_variant));
 
         // Run Engine in new thread.
