@@ -1,0 +1,18 @@
+* mxyz-engine
+
+This project's goal is the creation of a generalized physics simulation engine. 
+Ideally, the engine should be able to construct numerical models for a wide 
+variety of physical systems, and approximate their evolution numerically without 
+sacrificing too much performance for generality.
+
+Keywords:
+- n-body simulations
+- cellular automata
+- interactions between particles & fields
+- simulations in 2D, 3D, & eventually ND
+- gravity, electro-statics, Lennard-Jones, ...
+- hierarchical quad- or oct-trees
+- fluid dynamics simulations
+- multi-threaded computes
+- GPU computes
+- problems from classical physics, astronomy, fluid dynamics, thermodynamics, quantum mechanics, mathematics
