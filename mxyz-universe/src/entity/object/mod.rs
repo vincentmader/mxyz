@@ -1,3 +1,4 @@
+pub mod object_v01;
 pub mod planet;
 use crate::entity::attribute::*;
 

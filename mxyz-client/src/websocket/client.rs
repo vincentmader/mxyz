@@ -6,6 +6,7 @@ use mxyz_network::package::request::Request;
 use mxyz_network::package::response::Response;
 use mxyz_network::package::Package;
 use mxyz_universe::preset::SimulationVariant;
+use mxyz_universe::system::SystemVariant;
 use std::sync::mpsc;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
@@ -189,16 +190,19 @@ pub fn handle_onmessage_package(
                     console_log!("{:#?}", state);
                     for system in state.systems.iter() {
                         match &system.variant {
-                            mxyz_universe::system::SystemVariant::Planets(system) => {
-                                for planet in system.entities.iter() {
-                                    let pos = planet.position;
-                                    let pos = (pos[0], pos[1]);
-                                    let pos = (pos.0 * cnv_dim.0 / 2., pos.1 * cnv_dim.1 / 2.);
-                                    let pos = (pos.0 + cnv_dim.0 / 2., pos.1 + cnv_dim.1 / 2.);
-                                    let r = 1.;
-                                    canvas.draw_circle(pos, r, true);
+                            SystemVariant::Objects(objects_variant) => match objects_variant {
+                                mxyz_universe::system::ObjectsVariant::Planets(system) => {
+                                    for planet in system.entities.iter() {
+                                        let pos = planet.position;
+                                        let pos = (pos[0], pos[1]);
+                                        let pos = (pos.0 * cnv_dim.0 / 2., pos.1 * cnv_dim.1 / 2.);
+                                        let pos = (pos.0 + cnv_dim.0 / 2., pos.1 + cnv_dim.1 / 2.);
+                                        let r = 1.;
+                                        canvas.draw_circle(pos, r, true);
+                                    }
                                 }
-                            }
+                                _ => todo!(),
+                            },
                             _ => todo!(),
                         }
                     }

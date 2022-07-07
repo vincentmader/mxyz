@@ -3,14 +3,13 @@ pub mod field;
 pub mod object;
 // use crate::system::ToBytes;
 use attribute::*;
-// use serde::{de::DeserializeOwned, Serialize};
+// use serde::{de::DeserializeOwned, Deserialize, Serialize};
 
 /// Entity Trait
 pub trait Entity:
-    EntityClone
+    // EntityClone
     // + Serialize
-    // + Deserialize
-    + Mass
+    Mass
     + Position
     + Velocity
     + Charge
@@ -21,21 +20,22 @@ pub trait Entity:
     + Send
     // + Serialize
     // + DeserializeOwned
+    // + Deserialize<'a>
 {
 }
-pub trait EntityClone {
-    fn clone_box(&self) -> Box<dyn Entity>;
-}
-impl<T> EntityClone for T
-where
-    T: 'static + Entity + Clone,
-{
-    fn clone_box(&self) -> Box<dyn Entity> {
-        Box::new(self.clone())
-    }
-}
-impl Clone for Box<dyn Entity> {
-    fn clone(&self) -> Box<dyn Entity> {
-        self.clone_box()
-    }
-}
+// pub trait EntityClone {
+//     fn clone_box(&self) -> Box<dyn Entity>;
+// }
+// impl<T> EntityClone for T
+// where
+//     T: 'static + Entity + Clone,
+// {
+//     fn clone_box(&self) -> Box<dyn Entity> {
+//         Box::new(self.clone())
+//     }
+// }
+// impl Clone for Box<dyn Entity> {
+//     fn clone(&self) -> Box<dyn Entity> {
+//         self.clone_box()
+//     }
+// }

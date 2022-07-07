@@ -5,6 +5,7 @@ use mxyz_network::package::request::Request;
 use mxyz_network::package::Package;
 use mxyz_universe::entity::attribute::*;
 use mxyz_universe::preset::SimulationVariant;
+use mxyz_universe::system::ObjectsVariant;
 use mxyz_universe::system::SystemVariant;
 use std::sync::mpsc;
 
@@ -131,25 +132,28 @@ pub fn export_to_database(engine: &mut Engine, states_to_save: &Vec<usize>) {
 
             // Export format depends on System Variant.
             match &system.variant {
-                SystemVariant::Planets(system) => {
-                    // Loop over Entities.
-                    for (planet_id, planet) in system.entities.iter().enumerate() {
-                        let db_planet = mxyz_database::models::planet::NewPlanet {
-                            engine_id: &(engine.engine_id as i32),
-                            state_id: &(*state_id as i32),
-                            planet_id: &(planet_id as i32),
-                            system_id: &(system_id as i32),
-                            mass: &planet.get_mass(),
-                            pos_x: &planet.get_position()[0],
-                            pos_y: &planet.get_position()[1],
-                            pos_z: &planet.get_position()[2],
-                            vel_x: &planet.get_velocity()[0],
-                            vel_y: &planet.get_velocity()[1],
-                            vel_z: &planet.get_velocity()[2],
-                        };
-                        mxyz_database::create_planet(&conn, db_planet);
+                SystemVariant::Objects(objects_variant) => match objects_variant {
+                    ObjectsVariant::Planets(system) => {
+                        // Loop over Entities.
+                        for (planet_id, planet) in system.entities.iter().enumerate() {
+                            let db_planet = mxyz_database::models::planet::NewPlanet {
+                                engine_id: &(engine.engine_id as i32),
+                                state_id: &(*state_id as i32),
+                                planet_id: &(planet_id as i32),
+                                system_id: &(system_id as i32),
+                                mass: &planet.get_mass(),
+                                pos_x: &planet.get_position()[0],
+                                pos_y: &planet.get_position()[1],
+                                pos_z: &planet.get_position()[2],
+                                vel_x: &planet.get_velocity()[0],
+                                vel_y: &planet.get_velocity()[1],
+                                vel_z: &planet.get_velocity()[2],
+                            };
+                            mxyz_database::create_planet(&conn, db_planet);
+                        }
                     }
-                }
+                    _ => todo!(),
+                },
                 _ => {}
             }
             // Save system to database.

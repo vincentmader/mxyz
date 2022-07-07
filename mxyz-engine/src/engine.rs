@@ -3,12 +3,10 @@ use mxyz_config::EngineConfig;
 use mxyz_universe::entity::object::planet::Planet;
 use mxyz_universe::preset::SimulationVariant;
 use mxyz_universe::state::State;
-use mxyz_universe::system::planets::Planets;
+use mxyz_universe::system::objects::planets::Planets;
 use mxyz_universe::system::System;
-use mxyz_universe::system::SystemVariant;
-// use crate::tmp;
-// use serde::{Deserialize, Serialize};
-// use mxyz_universe::integrator::IntegratorVariant;
+
+// ============================================================================
 
 /// MXYZ Simulation Engine
 pub struct Engine {
@@ -16,7 +14,6 @@ pub struct Engine {
     pub config: EngineConfig,
     pub states: Vec<State>,
 }
-
 impl Engine {
     /// Creates a new Engine instance
     pub fn new(engine_id: usize) -> Self {
@@ -136,17 +133,17 @@ impl Engine {
         // Loop over "other" systems (including self).
         for other in current_state.systems.iter() {
             todo!("check whether systems are interacting");
-            match system.variant {
-                SystemVariant::Planets(system) => match &other.variant {
-                    SystemVariant::Planets(other) => {}
-                    _ => todo!(),
-                },
-                _ => todo!(),
-            }
+            // match system.variant {
+            // SystemVariant::Planets(system) => match &other.variant {
+            //     SystemVariant::Planets(other) => {}
+            //     _ => todo!(),
+            // },
+            // _ => todo!(),
+            // }
         }
 
         let variant = match &system.variant {
-            SystemVariant::Planets(_) => SystemVariant::Planets(self.forward_planets(system)),
+            // SystemVariant::Planets(_) => SystemVariant::Planets(self.forward_planets(system)),
             _ => todo!(),
         };
         System {
@@ -157,10 +154,10 @@ impl Engine {
     }
 
     pub fn forward_planets(&self, system: &System) -> Planets {
-        match system.variant {
-            SystemVariant::Planets(_) => {}
-            _ => panic!(),
-        }
+        // match system.variant {
+        // SystemVariant::Planets(_) => {}
+        // _ => panic!(),
+        // }
 
         let planets = Planets::new();
         let entities = planets

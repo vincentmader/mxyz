@@ -1,43 +1,7 @@
-pub mod collision;
-pub mod force;
-use crate::system::System;
-use serde::{Deserialize, Serialize};
-
-// ============================================================================
-
-/// Interaction
-#[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct Interaction {
-    pub variant: InteractionVariant,
-    pub matrix: InteractionVector,
-    // pub neighborhoods:Vec<>
-    pub active: bool,
-}
-impl Interaction {
-    pub fn new(variant: InteractionVariant) -> Self {
-        Interaction {
-            variant,
-            matrix: InteractionVector::new(),
-            active: true,
-        }
-    }
-}
-
-// ============================================================================
-
-/// Interaction Variant
-#[derive(Debug, Clone, Deserialize, Serialize)]
-pub enum InteractionVariant {
-    Force(force::Force),
-    Collision(collision::Collision),
-    // Diffusion(diffusion::Diffusion),
-    // GameOfLife(game_of_life::GameOfLife),
-    // Ising(ising::Ising),
-    // Composed(Box<dyn InteractionTrait>),
-}
+use mxyz_universe::system::System;
 
 /// Interaction "Vector"
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug)]
 pub struct InteractionVector {
     pub entries: Vec<Option<bool>>, // pub entries: Vec<Vec<Option<bool>>>,
 }
@@ -55,9 +19,6 @@ impl InteractionVector {
     // TODO run tests for matrix on system-delete
     // TODO run test for all simulation_variants (initialization)
 }
-
-// use crate::entity::Entity;
-// pub fn foo(entities: Vec<Box<dyn Entity>>) {}
 
 // /// Interaction Matrix
 // #[derive(Debug)]

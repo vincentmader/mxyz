@@ -8,20 +8,20 @@ mod testing;
 use mxyz_universe::interaction::InteractionVariant;
 use mxyz_universe::interaction::InteractionVector;
 
-/// Interaction
-#[derive(Debug)]
-pub struct Interaction {
-    pub variant: InteractionVariant,
-    pub matrix: InteractionVector,
-    // pub neighborhoods:Vec<>
-    pub active: bool,
-}
-impl Interaction {
-    pub fn new(variant: InteractionVariant) -> Self {
-        Interaction {
-            variant,
-            matrix: InteractionVector::new(),
-            active: true,
-        }
-    }
-}
+// /// Interaction
+// #[derive(Debug)]
+// pub struct Interaction {
+//     pub variant: InteractionVariant,
+//     pub matrix: InteractionVector,
+//     // pub neighborhoods:Vec<>
+//     pub active: bool,
+// }
+// impl Interaction {
+//     pub fn new(variant: InteractionVariant) -> Self {
+//         Interaction {
+//             variant,
+//             matrix: InteractionVector::new(),
+//             active: true,
+//         }
+//     }
+// }

@@ -1,5 +1,6 @@
 use crate::schema::systems;
-use mxyz_universe::system::planets::Planets;
+use mxyz_universe::system::objects::planets::Planets;
+use mxyz_universe::system::ObjectsVariant;
 use mxyz_universe::system::SystemVariant;
 
 #[derive(Insertable, Debug)]
@@ -23,18 +24,21 @@ impl std::convert::Into<mxyz_universe::system::System> for System {
     fn into(self) -> mxyz_universe::system::System {
         let other_system_id = self.system_id as usize;
         let other_system_variant = SystemVariant::from(self.system_variant_id as usize);
-        let other_system_variant = match other_system_variant {
-            SystemVariant::Planets(_) => {
-                let mut system = Planets::new();
-                system.entities = crate::models::planet::get_planets(
-                    self.engine_id,
-                    self.state_id,
-                    self.system_id,
-                );
-                SystemVariant::Planets(system)
-            }
-            _ => todo!(),
-        };
+        // let other_system_variant = match other_system_variant {
+        //     SystemVariant::Objects(objects_variant) => match objects_variant {
+        //         ObjectsVariant => {}
+        //     },
+        //     // SystemVariant::Planets(_) => {
+        //     //     let mut system = Planets::new();
+        //     //     system.entities = crate::models::planet::get_planets(
+        //     //         self.engine_id,
+        //     //         self.state_id,
+        //     //         self.system_id,
+        //     //     );
+        //     //     SystemVariant::Planets(system)
+        //     // }
+        //     _ => todo!(),
+        // };
         let system = mxyz_universe::system::System::new(other_system_id, other_system_variant);
         system
     }

@@ -5,12 +5,11 @@
 // #![allow(unreachable_patterns)]
 // #![allow(non_snake_case)]
 
-pub mod config;
 pub mod engine;
 pub mod integrator;
 pub mod interaction;
-pub mod neighborhood;
 pub mod preset;
 pub mod tmp;
+// pub mod neighborhood;
 
 pub use engine::Engine;
