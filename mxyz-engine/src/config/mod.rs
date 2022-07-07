@@ -1,5 +1,5 @@
 pub mod system;
-use super::integrator::Integrator;
+// use super::integrator::Integrator;
 use mxyz_universe::preset::SimulationVariant;
 
 pub struct EngineConfig {
@@ -7,7 +7,7 @@ pub struct EngineConfig {
     pub simulation_variant: Option<SimulationVariant>,
     // pub systems: Vec<SystemConfig>,
     // pub interactions: Vec<Interaction>,
-    pub integrators: Vec<Vec<Integrator>>,
+    // pub integrators: Vec<Vec<Integrator>>,
     pub constants: Constants,
     pub export_variant: ExportVariant,
     pub last_export_step_id: Option<usize>,
@@ -17,7 +17,7 @@ impl EngineConfig {
     pub fn new() -> Self {
         // let systems = vec![];
         // let interactions = vec![];
-        let integrators = vec![];
+        // let integrators = vec![];
         let step_id = (0, usize::MAX);
         let constants = Constants::new();
         let export_variant = ExportVariant::ToDatabase;
@@ -27,7 +27,7 @@ impl EngineConfig {
         EngineConfig {
             // systems,
             // interactions,
-            integrators,
+            // integrators,
             step_id,
             constants,
             export_variant,

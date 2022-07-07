@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Debug)]
 pub struct State {
     pub state_id: usize,
-    pub systems: Vec<System>,
+    pub systems: Vec<System>, // todo include into db ?
 }
 impl State {
     /// Creates new instance of State Structure

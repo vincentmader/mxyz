@@ -8,7 +8,6 @@
     bincode = "1.3.3"
     mxyz-config = { path = "../mxyz-config" }
     mxyz-universe = { path = "../mxyz-universe" }
-    mxyz-engine = { path = "../mxyz-engine" }
     wasm-bindgen = { version = "^0.2", features = ["nightly", "serde-serialize"] }
 
 [dependencies.serde]

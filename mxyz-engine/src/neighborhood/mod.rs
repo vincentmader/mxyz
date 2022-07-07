@@ -29,7 +29,7 @@ mod world {
         fn for_entity(&self, _entity: (usize, usize), system: System) -> Vec<usize> {
             match system.variant {
                 SystemVariant::Planets(system) => (0..system.entities.len()).collect(),
-                SystemVariant::PhysicalObjects(_system) => (0..10).collect(), // TODO
+                // SystemVariant::PhysicalObjects(_system) => (0..10).collect(), // TODO
                 _ => todo!(),
             }
         }
@@ -75,7 +75,7 @@ mod sectors {
                 SystemVariant::Planets(system) => (0..system.entities.len())
                     .filter(|id| is_in_same_sector(entity, (system_id, *id)))
                     .collect(),
-                SystemVariant::PhysicalObjects(_system) => (0..10).collect(), // TODO
+                // SystemVariant::PhysicalObjects(_system) => (0..10).collect(), // TODO
                 _ => todo!(),
             }
         }

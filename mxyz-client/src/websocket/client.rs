@@ -117,13 +117,13 @@ pub fn handle_arraybuffer(
     let array = js_sys::Uint8Array::new(&abuf);
     let len = array.byte_length() as usize;
     let package = Package::from_bytes(array.to_vec());
-    console_log!("\nArraybuffer received {} bytes", len);
+    // console_log!("\nArraybuffer received {} bytes", len);
     // console_log!("\nArraybuffer received {} bytes -> {:?}", len, &package);
     handle_onmessage_package(ws, package, tx_web_to_render.clone());
 }
 
 pub fn handle_blob(_ws: &mut WebSocket, blob: web_sys::Blob) {
-    console_log!("message event, received blob: {:?}", blob);
+    console_log!("UNHANDLED message event, received blob: {:?}", blob);
     // better alternative to juggling with FileReader is to use https://crates.io/crates/gloo-file
     let fr = web_sys::FileReader::new().unwrap();
     let fr_c = fr.clone();
@@ -146,6 +146,7 @@ pub fn handle_onmessage_package(
     package: Package,
     tx_web_to_render: std::sync::mpsc::Sender<Package>,
 ) {
+    console_log!("\nArraybuffer-Package received: {:?}", package);
     match package {
         Package::Response(res) => match res {
             Response::AddedClient(client_id) => {

@@ -1,5 +1,6 @@
 use crate::interaction::Interaction;
 use serde::{Deserialize, Serialize};
+// use crate::interaction::Interaction;
 
 // ============================================================================
 
@@ -7,6 +8,15 @@ use serde::{Deserialize, Serialize};
 pub struct Integrator {
     pub variant: IntegratorVariant,
     pub interactions: Vec<Interaction>,
+}
+impl Integrator {
+    pub fn new(variant: IntegratorVariant) -> Self {
+        let interactions = vec![];
+        Integrator {
+            variant,
+            interactions,
+        }
+    }
 }
 
 // ============================================================================

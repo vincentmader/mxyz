@@ -1,6 +1,6 @@
-pub mod cellular_automata;
+// pub mod cellular_automata;
 pub mod discrete_field;
-pub mod physical_objects;
+// pub mod physical_objects;
 pub mod planets;
 use crate::integrator::Integrator;
 use serde::{Deserialize, Serialize};
@@ -28,8 +28,9 @@ impl System {
 /// System Variant Enumeration
 pub enum SystemVariant {
     Planets(planets::Planets),
-    PhysicalObjects(physical_objects::PhysicalObjects),
-    CellularAutomata(cellular_automata::CellularAutomata),
+    // DiscreteField(discrete_field::DiscreteField),
+    // PhysicalObjects(physical_objects::PhysicalObjects),
+    // CellularAutomata(cellular_automata::CellularAutomata)
 }
 
 impl std::convert::Into<usize> for SystemVariant {

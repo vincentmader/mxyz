@@ -1,10 +1,11 @@
 use crate::config::EngineConfig;
-use crate::integrator::Integrator;
-use crate::interaction::Interaction;
+// use crate::integrator::Integrator;
 use mxyz_universe::entity;
+use mxyz_universe::integrator::Integrator;
 use mxyz_universe::integrator::IntegratorVariant;
 use mxyz_universe::interaction::force::Force;
 use mxyz_universe::interaction::force::ForceVariant;
+use mxyz_universe::interaction::Interaction;
 use mxyz_universe::interaction::InteractionVariant;
 use mxyz_universe::system::planets::Planets;
 use mxyz_universe::system::{System, SystemVariant};
@@ -32,27 +33,29 @@ pub fn preset(systems: &mut Vec<System>, config: &mut EngineConfig) {
         system.entities.push(entity);
     }
     let variant = SystemVariant::Planets(system);
-    let system = System::new(system_id, variant);
-    systems.push(system);
 
     // II.INTEGRATORS
     // ========================================================================
 
     // System 0: Objects
     // ------------------------------------------------------------------------
-    let mut integrators = vec![];
+    //let mut integrators = vec![];
+    ////
+    //let mut integrator = Integrator::new(IntegratorVariant::EulerExplicit);
+    //let mut interactions = vec![];
+    ////
+    //let force = Force::new(ForceVariant::NewtonianGravity);
+    //let mut interaction = Interaction::new(InteractionVariant::Force(force));
+    //interaction.matrix.init(&systems);
+    //interaction.matrix.entries[0] = Some(true);
+    //interactions.push(interaction);
+    ////
+    //integrator.interactions = interactions;
+    //integrators.push(integrator);
+
+    //let mut system = System::new(system_id, variant);
+    //system.integrators = integrators;
+    //systems.push(system);
     //
-    let mut integrator = Integrator::new(IntegratorVariant::EulerExplicit);
-    let mut interactions = vec![];
-    //
-    let force = Force::new(ForceVariant::NewtonianGravity);
-    let mut interaction = Interaction::new(InteractionVariant::Force(force));
-    interaction.matrix.init(&systems);
-    interaction.matrix.entries[0] = Some(true);
-    interactions.push(interaction);
-    //
-    integrator.interactions = interactions;
-    integrators.push(integrator);
-    //
-    config.integrators.push(integrators); // TODO needs to be run for each system!
+    // config.integrators.push(integrators); // TODO needs to be run for each system!
 }

@@ -3,11 +3,10 @@ pub mod composed;
 pub mod diffusion;
 pub mod force;
 pub mod game_of_life;
-pub mod interaction_matrix;
 pub mod ising;
 mod testing;
-use interaction_matrix::InteractionVector;
 use mxyz_universe::interaction::InteractionVariant;
+use mxyz_universe::interaction::InteractionVector;
 
 /// Interaction
 #[derive(Debug)]

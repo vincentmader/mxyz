@@ -1,5 +1,5 @@
 use crate::config::EngineConfig;
-use crate::integrator::Integrator;
+// use crate::integrator::Integrator;
 use mxyz_universe::state::State;
 use mxyz_universe::system::System;
 
@@ -35,22 +35,22 @@ enum _Tree {
     Total,   // all nodes are returned
 }
 
-pub fn get_other_ids(integrator: &Integrator, state: &State) -> Vec<usize> {
-    (0..state.systems.len())
-        .filter(|id| {
-            let mut foo = false;
-            for interaction in integrator.interactions.iter() {
-                if match interaction.matrix.entries[*id] {
-                    None => false,
-                    Some(active) => active,
-                } {
-                    foo = true;
-                }
-            }
-            foo
-        })
-        .collect()
-}
+// pub fn get_other_ids(integrator: &Integrator, state: &State) -> Vec<usize> {
+//     (0..state.systems.len())
+//         .filter(|id| {
+//             let mut foo = false;
+//             for interaction in integrator.interactions.iter() {
+//                 if match interaction.matrix.entries[*id] {
+//                     None => false,
+//                     Some(active) => active,
+//                 } {
+//                     foo = true;
+//                 }
+//             }
+//             foo
+//         })
+//         .collect()
+// }
 
 // pub fn get_interactions(sys_id: usize, sys_jd: usize, config: &EngineConfig) -> Vec<&Interaction> {
 //     config
