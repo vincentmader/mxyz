@@ -1,5 +1,9 @@
 pub mod cellular_automaton;
+pub mod electro_magnetic; // e.m. field density (F/q)
 pub mod fluid_cell;
+pub mod game_of_life;
+pub mod gravity; // grav. field density (F/q)
+pub mod ising_spin;
 use crate::entity::attribute::*;
 
 pub trait DiscreteFieldCell: Density + Velocity + Force {}
