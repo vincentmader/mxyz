@@ -166,10 +166,12 @@ pub fn export_to_database(engine: &mut Engine, states_to_save: &Vec<usize>) {
             mxyz_database::create_system(&conn, db_system);
         }
         // Save state to database.
+        // let state = mxyz_universe::state::State { state_id };
         let db_state = mxyz_database::models::state::NewState {
             engine_id: &(engine.engine_id as i32),
             state_id: &(*state_id as i32),
         };
+        // mxyz_database::models::state::create_state(&conn, db_state);
         mxyz_database::create_state(&conn, db_state);
     }
 }

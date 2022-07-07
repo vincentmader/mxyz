@@ -46,18 +46,22 @@ fn _show_planets() -> Vec<Planet> {
     results
 }
 
+// TODO remove below !!!
+
 pub fn create_planet<'a>(conn: &PgConnection, new_planet: NewPlanet) -> Planet {
     diesel::insert_into(planets::table)
         .values(&new_planet)
         .get_result(conn)
         .expect("Error saving new planet")
 }
+
 pub fn create_system<'a>(conn: &PgConnection, new_system: NewSystem) -> System {
     diesel::insert_into(systems::table)
         .values(&new_system)
         .get_result(conn)
         .expect("Error saving new system")
 }
+
 pub fn create_state<'a>(conn: &PgConnection, new_state: NewState) -> State {
     diesel::insert_into(states::table)
         .values(&new_state)
