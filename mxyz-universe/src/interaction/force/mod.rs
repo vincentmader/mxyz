@@ -1,10 +1,11 @@
 use crate::entity::Entity;
+use serde::{Deserialize, Serialize};
 
 // TODO move else-where
 const G: f64 = 1.; // Newton Gravity
 const K: f64 = 1.; // Coulomb
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum ForceVariant {
     Coulomb,
     NewtonianGravity,
@@ -15,7 +16,7 @@ pub enum ForceVariant {
     Alignment,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Force {
     pub variant: ForceVariant,
 }

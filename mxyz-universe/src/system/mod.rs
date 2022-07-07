@@ -1,19 +1,26 @@
-use serde::{Deserialize, Serialize};
 pub mod cellular_automata;
 pub mod discrete_field;
 pub mod physical_objects;
 pub mod planets;
+use crate::integrator::Integrator;
+use serde::{Deserialize, Serialize};
 
 /// System Structure
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct System {
     pub system_id: usize,
     pub variant: SystemVariant,
+    pub integrators: Vec<Integrator>,
 }
 
 impl System {
     pub fn new(system_id: usize, variant: SystemVariant) -> Self {
-        System { system_id, variant }
+        let integrators = vec![];
+        System {
+            system_id,
+            variant,
+            integrators,
+        }
     }
 }
 
