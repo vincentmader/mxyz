@@ -5,7 +5,7 @@ use mxyz_network::package::request::Request;
 use mxyz_network::package::Package;
 use mxyz_universe::entity::attribute::*;
 use mxyz_universe::preset::SimulationVariant;
-use mxyz_universe::system::ObjectsVariant;
+use mxyz_universe::system::objects::ObjectsVariant;
 use mxyz_universe::system::SystemVariant;
 use std::sync::mpsc;
 
@@ -64,7 +64,7 @@ impl EngineRunner {
         std::thread::spawn(move || {
             // for _ in 0..1000 {
             for _ in 0..engine.config.step_id.1 {
-                engine.step();
+                engine.forward();
                 if engine.config.step_id.0 % engine.config.nr_of_steps_between_exports == 0 {
                     export(&mut engine);
                 }

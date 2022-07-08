@@ -1,6 +1,6 @@
 use crate::schema::systems;
 use mxyz_universe::system::objects::planets::Planets;
-use mxyz_universe::system::ObjectsVariant;
+use mxyz_universe::system::objects::ObjectsVariant;
 use mxyz_universe::system::SystemVariant;
 
 #[derive(Insertable, Debug)]

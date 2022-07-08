@@ -1,41 +1,23 @@
 pub mod attribute;
 pub mod field;
 pub mod object;
-// use crate::system::ToBytes;
 use attribute::*;
-// use serde::{de::DeserializeOwned, Deserialize, Serialize};
+use serde::{Deserialize, Serialize};
+use std::fmt::Debug;
+
+// ============================================================================
 
 /// Entity Trait
-pub trait Entity:
-    // EntityClone
-    // + Serialize
-    Mass
-    + Position
-    + Velocity
-    + Charge
-    + Density
-    + Force
-    // + ToBytes
-    + std::fmt::Debug
-    + Send
-    // + Serialize
-    // + DeserializeOwned
-    // + Deserialize<'a>
-{
-}
-// pub trait EntityClone {
-//     fn clone_box(&self) -> Box<dyn Entity>;
-// }
-// impl<T> EntityClone for T
-// where
-//     T: 'static + Entity + Clone,
-// {
-//     fn clone_box(&self) -> Box<dyn Entity> {
-//         Box::new(self.clone())
-//     }
-// }
-// impl Clone for Box<dyn Entity> {
-//     fn clone(&self) -> Box<dyn Entity> {
-//         self.clone_box()
-//     }
-// }
+pub trait Entity: Mass + Position + Velocity + Charge + Density + Force + Debug + Send {}
+
+// ============================================================================
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct EntityV1 {}
+impl Mass for EntityV1 {}
+impl Position for EntityV1 {}
+impl Velocity for EntityV1 {}
+impl Charge for EntityV1 {}
+impl Density for EntityV1 {}
+impl Force for EntityV1 {}
+impl Entity for EntityV1 {}

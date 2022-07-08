@@ -191,7 +191,7 @@ pub fn handle_onmessage_package(
                     for system in state.systems.iter() {
                         match &system.variant {
                             SystemVariant::Objects(objects_variant) => match objects_variant {
-                                mxyz_universe::system::ObjectsVariant::Planets(system) => {
+                                mxyz_universe::system::objects::ObjectsVariant::Planets(system) => {
                                     for planet in system.entities.iter() {
                                         let pos = planet.position;
                                         let pos = (pos[0], pos[1]);
