@@ -7,7 +7,7 @@ use mxyz_universe::state::State;
 
 /// Initialize State & Config
 pub fn initialize(simulation_variant: Option<SimulationVariant>, cfg: &mut EngineConfig) -> State {
-    let mut state = State::new();
+    let mut state = State::new(0);
     let mut systems = vec![];
     match simulation_variant {
         Some(simulation_variant) => match simulation_variant {

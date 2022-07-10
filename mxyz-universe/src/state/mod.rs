@@ -1,18 +1,29 @@
 use crate::system::System;
+use crate::system::SystemVariant;
 use serde::{Deserialize, Serialize};
 
 /// State
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Debug)]
 pub struct State {
     pub state_id: usize,
     pub systems: Vec<System>, // todo include into db ?
 }
 impl State {
     /// Creates new instance of State Structure
-    pub fn new() -> Self {
-        let state_id = 0;
+    pub fn new(state_id: usize) -> Self {
         let systems = vec![];
         State { state_id, systems }
+    }
+}
+
+pub struct SendState {
+    pub state_id: usize,
+    pub systems: Vec<SystemVariant>,
+}
+impl SendState {
+    pub fn new(state_id: usize) -> Self {
+        let systems = vec![];
+        SendState { state_id, systems }
     }
 }
 

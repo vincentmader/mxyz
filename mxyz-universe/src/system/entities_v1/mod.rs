@@ -5,17 +5,17 @@ use serde::{Deserialize, Serialize};
 // use crate::interaction::Interaction;
 // use crate::interaction::InteractionVariant;
 // use crate::system::discrete_field::DiscreteField;
-use crate::entity::object::planet::Planet;
+use crate::entity::EntityV1;
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
-/// System: Planets
-pub struct Planets {
-    pub entities: Vec<Planet>,
+#[derive(Serialize, Deserialize, Debug)]
+/// System: EntitiesV1
+pub struct EntitiesV1 {
+    pub entities: Vec<EntityV1>,
 }
-impl Planets {
+impl EntitiesV1 {
     pub fn new() -> Self {
         let entities = vec![];
-        Planets { entities }
+        EntitiesV1 { entities }
     }
     //    pub fn step(&mut self, interactions: Vec<&Interaction>) {
     //        for _interaction in interactions.iter() {}

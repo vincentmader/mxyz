@@ -1,14 +1,17 @@
 #![allow(unreachable_code)]
+use crate::integrator::euler;
 use mxyz_config::EngineConfig;
 use mxyz_universe::entity::object::planet::Planet;
-use mxyz_universe::entity::Entity;
+use mxyz_universe::integrator::Integrator;
+use mxyz_universe::integrator::IntegratorVariant;
 use mxyz_universe::preset::SimulationVariant;
 use mxyz_universe::state::State;
-use mxyz_universe::system::field::FieldVariant;
 use mxyz_universe::system::objects::planets::Planets;
-use mxyz_universe::system::objects::ObjectsVariant;
 use mxyz_universe::system::System;
 use mxyz_universe::system::SystemVariant;
+// use mxyz_universe::system::field::FieldVariant;
+// use mxyz_universe::system::objects::ObjectsVariant;
+// use mxyz_universe::entity::Entity;
 
 // ============================================================================
 
@@ -68,90 +71,125 @@ impl Engine {
 
     /// Forwards System
     pub fn forward_system(&self, system: &System) -> System {
-        // Load current State.
+        // Load current state.
         let current_state = &self.states[self.config.step_id.0];
-        // Set System-ID & Integrators for next State.
+        // Set system-id & integrators for next state.
         let system_id = system.system_id;
-        let integrators = system.integrators.clone(); // todo better way?
+        let integrators = system.integrators.clone();
+        //                                     ^ todo better way?
 
-        // let entities = system.entities();
+        let next_system = System {
+            integrators: system.integrators.clone(),
+            variant: system.variant.clone(),
+            system_id: system.system_id,
+            entities: vec![],
+        };
 
-        for integrator in integrators.into_iter() {
+        // Load entities.
+        // let entities = &system.entities;
+        // Define next state's vector of systems.
+        // let mut next_system = System {}
+        let mut next_system: System;
+
+        fn foo(integrator: &Integrator, system: &System) -> System {
+            // Load interactions.
             let interactions = &integrator.interactions;
+            // Match integration variant to find corresponding function.
+            let integrate = match integrator.variant {
+                IntegratorVariant::EulerExplicit => euler::explicit::apply,
+                _ => todo!(),
+            };
+            integrate(&system)
+        }
 
-            for other in current_state.systems.iter().filter(|other| true) {
-                // TODO load tree/neighborhood (?)
+        let mut next_system = foo(&integrators[0], &system);
+        // // let next_entities = vec![];
+        // // Make sure entities can be used in forwarded system.
+        // if integrators.len() == 0 {
+        //     next_system = System {
+        //         system_id: system.system_id,
+        //         integrators: system.integrators.clone(),
+        //         entities: vec![],                   // TODO system.entities.clone(),
+        //         variant: SystemVariant::EntitiesV1, // TODO system.variant.clone(),
+        //     };
+        //     // system.clone();
+        // } else {
+        // Loop over integrators.
+        for (int_idx, integrator) in integrators[1..].iter().enumerate() {
+            next_system = foo(&integrator, &next_system);
 
-                // let mut entities = vec![];
-                // let entities: Vec<Box<dyn Entity>> = match &system.variant {
-                // match &system.variant {
-                //     SystemVariant::EntitiesV1(system) => todo!(),
-                //     SystemVariant::Field(field_variant) => match field_variant {
-                //         FieldVariant::FieldVariantV1 => todo!(),
-                //         FieldVariant::GameOfLife => todo!(),
-                //         FieldVariant::IsingSpinField => todo!(),
-                //         _ => todo!(),
-                //     },
-                //     SystemVariant::Objects(objects_variant) => match objects_variant {
-                //         ObjectsVariant::ObjectsVariantV1(objects) => {
-                //             // let b = objects
-                //             //     .entities
-                //             //     .into_iter()
-                //             //     .map(|x| {
-                //             //         let a = Box::<dyn Entity>::from(Box::from(x));
-                //             //         a
-                //             //     })
-                //             //     .collect();
-                //             // b
+            // TODO load tree/neighborhood (?)
 
-                //             entities.push(objects.entities);
-                //         }
-                //         ObjectsVariant::Ants => todo!(),
-                //         // ObjectsVariant::Planets(planets) => {
-                //         //     let b = planets
-                //         //         .entities
-                //         //         .into_iter()
-                //         //         .map(|x| Box::<dyn Entity>::from(Box::from(x)))
-                //         //         .collect();
-                //         //     b
-                //         // }
-                //         // as Vec<Box<dyn Entity>>,
-                //         ObjectsVariant::Boids => todo!(),
-                //         ObjectsVariant::ChargedParticles => todo!(),
-                //         ObjectsVariant::Electrons => todo!(),
-                //         ObjectsVariant::Neutrons => todo!(),
-                //         ObjectsVariant::Protons => todo!(),
-                //         _ => todo!(),
-                //     },
-                //     _ => todo!(),
-                // };
+            // let mut entities = vec![];
+            // let entities: Vec<Box<dyn Entity>> = match &system.variant {
+            // match &system.variant {
+            //     SystemVariant::EntitiesV1(system) => todo!(),
+            //     SystemVariant::Field(field_variant) => match field_variant {
+            //         FieldVariant::FieldVariantV1 => todo!(),
+            //         FieldVariant::GameOfLife => todo!(),
+            //         FieldVariant::IsingSpinField => todo!(),
+            //         _ => todo!(),
+            //     },
+            //     SystemVariant::Objects(objects_variant) => match objects_variant {
+            //         ObjectsVariant::ObjectsVariantV1(objects) => {
+            //             // let b = objects
+            //             //     .entities
+            //             //     .into_iter()
+            //             //     .map(|x| {
+            //             //         let a = Box::<dyn Entity>::from(Box::from(x));
+            //             //         a
+            //             //     })
+            //             //     .collect();
+            //             // b
 
-                // let entities = &(system.entities());
-                // let entities: Vec<Box<dyn Entity>> = match &system.variant {
-                //     SystemVariant::EntitiesV1(system) => todo!(),
-                //     SystemVariant::Field(field_variant) => match field_variant {
-                //         FieldVariant::FieldVariantV1 => todo!(),
-                //         FieldVariant::GameOfLife => todo!(),
-                //         FieldVariant::IsingSpinField => todo!(),
-                //         _ => todo!(),
-                //     },
-                //     SystemVariant::Objects(objects_variant) => match objects_variant {
-                //         // ObjectsVariant::ObjectsVariantV1(objects) => objects.entities,
-                //         ObjectsVariant::Ants => todo!(),
-                //         // ObjectsVariant::Planets(planets) => &planets.entities,
-                //         ObjectsVariant::Boids => todo!(),
-                //         ObjectsVariant::ChargedParticles => todo!(),
-                //         ObjectsVariant::Electrons => todo!(),
-                //         ObjectsVariant::Neutrons => todo!(),
-                //         ObjectsVariant::Protons => todo!(),
-                //         _ => todo!(),
-                //     },
-                //     _ => todo!(),
-                // };
-                // for entity in system.
-            }
+            //             entities.push(objects.entities);
+            //         }
+            //         ObjectsVariant::Ants => todo!(),
+            //         // ObjectsVariant::Planets(planets) => {
+            //         //     let b = planets
+            //         //         .entities
+            //         //         .into_iter()
+            //         //         .map(|x| Box::<dyn Entity>::from(Box::from(x)))
+            //         //         .collect();
+            //         //     b
+            //         // }
+            //         // as Vec<Box<dyn Entity>>,
+            //         ObjectsVariant::Boids => todo!(),
+            //         ObjectsVariant::ChargedParticles => todo!(),
+            //         ObjectsVariant::Electrons => todo!(),
+            //         ObjectsVariant::Neutrons => todo!(),
+            //         ObjectsVariant::Protons => todo!(),
+            //         _ => todo!(),
+            //     },
+            //     _ => todo!(),
+            // };
 
-            fn step(entities: &Vec<Box<dyn Entity>>) {}
+            // let entities = &(system.entities());
+            // let entities: Vec<Box<dyn Entity>> = match &system.variant {
+            //     SystemVariant::EntitiesV1(system) => todo!(),
+            //     SystemVariant::Field(field_variant) => match field_variant {
+            //         FieldVariant::FieldVariantV1 => todo!(),
+            //         FieldVariant::GameOfLife => todo!(),
+            //         FieldVariant::IsingSpinField => todo!(),
+            //         _ => todo!(),
+            //     },
+            //     SystemVariant::Objects(objects_variant) => match objects_variant {
+            //         // ObjectsVariant::ObjectsVariantV1(objects) => objects.entities,
+            //         ObjectsVariant::Ants => todo!(),
+            //         // ObjectsVariant::Planets(planets) => &planets.entities,
+            //         ObjectsVariant::Boids => todo!(),
+            //         ObjectsVariant::ChargedParticles => todo!(),
+            //         ObjectsVariant::Electrons => todo!(),
+            //         ObjectsVariant::Neutrons => todo!(),
+            //         ObjectsVariant::Protons => todo!(),
+            //         _ => todo!(),
+            //     },
+            //     _ => todo!(),
+            // };
+            // for entity in system.
+            // }
+
+            // fn step(entities: &Vec<Box<dyn Entity>>) {}
 
             //     let other_ids = todo!();
             //     match integrator.variant {
@@ -163,29 +201,32 @@ impl Engine {
             //         ),
             //         _ => todo!(),
             //     }
-        }
-
-        // Loop over "other" systems (including self).
-        for other in current_state.systems.iter() {
-            todo!("check whether systems are interacting");
-            // match system.variant {
-            // SystemVariant::Planets(system) => match &other.variant {
-            //     SystemVariant::Planets(other) => {}
-            //     _ => todo!(),
-            // },
-            // _ => todo!(),
             // }
         }
+        next_system
 
-        let variant = match &system.variant {
-            // SystemVariant::Planets(_) => SystemVariant::Planets(self.forward_planets(system)),
-            _ => todo!(),
-        };
-        System {
-            system_id,
-            variant,
-            integrators,
-        }
+        // // Loop over "other" systems (including self).
+        // for other in current_state.systems.iter() {
+        //     todo!("check whether systems are interacting");
+        //     // match system.variant {
+        //     // SystemVariant::Planets(system) => match &other.variant {
+        //     //     SystemVariant::Planets(other) => {}
+        //     //     _ => todo!(),
+        //     // },
+        //     // _ => todo!(),
+        //     // }
+        // }
+
+        // let variant = match &system.variant {
+        //     // SystemVariant::Planets(_) => SystemVariant::Planets(self.forward_planets(system)),
+        //     _ => todo!(),
+        // };
+        // System {
+        //     system_id,
+        //     variant,
+        //     entities,
+        //     integrators,
+        // }
     }
 
     pub fn forward_planets(&self, system: &System) -> Planets {
