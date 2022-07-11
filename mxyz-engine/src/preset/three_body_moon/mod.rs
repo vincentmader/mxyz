@@ -1,6 +1,6 @@
 #![allow(unused_variables)]
 use mxyz_config::EngineConfig;
-use mxyz_universe::system::System;
+use mxyz_universe::system::system::System;
 // use mxyz_universe::system::SystemVariant;
 // use mxyz_universe::entity;
 // use mxyz_universe::system::planets::Planets;

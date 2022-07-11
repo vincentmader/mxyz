@@ -3,7 +3,7 @@ pub mod runge_kutta;
 
 use mxyz_universe::interaction::Interaction;
 use mxyz_universe::state::State;
-use mxyz_universe::system::System;
+use mxyz_universe::system::system::System;
 
 /// Explicit Euler:
 /// - dy/dt = a(t,y) =  f(t,y)

@@ -16,10 +16,18 @@ pub struct State {
     pub engine_id: i32,
     pub state_id: i32,
 }
-impl std::convert::Into<mxyz_universe::state::State> for State {
-    fn into(self) -> mxyz_universe::state::State {
-        let mut state = mxyz_universe::state::State::new();
-        state.state_id = self.state_id as usize;
+// impl std::convert::Into<mxyz_universe::state::State> for State {
+//     fn into(self) -> mxyz_universe::state::State {
+//         let other_state_id = self.state_id as usize;
+//         let mut state = mxyz_universe::state::State::new(other_state_id);
+//         state.systems = crate::system::get_systems(self.engine_id, self.state_id);
+//         state
+//     }
+// }
+impl std::convert::Into<mxyz_universe::state::SizedState> for State {
+    fn into(self) -> mxyz_universe::state::SizedState {
+        let other_state_id = self.state_id as usize;
+        let mut state = mxyz_universe::state::SizedState::new(other_state_id);
         state.systems = crate::system::get_systems(self.engine_id, self.state_id);
         state
     }
@@ -45,7 +53,10 @@ pub fn get_db_states(engine_query: i32, state_query: &StateQuery) -> Vec<State> 
     }
 }
 
-pub fn get_states(engine_query: i32, state_query: &StateQuery) -> Vec<mxyz_universe::state::State> {
+pub fn get_states(
+    engine_query: i32,
+    state_query: &StateQuery,
+) -> Vec<mxyz_universe::state::SizedState> {
     let db_states = get_db_states(engine_query, &state_query);
     db_states
         .into_iter()

@@ -1,6 +1,6 @@
 pub mod collision;
 pub mod force;
-use crate::system::System;
+use crate::system::system::System;
 use serde::{Deserialize, Serialize};
 
 // ============================================================================

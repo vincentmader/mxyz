@@ -31,6 +31,27 @@ pub enum SystemVariant {
     Objects(ObjectsVariant),
     Network(NetworkVariant),
 }
+impl std::convert::Into<usize> for SystemVariant {
+    fn into(self) -> usize {
+        match self {
+            SystemVariant::EntitiesV1 => 0,
+            _ => todo!("Conversion: SystemVariant -> usize"),
+        }
+    }
+}
+impl std::convert::From<usize> for SystemVariant {
+    fn from(system_variant: usize) -> SystemVariant {
+        match system_variant {
+            0 => SystemVariant::EntitiesV1,
+            // {
+            // let system = crate::system::planets::Planets::new();
+            // let system_variant = SystemVariant::Planets(system);
+            // system_variant
+            // }
+            _ => todo!("Conversion: usize -> SystemVariant"),
+        }
+    }
+}
 
 #[derive(Debug, Clone)]
 pub enum FieldVariant {}
@@ -49,26 +70,6 @@ pub enum NetworkVariant {}
 //     EntitiesV1(entities_v1::EntitiesV1),
 //     Field(field::FieldVariant),
 //     Objects(objects::ObjectsVariant),
-// }
-// impl std::convert::Into<usize> for SystemVariant {
-//     fn into(self) -> usize {
-//         match self {
-//             // SystemVariant::Planets(_) => 0,
-//             _ => todo!("conversion from SystemVariant enum to usize"),
-//         }
-//     }
-// }
-// impl std::convert::From<usize> for SystemVariant {
-//     fn from(system_variant: usize) -> SystemVariant {
-//         match system_variant {
-//             // 0 => {
-//             // let system = crate::system::planets::Planets::new();
-//             // let system_variant = SystemVariant::Planets(system);
-//             // system_variant
-//             // }
-//             _ => todo!("conversion from usize enum to SystemVariant"),
-//         }
-//     }
 // }
 
 // ============================================================================

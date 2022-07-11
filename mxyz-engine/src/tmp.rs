@@ -1,7 +1,7 @@
 use mxyz_config::EngineConfig;
 // use crate::integrator::Integrator;
 use mxyz_universe::state::State;
-use mxyz_universe::system::System;
+use mxyz_universe::system::system::System;
 
 // pub fn get_integrators<'a>(
 //     system: &System,
