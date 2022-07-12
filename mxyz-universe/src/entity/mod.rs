@@ -38,6 +38,15 @@ pub struct EntityV1 {
     pub position: [f64; 3],
     pub velocity: [f64; 3],
 }
+impl EntityV1 {
+    pub fn new(mass: f64, position: [f64; 3], velocity: [f64; 3]) -> Self {
+        EntityV1 {
+            mass,
+            position,
+            velocity,
+        }
+    }
+}
 impl Mass for EntityV1 {
     fn get_mass(&self) -> f64 {
         self.mass

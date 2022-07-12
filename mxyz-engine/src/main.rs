@@ -2,7 +2,6 @@
 use mxyz_config::ExportVariant;
 use mxyz_engine::Engine;
 use mxyz_universe::preset::SimulationVariant;
-mod dev_utils;
 
 const EXPORT_VARIANT: ExportVariant = ExportVariant::ToDatabase;
 const ENGINE_ID: usize = 0;
@@ -18,7 +17,4 @@ fn main() {
     engine.run();
     let duration = start_time.elapsed().as_millis();
     println!("\nruntime:\t{} ms", duration);
-
-    // dev_utils::print_state(&engine);
-    // dev_utils::_print_interaction_matrix(&engine);
 }

@@ -1,6 +1,8 @@
 use crate::entity::Entity;
 use crate::integrator::Integrator;
 
+// ============================================================================
+
 /// System Structure
 #[derive(Debug)]
 pub struct System {
@@ -24,6 +26,9 @@ impl System {
     }
 }
 
+// ============================================================================
+
+/// System Variant Enumeration
 #[derive(Debug, Clone)]
 pub enum SystemVariant {
     EntitiesV1,
@@ -53,6 +58,8 @@ impl std::convert::From<usize> for SystemVariant {
     }
 }
 
+// ============================================================================
+
 #[derive(Debug, Clone)]
 pub enum FieldVariant {}
 
@@ -61,49 +68,3 @@ pub enum ObjectsVariant {}
 
 #[derive(Debug, Clone)]
 pub enum NetworkVariant {}
-
-// ============================================================================
-
-// #[derive(Serialize, Deserialize, Debug, Clone)]
-// /// System Variant Enumeration
-// pub enum SystemVariant {
-//     EntitiesV1(entities_v1::EntitiesV1),
-//     Field(field::FieldVariant),
-//     Objects(objects::ObjectsVariant),
-// }
-
-// ============================================================================
-
-// pub fn entities(&self) -> &Vec<Box<dyn Entity>> {
-//     match &self.variant {
-//         SystemVariant::EntitiesV1(system) => todo!(),
-//         SystemVariant::Field(field_variant) => match field_variant {
-//             FieldVariant::FieldVariantV1 => todo!(),
-//             FieldVariant::GameOfLife => todo!(),
-//             FieldVariant::IsingSpinField => todo!(),
-//             _ => todo!(),
-//         },
-//         SystemVariant::Objects(objects_variant) => match objects_variant {
-//             ObjectsVariant::ObjectsVariantV1(objects) => &objects
-//                 .entities
-//                 .into_iter()
-//                 .map(|x| Box::<dyn Entity>::from(Box::from(x)))
-//                 .collect(),
-
-//             ObjectsVariant::Ants => todo!(),
-//             ObjectsVariant::Planets(planets) => &planets
-//                 .entities
-//                 .into_iter()
-//                 .map(|x| Box::<dyn Entity>::from(Box::from(x)))
-//                 .collect(),
-//             // as Vec<Box<dyn Entity>>,
-//             ObjectsVariant::Boids => todo!(),
-//             ObjectsVariant::ChargedParticles => todo!(),
-//             ObjectsVariant::Electrons => todo!(),
-//             ObjectsVariant::Neutrons => todo!(),
-//             ObjectsVariant::Protons => todo!(),
-//             _ => todo!(),
-//         },
-//         _ => todo!(),
-//     }
-// }

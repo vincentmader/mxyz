@@ -5,29 +5,32 @@ use mxyz_universe::system::system::System;
 // use crate::interaction::collision::Collision;
 // use crate::interaction::force::{Force, ForceVariant};
 // use crate::interaction::{Interaction, InteractionVariant};
-// use crate::system::SystemVariant;
+use mxyz_universe::entity::EntityV1;
+use mxyz_universe::system::system::SystemVariant;
 
 // const NR_OF_STEPS: usize = 2221;
 const NR_OF_STEPS: usize = 10;
 
-pub fn preset(_systems: &mut Vec<System>, config: &mut EngineConfig) {
-    //// I. SYSTEMS
-    //// ========================================================================
+pub fn preset(systems: &mut Vec<System>, config: &mut EngineConfig) {
+    // I. SYSTEMS
+    // ========================================================================
     config.step_id.1 = NR_OF_STEPS;
 
-    //// System 0: Objects
-    //// ------------------------------------------------------------------------
-    //let variant = SystemVariant::PhysicalObjects;
-    //let mut system = System::new(variant);
-    //let speed = 0.;
-    //for entity_id in 0..2 {
-    //    let m = 1.;
-    //    let x = [2. * (entity_id as f64 - 0.5), 0., 0.];
-    //    let v = [0., speed * (2. * entity_id as f64 - 1.), 0.];
-    //    let entity = entity::object::planet::Planet::new(m, x, v);
-    //    system.entities.push(Box::new(entity));
-    //}
-    //systems.push(system);
+    let speed = 0.;
+
+    // System 0: Objects
+    // ------------------------------------------------------------------------
+    let system_id = 0;
+    let variant = SystemVariant::EntitiesV1;
+    let mut system = System::new(system_id, variant);
+    for entity_id in 0..2 {
+        let m = 1.;
+        let x = [2. * (entity_id as f64 - 0.5), 0., 0.];
+        let v = [0., speed * (2. * entity_id as f64 - 1.), 0.];
+        let entity = EntityV1::new(m, x, v);
+        system.entities.push(Box::new(entity));
+    }
+    systems.push(system);
 
     //// System 1: Field
     //// ------------------------------------------------------------------------

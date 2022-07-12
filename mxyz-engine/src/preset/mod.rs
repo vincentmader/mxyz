@@ -20,18 +20,4 @@ pub fn initialize(simulation_variant: Option<SimulationVariant>, cfg: &mut Engin
         },
         None => todo!("handle this earlier? (in str->enum sim-var conversion)"),
     }
-
-    // let mut systems = vec![];
-    // match &simulation_variant {
-    //     None => {}
-    //     Some(id) => match id {
-    //         SimulationVariant::ThreeBodyFigureEight => {
-    //             three_body_figure_eight::preset(&mut systems, config)
-    //         }
-    //         SimulationVariant::ThreeBodyMoon => three_body_moon::preset(&mut systems, config),
-    //         _ => todo!(),
-    //     },
-    // }
-    // config.simulation_variant = simulation_variant;
-    // systems
 }

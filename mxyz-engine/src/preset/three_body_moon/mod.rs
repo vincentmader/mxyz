@@ -1,16 +1,18 @@
 #![allow(unused_variables)]
 use mxyz_config::EngineConfig;
+use mxyz_universe::entity::EntityV1;
+use mxyz_universe::integrator::Integrator;
+use mxyz_universe::integrator::IntegratorVariant;
+use mxyz_universe::interaction::force::Force;
+use mxyz_universe::interaction::force::ForceVariant;
+use mxyz_universe::interaction::Interaction;
+use mxyz_universe::interaction::InteractionVariant;
 use mxyz_universe::system::system::System;
+use mxyz_universe::system::system::SystemVariant;
 // use mxyz_universe::system::SystemVariant;
 // use mxyz_universe::entity;
 // use mxyz_universe::system::planets::Planets;
 // use crate::integrator::Integrator;
-// use mxyz_universe::integrator::Integrator;
-// use mxyz_universe::integrator::IntegratorVariant;
-// use mxyz_universe::interaction::force::Force;
-// use mxyz_universe::interaction::force::ForceVariant;
-// use mxyz_universe::interaction::Interaction;
-// use mxyz_universe::interaction::InteractionVariant;
 
 const NR_OF_STEPS: usize = 10;
 
@@ -18,46 +20,45 @@ pub fn preset(systems: &mut Vec<System>, config: &mut EngineConfig) {
     // I. SYSTEMS
     // ========================================================================
     config.step_id.1 = NR_OF_STEPS;
-    // const M: f64 = 1.;
-    // const G: f64 = 1.;
-    // let r = 2.;
+
+    let speed = 1. / 1.41;
+    let dist = 1.;
 
     // System 0: Objects
     // ------------------------------------------------------------------------
-    // let system_id = 0;
-    // let mut system = Planets::new();
-    // let speed = (G * M / r).powf(0.5);
-    // for entity_id in 0..2 {
-    //     let m = M;
-    //     let x = [r * (entity_id as f64 - 0.5), 0., 0.];
-    //     let v = [0., speed * (2. * entity_id as f64 - 1.), 0.];
-    //     let entity = entity::object::planet::Planet::new(m, x, v);
-    //     system.entities.push(entity);
-    // }
-    // let variant = SystemVariant::Planets(system);
+    let system_id = 0;
+    let variant = SystemVariant::EntitiesV1;
+    let mut system = System::new(system_id, variant);
+    for entity_id in 0..2 {
+        let m = 1.;
+        let x = [dist * (entity_id as f64 - 0.5), 0., 0.];
+        let v = [0., speed * (2. * entity_id as f64 - 1.), 0.];
+        // let v = [0., 0., 0.];
+        let entity = EntityV1::new(m, x, v);
+        system.entities.push(Box::new(entity));
+    }
 
     // II.INTEGRATORS
     // ========================================================================
 
     // System 0: Objects
     // ------------------------------------------------------------------------
-    //let mut integrators = vec![];
-    ////
-    //let mut integrator = Integrator::new(IntegratorVariant::EulerExplicit);
-    //let mut interactions = vec![];
-    ////
-    //let force = Force::new(ForceVariant::NewtonianGravity);
-    //let mut interaction = Interaction::new(InteractionVariant::Force(force));
-    //interaction.matrix.init(&systems);
-    //interaction.matrix.entries[0] = Some(true);
-    //interactions.push(interaction);
-    ////
-    //integrator.interactions = interactions;
-    //integrators.push(integrator);
 
-    //let mut system = System::new(system_id, variant);
-    //system.integrators = integrators;
-    //systems.push(system);
-    //
-    // config.integrators.push(integrators); // TODO needs to be run for each system!
+    let integrator_variant = IntegratorVariant::EulerExplicit;
+    let mut integrator = Integrator::new(integrator_variant);
+    let mut interactions = vec![];
+
+    let force_variant = ForceVariant::NewtonianGravity;
+    let force = Force::new(force_variant);
+
+    let interaction_variant = InteractionVariant::Force(force);
+    let mut interaction = Interaction::new(interaction_variant);
+    interaction.matrix.init(&systems);
+    interaction.matrix.entries[0] = Some(true);
+    interactions.push(interaction);
+
+    integrator.interactions = interactions;
+
+    system.integrators.push(integrator); // TODO needs to be run for each system!
+    systems.push(system);
 }

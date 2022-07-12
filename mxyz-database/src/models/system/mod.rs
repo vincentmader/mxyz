@@ -1,9 +1,13 @@
+use crate::models::entity_v1;
 use crate::schema::systems;
+use diesel::pg::PgConnection;
 use mxyz_universe::system::objects::planets::Planets;
 use mxyz_universe::system::objects::ObjectsVariant;
 use mxyz_universe::system::sized::{SizedSystem, SizedSystemVariant};
 use mxyz_universe::system::system::SystemVariant;
 use mxyz_universe::system::EntitiesV1;
+
+// ============================================================================
 
 #[derive(Insertable, Debug)]
 #[table_name = "systems"]
@@ -24,12 +28,16 @@ pub struct System {
 }
 impl std::convert::Into<mxyz_universe::system::sized::SizedSystem> for System {
     fn into(self) -> mxyz_universe::system::sized::SizedSystem {
+        let conn = crate::establish_connection();
         let other_system_id = self.system_id as usize;
         let other_system_variant = SystemVariant::from(self.system_variant_id as usize);
         let other_system_variant = match other_system_variant {
             SystemVariant::EntitiesV1 => {
+                let entities =
+                    entity_v1::get_entities(&conn, self.engine_id, self.state_id, self.system_id);
                 //
-                let system = EntitiesV1::new();
+                let mut system = EntitiesV1::new();
+                system.entities = entities;
                 SizedSystemVariant::EntitiesV1(system)
             }
             _ => todo!(),
@@ -81,24 +89,31 @@ pub fn get_systems(
         .collect()
 }
 
-pub fn create_system<'a>(
-    conn: &PgConnection,
-    system: mxyz_universe::system::sized::SizedSystem,
-) -> System {
-    let other_engine_id = 0; // DODO
-    let other_state_id = 0; // TODO
-    let other_system_id = system.system_id;
-    let other_system_variant_id = 0; // TODO
-
-    let new_system = NewSystem {
-        engine_id: &(other_engine_id as i32),
-        state_id: &(other_state_id as i32),
-        system_id: &(other_system_id as i32),
-        system_variant_id: &(other_system_variant_id as i32),
-    };
-
+pub fn create_system<'a>(conn: &PgConnection, new_system: NewSystem) -> System {
     diesel::insert_into(systems::table)
         .values(&new_system)
         .get_result(conn)
-        .expect("Error saving new post")
+        .expect("Error saving new system")
 }
+
+// pub fn create_system<'a>(
+//     conn: &PgConnection,
+//     system: mxyz_universe::system::sized::SizedSystem,
+// ) -> System {
+//     let other_engine_id = 0; // DODO
+//     let other_state_id = 0; // TODO
+//     let other_system_id = system.system_id;
+//     let other_system_variant_id = 0; // TODO
+
+//     let new_system = NewSystem {
+//         engine_id: &(other_engine_id as i32),
+//         state_id: &(other_state_id as i32),
+//         system_id: &(other_system_id as i32),
+//         system_variant_id: &(other_system_variant_id as i32),
+//     };
+
+//     diesel::insert_into(systems::table)
+//         .values(&new_system)
+//         .get_result(conn)
+//         .expect("Error saving new post")
+// }

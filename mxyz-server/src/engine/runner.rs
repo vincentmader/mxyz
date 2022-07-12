@@ -51,20 +51,22 @@ impl EngineRunner {
     pub fn add_engine(&mut self, client_id: usize, simulation_variant: &SimulationVariant) {
         let simulation_variant = simulation_variant.clone();
 
-        // Save Engine to Database. (actually: only ID)
+        // Save engine to database. (actually: only engine-id)
         let db_conn = mxyz_database::establish_connection();
         let db_engine = mxyz_database::models::engine::create_engine(&db_conn, client_id);
         let engine_id = db_engine.engine_id as usize;
 
-        // Create & initialize new Simulation Engine.
+        // Create & initialize new simulation engine.
         let mut engine = Engine::new(engine_id);
         engine.init(Some(simulation_variant));
+        engine.config.step_id.1 = usize::MAX;
 
-        // Run Engine in new thread.
+        // Run engine in new thread.
         std::thread::spawn(move || {
-            // for _ in 0..1000 {
             for _ in 0..engine.config.step_id.1 {
+                // Forward engine to next step-id.
                 engine.forward();
+                // Every so often, export the engine to the database.
                 if engine.config.step_id.0 % engine.config.nr_of_steps_between_exports == 0 {
                     export(&mut engine);
                 }
@@ -89,6 +91,7 @@ pub fn export(engine: &mut Engine) {
         ExportVariant::ToFile => export_to_file(engine, &states_to_save),
         ExportVariant::ToDatabase => export_to_database(engine, &states_to_save),
     }
+    // println!("Saved {} states to database.", states_to_save.len());
     // Update step-id of last export.
     engine.config.last_export_step_id = Some(engine.config.step_id.0);
 }
@@ -123,7 +126,7 @@ pub fn export_to_database(engine: &mut Engine, states_to_save: &Vec<usize>) {
                             vel_y: &ent.get_velocity()[1],
                             vel_z: &ent.get_velocity()[2],
                         };
-                        mxyz_database::create_planet(&conn, db_entity);
+                        mxyz_database::models::entity_v1::create_entity_v1(&conn, db_entity);
                     }
                 }
                 _ => todo!(),
@@ -135,14 +138,14 @@ pub fn export_to_database(engine: &mut Engine, states_to_save: &Vec<usize>) {
                 system_id: &(system_id as i32),
                 system_variant_id: &(system_variant_id as i32),
             };
-            mxyz_database::create_system(&conn, db_system);
+            mxyz_database::models::system::create_system(&conn, db_system);
         }
         // Save state to database.
         let db_state = mxyz_database::models::state::NewState {
             engine_id: &(engine.engine_id as i32),
             state_id: &(*state_id as i32),
         };
-        mxyz_database::create_state(&conn, db_state);
+        mxyz_database::models::state::create_state(&conn, db_state);
     }
 }
 

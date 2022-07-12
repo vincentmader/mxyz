@@ -1,6 +1,7 @@
 use crate::establish_connection;
 use crate::schema::entities_v1;
 use crate::schema::entities_v1::dsl::*;
+use diesel::pg::PgConnection;
 use diesel::prelude::*;
 
 #[derive(Insertable, Debug)]
@@ -46,23 +47,35 @@ impl std::convert::Into<mxyz_universe::entity::EntityV1> for EntityV1 {
 
 // ============================================================================
 
-pub fn get_db_entities(engine_query: i32, state_query: i32, system_query: i32) -> Vec<EntityV1> {
-    let connection = crate::establish_connection();
+// TODO remove below !!!
+pub fn create_entity_v1<'a>(conn: &PgConnection, new_entity: NewEntityV1) -> EntityV1 {
+    diesel::insert_into(entities_v1::table)
+        .values(&new_entity)
+        .get_result(conn)
+        .expect("Error saving new planet")
+}
+
+pub fn get_db_entities(
+    conn: &PgConnection,
+    engine_query: i32,
+    state_query: i32,
+    system_query: i32,
+) -> Vec<EntityV1> {
     entities_v1
         .filter(engine_id.eq(&engine_query))
         .filter(state_id.eq(state_query))
         .filter(system_id.eq(system_query))
-        .load::<EntityV1>(&connection)
+        .load::<EntityV1>(conn)
         .expect("Error loading systems")
 }
 
 pub fn get_entities(
+    conn: &PgConnection,
     engine_query: i32,
     state_query: i32,
     system_query: i32,
 ) -> Vec<mxyz_universe::entity::EntityV1> {
-    let db_entities = get_db_entities(engine_query, state_query, system_query);
-    // println!("{:?}", db_planets);
+    let db_entities = get_db_entities(conn, engine_query, state_query, system_query);
     db_entities
         .into_iter()
         .map(|db_planet| db_planet.into())

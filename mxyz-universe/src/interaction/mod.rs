@@ -36,23 +36,29 @@ pub enum InteractionVariant {
     // Composed(Box<dyn InteractionTrait>),
 }
 
-/// Interaction "Vector"
+// ============================================================================
+
+/// Interaction "Vector" (Interaction Matrix Row)
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct InteractionVector {
     pub entries: Vec<Option<bool>>, // pub entries: Vec<Vec<Option<bool>>>,
 }
 impl InteractionVector {
+    /// Creates a new Interaction Matrix Row
     pub fn new() -> Self {
         let entries = vec![];
         InteractionVector { entries }
     }
+    /// Initialize Interaction Matrix Row
     pub fn init(&mut self, systems: &Vec<System>) {
-        for _ in 0..systems.len() {
+        for _ in 0..systems.len() + 1 {
             self.entries.push(None);
         }
     }
     // TODO auto-add/rm rows/cells on system-add/rm
+
     // TODO run tests for matrix on system-delete
+
     // TODO run test for all simulation_variants (initialization)
 }
 

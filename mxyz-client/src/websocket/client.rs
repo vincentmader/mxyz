@@ -150,18 +150,19 @@ pub fn handle_onmessage_package(
         Package::Response(res) => {
             match res {
                 Response::AddedClient(client_id) => {
-                    // TODO get simulation-variant from html/js
+                    // TODO Get simulation-variant from HTML/JS.
                     let sim_variant = SimulationVariant::ThreeBodyMoon;
 
-                    // Request Engine to be started on Server.
+                    // Request engine to be started on server.
                     let request = request::Request::AddEngine(client_id, sim_variant);
                     let request = Package::Request(request).to_bytes();
                     ws.send_with_u8_array(&request).unwrap();
                 }
 
                 Response::AddedEngine(engine_id) => {
-                    // Start Sync-Loop for this Engine's States.
-                    let last_sync_id = 0; // should be fine like this
+                    // Initialize state-id of last sync with server.
+                    let last_sync_id = 0;
+                    // Start sync-loop for this engine's states.
                     let request = request::Request::GetUpdatedStates(engine_id, last_sync_id);
                     let request = Package::Request(request).to_bytes();
                     ws.send_with_u8_array(&request).unwrap();
@@ -172,11 +173,11 @@ pub fn handle_onmessage_package(
                     let state_id = if state_vector.len() == 0 {
                         0
                     } else {
-                        console_log!(
-                            "Received states: {:?} to {:?}",
-                            state_vector[0].state_id,
-                            state_vector[state_vector.len() - 1].state_id
-                        );
+                        // console_log!(
+                        //     "Received states: {:?} to {:?}",
+                        //     state_vector[0].state_id,
+                        //     state_vector[state_vector.len() - 1].state_id
+                        // );
                         state_vector[state_vector.len() - 1].state_id // last update
                     };
 
@@ -186,7 +187,7 @@ pub fn handle_onmessage_package(
                     canvas.init();
 
                     for state in state_vector.iter() {
-                        console_log!("{:#?}", state);
+                        // console_log!("{:#?}", state);
                         for system in state.systems.iter() {
                             match &system.variant {
                                 SizedSystemVariant::EntitiesV1(system) => {

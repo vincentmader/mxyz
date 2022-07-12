@@ -131,18 +131,22 @@ pub fn handle_request(request: Request, tx: &mpsc::Sender<Package>) -> Package {
             Package::Response(response)
         }
 
-        Request::RemoveEngine(_engine_id) => todo!("remove engine"),
-
         Request::GetUpdatedStates(engine_id, last_sync_id) => {
+            let conn = mxyz_database::establish_connection();
             let state_query = StateQuery::Since(last_sync_id as i32);
             println!("Incoming: get-updated-states: {:?}", state_query);
-            let states = mxyz_database::models::state::get_states(engine_id as i32, &state_query);
+            let states =
+                mxyz_database::models::state::get_states(&conn, engine_id as i32, &state_query);
             println!("Loaded {} states from database!", states.len());
+
+            // println!("{:?}", states);
 
             // Return state-vector response
             let response = Response::StateVector(engine_id, states);
             Package::Response(response)
         }
+
+        Request::RemoveEngine(_engine_id) => todo!("remove engine"),
     }
 }
 
