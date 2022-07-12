@@ -6,7 +6,7 @@ use mxyz_network::package::request::Request;
 use mxyz_network::package::response::Response;
 use mxyz_network::package::Package;
 use mxyz_universe::preset::SimulationVariant;
-use mxyz_universe::system::SystemVariant;
+use mxyz_universe::system::sized::SizedSystemVariant;
 use std::sync::mpsc;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
@@ -23,13 +23,11 @@ extern "C" {
     fn log(s: &str);
 }
 
-// #[wasm_bindgen]
 pub struct WebSocketClient {
     client_id: usize,
     socket: WebSocket,
     tx_web_to_render: mpsc::Sender<Package>,
 }
-// #[wasm_bindgen]
 impl WebSocketClient {
     /// Creates new instance of Web Socket Client
     pub fn new(host: &str, port: u16, tx_web_to_render: mpsc::Sender<Package>) -> Self {
@@ -149,49 +147,49 @@ pub fn handle_onmessage_package(
 ) {
     console_log!("\nArraybuffer-Package received: {:?}", package);
     match package {
-        Package::Response(res) => match res {
-            Response::AddedClient(client_id) => {
-                // TODO get simulation-variant from html/js
-                let sim_variant = SimulationVariant::ThreeBodyMoon;
+        Package::Response(res) => {
+            match res {
+                Response::AddedClient(client_id) => {
+                    // TODO get simulation-variant from html/js
+                    let sim_variant = SimulationVariant::ThreeBodyMoon;
 
-                // Request Engine to be started on Server.
-                let request = request::Request::AddEngine(client_id, sim_variant);
-                let request = Package::Request(request).to_bytes();
-                ws.send_with_u8_array(&request).unwrap();
-            }
+                    // Request Engine to be started on Server.
+                    let request = request::Request::AddEngine(client_id, sim_variant);
+                    let request = Package::Request(request).to_bytes();
+                    ws.send_with_u8_array(&request).unwrap();
+                }
 
-            Response::AddedEngine(engine_id) => {
-                // Start Sync-Loop for this Engine's States.
-                let last_sync_id = 0; // should be fine like this
-                let request = request::Request::GetUpdatedStates(engine_id, last_sync_id);
-                let request = Package::Request(request).to_bytes();
-                ws.send_with_u8_array(&request).unwrap();
-            }
+                Response::AddedEngine(engine_id) => {
+                    // Start Sync-Loop for this Engine's States.
+                    let last_sync_id = 0; // should be fine like this
+                    let request = request::Request::GetUpdatedStates(engine_id, last_sync_id);
+                    let request = Package::Request(request).to_bytes();
+                    ws.send_with_u8_array(&request).unwrap();
+                }
 
-            Response::StateVector(engine_id, state_vector) => {
-                // console_log!("Received states, {}", state_vector.len());
-                let state_id = if state_vector.len() == 0 {
-                    0
-                } else {
-                    console_log!(
-                        "Received states: {:?} to {:?}",
-                        state_vector[0].state_id,
-                        state_vector[state_vector.len() - 1].state_id
-                    );
-                    state_vector[state_vector.len() - 1].state_id // last update
-                };
+                Response::StateVector(engine_id, state_vector) => {
+                    // console_log!("Received states, {}", state_vector.len());
+                    let state_id = if state_vector.len() == 0 {
+                        0
+                    } else {
+                        console_log!(
+                            "Received states: {:?} to {:?}",
+                            state_vector[0].state_id,
+                            state_vector[state_vector.len() - 1].state_id
+                        );
+                        state_vector[state_vector.len() - 1].state_id // last update
+                    };
 
-                use crate::renderer::components::canvas::Canvas;
-                let mut canvas = Canvas::new(0);
-                let cnv_dim = canvas.dimensions;
-                canvas.init();
+                    use crate::renderer::components::canvas::Canvas;
+                    let mut canvas = Canvas::new(0);
+                    let cnv_dim = canvas.dimensions;
+                    canvas.init();
 
-                for state in state_vector.iter() {
-                    console_log!("{:#?}", state);
-                    for system in state.systems.iter() {
-                        match &system.variant {
-                            SystemVariant::Objects(objects_variant) => match objects_variant {
-                                mxyz_universe::system::objects::ObjectsVariant::Planets(system) => {
+                    for state in state_vector.iter() {
+                        console_log!("{:#?}", state);
+                        for system in state.systems.iter() {
+                            match &system.variant {
+                                SizedSystemVariant::EntitiesV1(system) => {
                                     for planet in system.entities.iter() {
                                         let pos = planet.position;
                                         let pos = (pos[0], pos[1]);
@@ -202,34 +200,33 @@ pub fn handle_onmessage_package(
                                     }
                                 }
                                 _ => todo!(),
-                            },
-                            _ => todo!(),
+                            }
                         }
                     }
+
+                    // let package = Package::StateVec(state_vec);
+                    // tx_web_to_render.send(package);
+
+                    let request = request::Request::GetUpdatedStates(engine_id, state_id);
+                    let request = Package::Request(request).to_bytes();
+                    ws.send_with_u8_array(&request).unwrap();
+
+                    // let (secs, nanos) = (1, 0);
+                    // let duration = core::time::Duration::new(secs, nanos);
+                    // wasm_timer::Delay::new(duration);
+                    // wasm_timer::sleep(duration);
+
+                    // use gloo_timers::callback::Timeout;
+                    // let timeout = Timeout::new(1_000, move || {
+                    // Do something after the one second timeout is up!
+                    // });
+                    // Since we don't plan on cancelling the timeout, call `forget`.
+                    // timeout.forget();
                 }
 
-                // let package = Package::StateVec(state_vec);
-                // tx_web_to_render.send(package);
-
-                let request = request::Request::GetUpdatedStates(engine_id, state_id);
-                let request = Package::Request(request).to_bytes();
-                ws.send_with_u8_array(&request).unwrap();
-
-                // let (secs, nanos) = (1, 0);
-                // let duration = core::time::Duration::new(secs, nanos);
-                // wasm_timer::Delay::new(duration);
-                // wasm_timer::sleep(duration);
-
-                // use gloo_timers::callback::Timeout;
-                // let timeout = Timeout::new(1_000, move || {
-                // Do something after the one second timeout is up!
-                // });
-                // Since we don't plan on cancelling the timeout, call `forget`.
-                // timeout.forget();
+                Response::Empty => {}
             }
-
-            Response::Empty => {}
-        },
+        }
 
         Package::Command(cmd) => match cmd {
             Command::SaveStatesToDatabase => todo!(),

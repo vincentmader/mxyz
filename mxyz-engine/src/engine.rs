@@ -58,8 +58,6 @@ impl Engine {
         // Load current state.
         let current_state = &self.states[self.config.step_id.0];
 
-        let state_id = current_state.state_id + 1;
-
         // TODO Build trees/neighborhoods for all systems.
 
         // Forward systems.
@@ -68,22 +66,28 @@ impl Engine {
             .iter()
             .map(|sys| self.forward_system(sys))
             .collect();
+        // Update state-id.
+        let state_id = current_state.state_id + 1;
 
         State { state_id, systems }
     }
 
     /// Forwards System
     pub fn forward_system(&self, system: &System) -> System {
+        let mut next_system: System;
+        // Load list of integrators for system.
         let integrators = &system.integrators;
-        // TODO fix crash on zero-length integrators
-        // - if len==0 => system.clone()
-        // - else      => self.integrate_system(&int[0], &sys)
-        let mut next_system = self.integrate_system(&integrators[0], &system);
-        // Loop over integrators.
-        for (int_idx, integrator) in integrators[1..].iter().enumerate() {
-            // TODO load tree/neighborhood (?)
-
-            next_system = self.integrate_system(&integrator, &next_system);
+        if integrators.len() > 0 {
+            // Apply first integrator to system.
+            next_system = self.integrate_system(&integrators[0], &system);
+            // Loop over other integrators.
+            for integrator in integrators[1..].iter() {
+                // Apply possible other integrators to system.
+                next_system = self.integrate_system(&integrator, &next_system);
+            }
+        // handle case of empty integrator-vector
+        } else {
+            next_system = todo!("Clone vector of integrators");
         }
         next_system
     }

@@ -1,9 +1,9 @@
 use crate::schema::systems;
 use mxyz_universe::system::objects::planets::Planets;
 use mxyz_universe::system::objects::ObjectsVariant;
+use mxyz_universe::system::sized::{SizedSystem, SizedSystemVariant};
+use mxyz_universe::system::system::SystemVariant;
 use mxyz_universe::system::EntitiesV1;
-use mxyz_universe::system::SystemVariant;
-use mxyz_universe::system::{SizedSystem, SizedSystemVariant};
 
 #[derive(Insertable, Debug)]
 #[table_name = "systems"]
@@ -22,8 +22,8 @@ pub struct System {
     pub system_id: i32,
     pub system_variant_id: i32,
 }
-impl std::convert::Into<mxyz_universe::system::SizedSystem> for System {
-    fn into(self) -> mxyz_universe::system::SizedSystem {
+impl std::convert::Into<mxyz_universe::system::sized::SizedSystem> for System {
+    fn into(self) -> mxyz_universe::system::sized::SizedSystem {
         let other_system_id = self.system_id as usize;
         let other_system_variant = SystemVariant::from(self.system_variant_id as usize);
         let other_system_variant = match other_system_variant {
@@ -69,7 +69,10 @@ pub fn get_db_systems(engine_query: i32, state_query: i32) -> Vec<System> {
         .expect("Error loading systems")
 }
 
-pub fn get_systems(engine_query: i32, state_query: i32) -> Vec<mxyz_universe::system::SizedSystem> {
+pub fn get_systems(
+    engine_query: i32,
+    state_query: i32,
+) -> Vec<mxyz_universe::system::sized::SizedSystem> {
     let db_systems = get_db_systems(engine_query, state_query);
     // println!("{:?}", db_systems);
     db_systems
@@ -78,7 +81,10 @@ pub fn get_systems(engine_query: i32, state_query: i32) -> Vec<mxyz_universe::sy
         .collect()
 }
 
-pub fn create_system<'a>(conn: &PgConnection, system: mxyz_universe::system::System) -> System {
+pub fn create_system<'a>(
+    conn: &PgConnection,
+    system: mxyz_universe::system::sized::SizedSystem,
+) -> System {
     let other_engine_id = 0; // DODO
     let other_state_id = 0; // TODO
     let other_system_id = system.system_id;

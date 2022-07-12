@@ -8,6 +8,7 @@ pub mod response;
 pub enum Package {
     Request(request::Request),
     Response(response::Response),
+
     Command(command::Command),
     // StateVec(Vec<State>),
 }

@@ -29,13 +29,13 @@ CREATE TABLE systems (
   system_variant_id INT NOT NULL
 );
 
--- PLANETS
-CREATE TABLE planets (
+-- Entities v1
+CREATE TABLE entities_v1 (
   dbentry_id SERIAL PRIMARY KEY,
   engine_id INT NOT NULL,
   state_id INT NOT NULL,
   system_id INT NOT NULL,
-  planet_id INT NOT NULL,
+  entity_id INT NOT NULL,
   -- physical attributes
   mass    FLOAT NOT NULL,
   pos_x   FLOAT NOT NULL,
@@ -46,3 +46,19 @@ CREATE TABLE planets (
   vel_z   FLOAT NOT NULL
 );
 
+-- PLANETS
+/* CREATE TABLE planets ( */
+/*   dbentry_id SERIAL PRIMARY KEY, */
+/*   engine_id INT NOT NULL, */
+/*   state_id INT NOT NULL, */
+/*   system_id INT NOT NULL, */
+/*   planet_id INT NOT NULL, */
+/*   -- physical attributes */
+/*   mass    FLOAT NOT NULL, */
+/*   pos_x   FLOAT NOT NULL, */
+/*   pos_y   FLOAT NOT NULL, */
+/*   pos_z   FLOAT NOT NULL, */
+/*   vel_x   FLOAT NOT NULL, */
+/*   vel_y   FLOAT NOT NULL, */
+/*   vel_z   FLOAT NOT NULL */
+/* ); */

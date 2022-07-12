@@ -9,12 +9,12 @@ pub mod schema;
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use dotenv::dotenv;
-use models::planet::{NewPlanet, Planet};
+use models::entity_v1::{EntityV1, NewEntityV1};
 use models::state::{NewState, State};
 use models::system::{NewSystem, System};
 use models::*;
-use schema::planets;
-use schema::planets::dsl::*;
+use schema::entities_v1;
+use schema::entities_v1::dsl::*;
 use schema::states;
 use schema::states::dsl::*;
 use schema::systems;
@@ -31,15 +31,15 @@ pub fn establish_connection() -> PgConnection {
     conn
 }
 
-fn _show_planets() -> Vec<Planet> {
+fn _show_entities_v1() -> Vec<EntityV1> {
     let connection = establish_connection();
-    let results = planets
+    let results = entities_v1
         // .filter(published.eq(true))
         .limit(5)
-        .load::<Planet>(&connection)
+        .load::<EntityV1>(&connection)
         .expect("Error loading planets");
 
-    println!("Displaying {} planets", results.len());
+    println!("Displaying {} entities", results.len());
     // for planet in results.iter() {
     // println!("{}", planet.mass);
     // }
@@ -48,9 +48,9 @@ fn _show_planets() -> Vec<Planet> {
 
 // TODO remove below !!!
 
-pub fn create_planet<'a>(conn: &PgConnection, new_planet: NewPlanet) -> Planet {
-    diesel::insert_into(planets::table)
-        .values(&new_planet)
+pub fn create_planet<'a>(conn: &PgConnection, new_entity: NewEntityV1) -> EntityV1 {
+    diesel::insert_into(entities_v1::table)
+        .values(&new_entity)
         .get_result(conn)
         .expect("Error saving new planet")
 }

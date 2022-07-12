@@ -5,8 +5,8 @@ use mxyz_network::package::request::Request;
 use mxyz_network::package::Package;
 use mxyz_universe::entity::attribute::*;
 use mxyz_universe::preset::SimulationVariant;
-use mxyz_universe::system::objects::ObjectsVariant;
-use mxyz_universe::system::SystemVariant;
+use mxyz_universe::system::sized::SizedObjectsVariant;
+use mxyz_universe::system::system::SystemVariant;
 use std::sync::mpsc;
 
 pub struct EngineRunner {
@@ -82,39 +82,15 @@ impl EngineRunner {
 
 /// Exports Engine
 pub fn export(engine: &mut Engine) {
+    // Get state-ids.
     let states_to_save = engine.get_unsaved_state_ids();
-
     // Choose export method.
     match engine.config.export_variant {
         ExportVariant::ToFile => export_to_file(engine, &states_to_save),
         ExportVariant::ToDatabase => export_to_database(engine, &states_to_save),
     }
-
     // Update step-id of last export.
     engine.config.last_export_step_id = Some(engine.config.step_id.0);
-
-    // println!(
-    //     "Exported states {} to {}",
-    //     states_to_save[0],
-    //     states_to_save[states_to_save.len() - 1]
-    // );
-}
-
-/// Exports Engine to File
-pub fn export_to_file(engine: &mut Engine, states_to_save: &Vec<usize>) {
-    // Get simulation variant.
-    let simulation_variant = engine.config.simulation_variant.as_ref().unwrap();
-    // Convert simulation variant to integer representation in out-path.
-    let simulation_variant: usize = simulation_variant.clone().into();
-    let out_dir = format!("./mxyz-engine/output/{:?}", simulation_variant);
-
-    // Loop over unsaved States.
-    for state_id in states_to_save.iter() {
-        let state = engine.states.get(*state_id).unwrap();
-        // Save to File.
-        let path = format!("{}/{}.txt", out_dir, state_id);
-        std::fs::write(path, format!("{:#?}", state)).unwrap();
-    }
 }
 
 /// Exports Engine to Database
@@ -132,29 +108,25 @@ pub fn export_to_database(engine: &mut Engine, states_to_save: &Vec<usize>) {
 
             // Export format depends on System Variant.
             match &system.variant {
-                SystemVariant::Objects(objects_variant) => match objects_variant {
-                    ObjectsVariant::Planets(system) => {
-                        // Loop over Entities.
-                        for (planet_id, planet) in system.entities.iter().enumerate() {
-                            let db_planet = mxyz_database::models::planet::NewPlanet {
-                                engine_id: &(engine.engine_id as i32),
-                                state_id: &(*state_id as i32),
-                                planet_id: &(planet_id as i32),
-                                system_id: &(system_id as i32),
-                                mass: &planet.get_mass(),
-                                pos_x: &planet.get_position()[0],
-                                pos_y: &planet.get_position()[1],
-                                pos_z: &planet.get_position()[2],
-                                vel_x: &planet.get_velocity()[0],
-                                vel_y: &planet.get_velocity()[1],
-                                vel_z: &planet.get_velocity()[2],
-                            };
-                            mxyz_database::create_planet(&conn, db_planet);
-                        }
+                SystemVariant::EntitiesV1 => {
+                    for (ent_id, ent) in system.entities.iter().enumerate() {
+                        let db_entity = mxyz_database::models::entity_v1::NewEntityV1 {
+                            engine_id: &(engine.engine_id as i32),
+                            state_id: &(*state_id as i32),
+                            entity_id: &(ent_id as i32),
+                            system_id: &(system_id as i32),
+                            mass: &ent.get_mass(),
+                            pos_x: &ent.get_position()[0],
+                            pos_y: &ent.get_position()[1],
+                            pos_z: &ent.get_position()[2],
+                            vel_x: &ent.get_velocity()[0],
+                            vel_y: &ent.get_velocity()[1],
+                            vel_z: &ent.get_velocity()[2],
+                        };
+                        mxyz_database::create_planet(&conn, db_entity);
                     }
-                    _ => todo!(),
-                },
-                _ => {}
+                }
+                _ => todo!(),
             }
             // Save system to database.
             let db_system = mxyz_database::models::system::NewSystem {
@@ -166,12 +138,27 @@ pub fn export_to_database(engine: &mut Engine, states_to_save: &Vec<usize>) {
             mxyz_database::create_system(&conn, db_system);
         }
         // Save state to database.
-        // let state = mxyz_universe::state::State { state_id };
         let db_state = mxyz_database::models::state::NewState {
             engine_id: &(engine.engine_id as i32),
             state_id: &(*state_id as i32),
         };
-        // mxyz_database::models::state::create_state(&conn, db_state);
         mxyz_database::create_state(&conn, db_state);
+    }
+}
+
+/// Exports Engine to File
+pub fn export_to_file(engine: &mut Engine, states_to_save: &Vec<usize>) {
+    // Get simulation variant.
+    let simulation_variant = engine.config.simulation_variant.as_ref().unwrap();
+    // Convert simulation variant to integer representation in out-path.
+    let simulation_variant: usize = simulation_variant.clone().into();
+    let out_dir = format!("./mxyz-engine/output/{:?}", simulation_variant);
+
+    // Loop over unsaved States.
+    for state_id in states_to_save.iter() {
+        let state = engine.states.get(*state_id).unwrap();
+        // Save to File.
+        let path = format!("{}/{}.txt", out_dir, state_id);
+        std::fs::write(path, format!("{:#?}", state)).unwrap();
     }
 }
