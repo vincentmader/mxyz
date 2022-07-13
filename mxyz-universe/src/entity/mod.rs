@@ -9,7 +9,8 @@ use std::fmt::Debug;
 
 /// Entity Trait
 pub trait Entity:
-    Mass + Position + Velocity + Charge + Density + Force + EntityClone + Debug + Send
+    Mass + Position + Velocity + Charge + Density + Force + EntityClone + Debug + Send + Sync
+//                                                                                        ^ added this, needed?
 {
 }
 

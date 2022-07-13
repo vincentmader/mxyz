@@ -225,10 +225,6 @@ extern "C" {
 //    // button.set_onclick(optionn);
 
 //    let on_click = EventListener::new(&button, "click", move |_event| {
-//        // web_sys::console::log_2(
-//        // &"Hello World Gloo :%s".into(),
-//        // &"WebAssemblyMan".into()
-//        // );
 //        // paragraph.set_text_content(Some("Gloo: Hello World"));
 //        // let a = (*callback);
 //        callback();

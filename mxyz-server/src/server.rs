@@ -18,6 +18,11 @@ impl RocketServer {
         let routes = crate::http::get_all_routes();
         let catchers = catchers![crate::http::error::not_found::route,];
         let file_server = FileServer::from(relative!("static"));
+
+        // use rayon::prelude::*;
+        // let a = vec![1, 2, 3, 4];
+        // let b: Vec<i32> = a.par_iter().map(|x| x).collect();
+
         RocketServer {
             routes,
             catchers,

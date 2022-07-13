@@ -6,3 +6,6 @@ pub mod system;
 pub use entities_v1::EntitiesV1;
 // pub use sized_system::{SizedSystem, SizedSystemVariant};
 // pub use system::{System, SystemVariant};
+
+// use mxyz_universe::entity::Entity;               NOT ALLOWED IN MXYZ-UNIVERSE
+// impl IntoParallelIterator for Vec<Box<dyn Entity>> {}

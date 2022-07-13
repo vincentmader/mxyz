@@ -29,6 +29,18 @@ impl SimulationClientV1 {
         let renderer = Renderer::new();
         let websocket = WebSocketClient::new(HOST, PORT, tx_web_to_render);
 
+        // use rayon::prelude::*;
+        // fn sum_of_squares(input: &[i32]) -> i32 {
+        // let a: u32 = [1, 2, 3, 4]
+        //     .par_iter() // <-- just change that!
+        //     .map(|&i| {
+        //         // dom::console_log(&format!("{}", i));
+        //         i * i
+        //     })
+        //     .sum();
+        // }
+        // sum_of_squares(&[1, 2, 3, 4, 5, 6]);
+
         SimulationClientV1 {
             config,
             renderer,

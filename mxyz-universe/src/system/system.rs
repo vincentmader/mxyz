@@ -4,7 +4,7 @@ use crate::integrator::Integrator;
 // ============================================================================
 
 /// System Structure
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct System {
     pub system_id: usize,
     pub entities: Vec<Box<dyn Entity>>,
@@ -48,11 +48,6 @@ impl std::convert::From<usize> for SystemVariant {
     fn from(system_variant: usize) -> SystemVariant {
         match system_variant {
             0 => SystemVariant::EntitiesV1,
-            // {
-            // let system = crate::system::planets::Planets::new();
-            // let system_variant = SystemVariant::Planets(system);
-            // system_variant
-            // }
             _ => todo!("Conversion: usize -> SystemVariant"),
         }
     }

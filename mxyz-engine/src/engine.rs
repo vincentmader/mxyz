@@ -88,7 +88,7 @@ impl Engine {
             }
         // Handle case of empty integrator-vector.
         } else {
-            next_system = todo!("Clone vector of integrators");
+            next_system = system.clone();
         }
         next_system
     }

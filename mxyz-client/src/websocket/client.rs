@@ -12,7 +12,7 @@ use web_sys::BinaryType::Arraybuffer;
 use web_sys::{ErrorEvent, MessageEvent, WebSocket};
 // use crate::renderer::Renderer;
 
-const STATE_BATCH_SIZE: i32 = 100;
+const STATE_BATCH_SIZE: i32 = 50;
 
 macro_rules! console_log {
     ($($t:tt)*) => (log(&format_args!($($t)*).to_string()))
@@ -146,7 +146,7 @@ pub fn handle_onmessage_package(
     package: Package,
     tx_web_to_render: std::sync::mpsc::Sender<Package>,
 ) {
-    console_log!("\nArraybuffer-Package received: {:?}", package);
+    // console_log!("\nArraybuffer-Package received: {:?}", package);
     match package {
         Package::Response(res) => {
             match res {
@@ -185,9 +185,11 @@ pub fn handle_onmessage_package(
 
                     for state in state_vector.iter() {
                         // canvas.clear();
-                        let text = format!("state {}", state.state_id);
-                        let (x, y) = (50., 50.);
-                        canvas.fill_text(&text, x, y);
+
+                        // let text = format!("state {}", state.state_id);
+                        // let (x, y) = (50., 50.);
+                        // canvas.fill_text(&text, x, y);
+
                         for system in state.systems.iter() {
                             match &system.variant {
                                 SizedSystemVariant::EntitiesV1(system) => {

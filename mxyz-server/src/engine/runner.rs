@@ -112,7 +112,8 @@ pub fn export_to_database(engine: &mut Engine, states_to_save: &Vec<usize>) {
             // Gets ids for engine, system, & system-variant (via conversion: enum -> usize).
             let engine_id = engine.engine_id;
             let system_id = system.system_id;
-            let system_variant_id: usize = system_id.into();
+            let system_variant_id: usize = system.variant.clone().into(); // TODO remove clone
+
             // Choose export format. (depends on system variant)
             match &system.variant {
                 SystemVariant::EntitiesV1 => {
