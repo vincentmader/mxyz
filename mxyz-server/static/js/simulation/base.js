@@ -1,4 +1,7 @@
-import init, { SimulationClientV1 } from "../../../static/pkg/mxyz_client.js";
+import init, {
+  // initThreadPool,
+  SimulationClientV1,
+} from "../../../static/pkg/mxyz_client.js";
 
 let script = document.getElementById("simulation.js");
 let category = script.getAttribute("category");
@@ -15,6 +18,7 @@ console.log(
 
 (async () => {
   await init();
+  // await initThreadPool(navigator.hardwareConcurrency);
   let simulation = SimulationClientV1.new(client_id);
   simulation.init(simulation_variant);
   simulation.run();
