@@ -1,7 +1,7 @@
-use crate::config::ClientConfig;
 use crate::renderer::Renderer;
 use crate::utils::dom;
 use crate::websocket::client::WebSocketClient;
+use mxyz_config::ClientConfig;
 use std::cell::RefCell;
 use std::rc::Rc;
 use std::sync::mpsc;
