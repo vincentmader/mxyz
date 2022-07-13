@@ -43,15 +43,6 @@ impl SimulationClientV1 {
     }
     /// Runs Renderer-Client in Animation Loop
     pub async fn run(mut self) -> Result<(), JsValue> {
-        // let (tx, rx) = mpsc::channel::<Package>();
-
-        // TCP Client
-        // TODO test get-request to server
-        // - TCP get-requests (bytestream? -> decode)
-        // - move inside animation loop (async?)
-        // crate::websocket::start_client().unwrap();
-        // let mut client = crate::websocket::client::WebSocketClient::new(HOST, PORT);
-
         // ANIMATION LOOP
         // TODO move to utils/dom/mod.rs (?)
         let f = Rc::new(RefCell::new(None));
@@ -76,3 +67,24 @@ impl SimulationClientV1 {
         self.config.frame_id.0 += 1;
     }
 }
+
+// fn foo<F>(h: F) -> Result<(), JsValue>
+// where
+//     F: FnMut() -> (),
+// {
+//     let f = Rc::new(RefCell::new(None));
+//     let g = f.clone();
+//     *g.borrow_mut() = Some(Closure::wrap(Box::new(move || {
+//         h();
+//         // if self.config.frame_id.0 > self.config.frame_id.1 {
+//         //     let _ = f.borrow_mut().take();
+//         //     return;
+//         // }
+//         // // std::thread::spawn(|| {});
+//         // // self.step(&tx); //
+//         // self.step(); //
+//         dom::request_animation_frame(f.borrow().as_ref().unwrap());
+//     }) as Box<dyn FnMut()>));
+//     dom::request_animation_frame(g.borrow().as_ref().unwrap());
+//     Ok(())
+// }

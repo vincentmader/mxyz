@@ -88,6 +88,7 @@ impl Canvas {
     }
     /// Writes Text to Canvas
     pub fn fill_text(&mut self, text: &str, x: f64, y: f64) {
+        // self.context.set_font("80px");
         self.context.fill_text(&text, x, y).unwrap();
     }
     // pub fn reset_line_width(&mut self) {

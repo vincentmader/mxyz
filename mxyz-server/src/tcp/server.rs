@@ -5,13 +5,12 @@ use mxyz_network::package::command::Command;
 use mxyz_network::package::request::Request;
 use mxyz_network::package::response::Response;
 use mxyz_network::package::Package;
-use mxyz_universe::state::StateQuery;
 use std::io::Error;
 use std::sync::mpsc;
 use tokio::net::{TcpListener, TcpStream};
 use tokio_tungstenite::tungstenite::Message;
-// use mxyz_universe::preset::SimulationVariant;
-// use mxyz_engine::state::State;
+
+// ============================================================================
 
 /// TCP Server
 pub struct TcpServer {
@@ -102,6 +101,8 @@ pub fn handle_binary_message(bytes: Vec<u8>, tx: &mpsc::Sender<Package>) -> Mess
     let bytes = response.to_bytes();
     Ok(Message::Binary(bytes))
 }
+
+// ============================================================================
 
 pub fn handle_request(request: Request, tx: &mpsc::Sender<Package>) -> Package {
     match request {

@@ -24,20 +24,40 @@ pub fn preset(systems: &mut Vec<System>, config: &mut EngineConfig) {
 
     let m = 1.;
     let dist = 1.;
-    let speed = (G * m / dist).powf(0.5) * 0.5;
+    let M = 1000.;
+    let speed = (G * M / dist).powf(0.5) * 0.5;
+    let N = 100;
+    let r0 = 0.8;
+    let v0 = speed;
 
     // System 0: Objects
     // ------------------------------------------------------------------------
     let system_id = 0;
     let variant = SystemVariant::EntitiesV1;
     let mut system = System::new(system_id, variant);
-    for entity_id in 0..2 {
-        let x = [dist * (entity_id as f64 - 0.5), 0., 0.];
-        let v = [0., speed * (2. * entity_id as f64 - 1.), 0.];
-        // let v = [0., 0., 0.];
+    for entity_id in 0..N {
+        let phi = 2. * 3.14159 * entity_id as f64 / N as f64;
+        let x = [r0 * phi.cos(), r0 * phi.sin(), 0.];
+        let v = [-v0 * phi.sin(), v0 * phi.cos(), 0.];
         let entity = EntityV1::new(m, x, v);
         system.entities.push(Box::new(entity));
     }
+
+    let entity = EntityV1::new(M, [0., 0., 0.], [0., 0., 0.]);
+    system.entities.push(Box::new(entity));
+
+    // System 0: Objects
+    // ------------------------------------------------------------------------
+    // let system_id = 0;
+    // let variant = SystemVariant::EntitiesV1;
+    // let mut system = System::new(system_id, variant);
+    // for entity_id in 0..2 {
+    //     let x = [dist * (entity_id as f64 - 0.5), 0., 0.];
+    //     let v = [0., speed * (2. * entity_id as f64 - 1.), 0.];
+    //     // let v = [0., 0., 0.];
+    //     let entity = EntityV1::new(m, x, v);
+    //     system.entities.push(Box::new(entity));
+    // }
 
     // II.INTEGRATORS
     // ========================================================================

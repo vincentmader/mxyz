@@ -1,5 +1,4 @@
 use crate::utils::dom;
-use mxyz_network::package::command::Command;
 use mxyz_network::package::request;
 use mxyz_network::package::response::Response;
 use mxyz_network::package::Package;
@@ -13,7 +12,7 @@ use web_sys::BinaryType::Arraybuffer;
 use web_sys::{ErrorEvent, MessageEvent, WebSocket};
 // use crate::renderer::Renderer;
 
-const STATE_BATCH_SIZE: i32 = 10;
+const STATE_BATCH_SIZE: i32 = 100;
 
 macro_rules! console_log {
     ($($t:tt)*) => (log(&format_args!($($t)*).to_string()))
@@ -185,6 +184,10 @@ pub fn handle_onmessage_package(
                     canvas.init();
 
                     for state in state_vector.iter() {
+                        canvas.clear();
+                        let text = format!("state {}", state.state_id);
+                        let (x, y) = (50., 50.);
+                        canvas.fill_text(&text, x, y);
                         for system in state.systems.iter() {
                             match &system.variant {
                                 SizedSystemVariant::EntitiesV1(system) => {
@@ -224,7 +227,6 @@ pub fn handle_onmessage_package(
         }
 
         Package::Command(cmd) => match cmd {
-            Command::SaveStatesToDatabase => todo!(),
             _ => todo!(),
         },
 

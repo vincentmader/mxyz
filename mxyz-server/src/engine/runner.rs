@@ -3,9 +3,7 @@ use mxyz_engine::Engine;
 use mxyz_network::package::command::Command;
 use mxyz_network::package::request::Request;
 use mxyz_network::package::Package;
-use mxyz_universe::entity::attribute::*;
 use mxyz_universe::preset::SimulationVariant;
-use mxyz_universe::system::sized::SizedObjectsVariant;
 use mxyz_universe::system::system::SystemVariant;
 use std::sync::mpsc;
 
@@ -37,7 +35,6 @@ impl EngineRunner {
                 _ => todo!(),
             },
             Package::Command(cmd) => match cmd {
-                // Command::SaveStatesToDatabase => {}
                 Command::AddEngine(engine_id, client_id, simulation_variant) => {
                     self.add_engine(*engine_id, *client_id, simulation_variant)
                 }
@@ -52,7 +49,7 @@ impl EngineRunner {
     pub fn add_engine(
         &mut self,
         engine_id: usize,
-        client_id: usize,
+        _client_id: usize, // TODO needed?
         simulation_variant: &SimulationVariant,
     ) {
         let simulation_variant = simulation_variant.clone();
@@ -83,7 +80,9 @@ impl EngineRunner {
 
     /// Removes Engine
     pub fn remove_engine(&mut self, engine_id: &usize) {
-        // ...
+        // TODO stop compute-loop
+        // - communicate with engines via MPSC?
+        // TODO remove from database
         println!("Engine-Runner removed engine {}", engine_id);
     }
 }
@@ -97,8 +96,7 @@ pub fn export(engine: &mut Engine) {
         ExportVariant::ToFile => export_to_file(engine, &states_to_save),
         ExportVariant::ToDatabase => export_to_database(engine, &states_to_save),
     }
-    // println!("Saved {} states to database.", states_to_save.len());
-    // Update step-id of last export.
+    // Update step-id of last expor.
     engine.config.last_export_step_id = Some(engine.config.step_id.0);
 }
 
@@ -111,6 +109,7 @@ pub fn export_to_database(engine: &mut Engine, states_to_save: &Vec<usize>) {
         let state = engine.states.get(*state_id).unwrap();
         // Loops over systems.
         for system in state.systems.iter() {
+            // Gets ids for engine, system, & system-variant (via conversion: enum -> usize).
             let engine_id = engine.engine_id;
             let system_id = system.system_id;
             let system_variant_id: usize = system_id.into();
