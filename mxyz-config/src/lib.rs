@@ -1,29 +1,25 @@
-// pub struct EngineConfig {
-//     pub step_id: (usize, usize),
-// }
-// impl EngineConfig {
-//     pub fn new() -> Self {
-//         let step_id = (0, usize::MAX);
-//         // let interactions = vec![];
-//         // let integrators = vec![];
-//         // let export_variant = ExportVariant::ToDatabase;
-//         // let last_export_step_id = None;
-//         // let nr_of_steps_between_exports = 100;
-//         // let simulation_variant = None;
-//         EngineConfig {
-//             step_id,
-//             // systems,
-//             // interactions,
-//             // integrators,
-//             // export_variant,
-//             // last_export_step_id,
-//             // nr_of_steps_between_exports,
-//             // simulation_variant,
-//         }
-//     }
-// }
+// use mxyz_network::package::Package;
+// use std::sync::mpsc::Receiver;
 
-pub struct ClientConfig {}
+pub struct ClientConfig {
+    pub client_id: usize,
+    pub frame_id: (usize, usize),
+    // pub rx: Receiver<Package>,
+}
+impl ClientConfig {
+    pub fn new(
+        client_id: usize,
+        // rx: Receiver<Package>
+    ) -> Self {
+        let frame_id = (0, usize::MAX);
+        ClientConfig {
+            client_id,
+            frame_id,
+            // rx,
+        }
+    }
+}
+
 pub struct RendererConfig {}
 
 use mxyz_universe::preset::SimulationVariant;
@@ -64,13 +60,28 @@ impl EngineConfig {
     }
 }
 
-// pub struct Constants {
-//     _g: f64, // Newton's gravitational constant
+// pub struct EngineConfig {
+//     pub step_id: (usize, usize),
 // }
-// impl Constants {
+// impl EngineConfig {
 //     pub fn new() -> Self {
-//         let g = 1.;
-//         Constants { _g: g }
+//         let step_id = (0, usize::MAX);
+//         // let interactions = vec![];
+//         // let integrators = vec![];
+//         // let export_variant = ExportVariant::ToDatabase;
+//         // let last_export_step_id = None;
+//         // let nr_of_steps_between_exports = 100;
+//         // let simulation_variant = None;
+//         EngineConfig {
+//             step_id,
+//             // systems,
+//             // interactions,
+//             // integrators,
+//             // export_variant,
+//             // last_export_step_id,
+//             // nr_of_steps_between_exports,
+//             // simulation_variant,
+//         }
 //     }
 // }
 
@@ -131,5 +142,15 @@ pub enum ExportVariant {
 //             entries.push(vec![]);
 //         }
 //         InteractionMatrixRow { entries }
+//     }
+// }
+
+// pub struct Constants {
+//     _g: f64, // Newton's gravitational constant
+// }
+// impl Constants {
+//     pub fn new() -> Self {
+//         let g = 1.;
+//         Constants { _g: g }
 //     }
 // }
