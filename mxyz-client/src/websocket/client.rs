@@ -182,6 +182,8 @@ pub fn handle_onmessage_package(
                     let mut canvas = Canvas::new(0);
                     let cnv_dim = canvas.dimensions;
                     canvas.init();
+                    canvas.set_fill_style("purple");
+                    canvas.set_stroke_style("purple");
 
                     for state in state_vector.iter() {
                         // canvas.clear();
