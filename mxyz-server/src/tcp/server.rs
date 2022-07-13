@@ -1,10 +1,11 @@
 use futures_util::{future, StreamExt, TryStreamExt};
 use log::info;
-use mxyz_database::models::state::StateQuery;
+use mxyz_database::models;
 use mxyz_network::package::command::Command;
 use mxyz_network::package::request::Request;
 use mxyz_network::package::response::Response;
 use mxyz_network::package::Package;
+use mxyz_universe::state::StateQuery;
 use std::io::Error;
 use std::sync::mpsc;
 use tokio::net::{TcpListener, TcpStream};
@@ -88,11 +89,10 @@ pub fn handle_message(msg: MessageResult, tx: &mpsc::Sender<Package>) -> Message
 }
 
 pub fn handle_binary_message(bytes: Vec<u8>, tx: &mpsc::Sender<Package>) -> MessageResult {
+    // Convert binary message to package enum.
     let bytes: Vec<u8> = bytes.clone();
-    // println!("incoming binary message: {:?}", bytes);
     let package = Package::from_bytes(bytes);
-    // println!("incoming package: {:?}", package);
-
+    // Handle request, & define response.
     let response = match package {
         Package::Request(request) => handle_request(request, &tx),
         Package::Response(response) => handle_response(response),
@@ -106,41 +106,35 @@ pub fn handle_binary_message(bytes: Vec<u8>, tx: &mpsc::Sender<Package>) -> Mess
 pub fn handle_request(request: Request, tx: &mpsc::Sender<Package>) -> Package {
     match request {
         Request::AddClient => {
+            // Add client to database.
             let db_conn = mxyz_database::establish_connection();
-            let client = mxyz_database::models::client::create_client(&db_conn);
+            let client = models::client::create_client(&db_conn);
             let client_id = client.client_id as usize;
+            // Send back added-client response to client.
             let response = Response::AddedClient(client_id);
             Package::Response(response)
         }
 
         Request::AddEngine(client_id, simulation_variant) => {
-            // let db_conn = mxyz_database::establish_connection();
-            // let engine = mxyz_database::models::engine::create_engine(&db_conn, client_id);
-            // let engine_id = engine.engine_id as usize;
-
-            // TODO do differently
-            // - get engine-id from channel somehow (2nd channel? request-response instead?)
-            // - or: see above (add to db from here, only start engine through mpsc)
-            let engine_id = mxyz_database::models::engine::get_db_engines().len() + 1;
-
-            let request = Request::AddEngine(client_id, simulation_variant);
-            let package = Package::Request(request);
-            tx.send(package).unwrap(); // TODO do this differently, it's just forwarding the msg
-
+            // Add engine to database.
+            let db_conn = mxyz_database::establish_connection();
+            let engine = models::engine::create_engine(&db_conn, client_id);
+            let engine_id = engine.engine_id as usize;
+            // Send add-engine command to engine-runner.
+            let command = Command::AddEngine(engine_id, client_id, simulation_variant);
+            let package = Package::Command(command);
+            tx.send(package).unwrap();
+            //   ^ TODO do this differently (it's just forwarding the msg, skip one step?)
+            // Send back added-engine response to client.
             let response = Response::AddedEngine(engine_id);
             Package::Response(response)
         }
 
-        Request::GetUpdatedStates(engine_id, last_sync_id) => {
+        Request::GetUpdatedStates(engine_id, state_query) => {
+            // Load states from database.
             let conn = mxyz_database::establish_connection();
-            let state_query = StateQuery::Since(last_sync_id as i32);
-            println!("Incoming: get-updated-states: {:?}", state_query);
-            let states =
-                mxyz_database::models::state::get_states(&conn, engine_id as i32, &state_query);
-            println!("Loaded {} states from database!", states.len());
-
-            // println!("{:?}", states);
-
+            let states = models::state::get_states(&conn, engine_id as i32, &state_query);
+            println!("Loaded {} db-states, query {:?}", states.len(), state_query);
             // Return state-vector response
             let response = Response::StateVector(engine_id, states);
             Package::Response(response)

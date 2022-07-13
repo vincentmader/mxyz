@@ -15,14 +15,16 @@ use mxyz_universe::system::system::SystemVariant;
 // use crate::integrator::Integrator;
 
 const NR_OF_STEPS: usize = 10;
+const G: f64 = 1.;
 
 pub fn preset(systems: &mut Vec<System>, config: &mut EngineConfig) {
     // I. SYSTEMS
     // ========================================================================
     config.step_id.1 = NR_OF_STEPS;
 
-    let speed = 1. / 1.41;
+    let m = 1.;
     let dist = 1.;
+    let speed = (G * m / dist).powf(0.5) * 0.5;
 
     // System 0: Objects
     // ------------------------------------------------------------------------
@@ -30,7 +32,6 @@ pub fn preset(systems: &mut Vec<System>, config: &mut EngineConfig) {
     let variant = SystemVariant::EntitiesV1;
     let mut system = System::new(system_id, variant);
     for entity_id in 0..2 {
-        let m = 1.;
         let x = [dist * (entity_id as f64 - 0.5), 0., 0.];
         let v = [0., speed * (2. * entity_id as f64 - 1.), 0.];
         // let v = [0., 0., 0.];

@@ -1,4 +1,5 @@
 use mxyz_universe::preset::SimulationVariant;
+use mxyz_universe::state::StateQuery;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -10,5 +11,5 @@ pub enum Request {
     /// Removes Engine
     RemoveEngine(usize),
     /// Gets States since last Update
-    GetUpdatedStates(usize, usize), // engine-id, state-id
+    GetUpdatedStates(usize, StateQuery), // engine-id, state-id
 }

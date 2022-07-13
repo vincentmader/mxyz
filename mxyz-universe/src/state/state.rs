@@ -1,5 +1,5 @@
 use crate::system::system::System;
-use crate::system::system::SystemVariant;
+use serde::{Deserialize, Serialize};
 
 /// State
 #[derive(Debug)]
@@ -15,16 +15,26 @@ impl State {
     }
 }
 
-pub struct SendState {
-    pub state_id: usize,
-    pub systems: Vec<SystemVariant>,
+// ============================================================================
+
+#[derive(Debug, Serialize, Deserialize)]
+pub enum StateQuery {
+    BatchSince(i32, i32),
+    AllSince(i32),
+    Between(i32, i32),
+    FromIds(Vec<i32>),
 }
-impl SendState {
-    pub fn new(state_id: usize) -> Self {
-        let systems = vec![];
-        SendState { state_id, systems }
-    }
-}
+
+// pub struct SendState {
+//     pub state_id: usize,
+//     pub systems: Vec<SystemVariant>,
+// }
+// impl SendState {
+//     pub fn new(state_id: usize) -> Self {
+//         let systems = vec![];
+//         SendState { state_id, systems }
+//     }
+// }
 
 // /// Initializes State & configuration
 // pub fn init(

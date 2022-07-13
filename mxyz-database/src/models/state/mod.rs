@@ -3,6 +3,7 @@ use crate::schema::states;
 use crate::schema::states::dsl::*;
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
+use mxyz_universe::state::StateQuery;
 
 #[derive(Insertable, Debug)]
 #[table_name = "states"]
@@ -17,14 +18,6 @@ pub struct State {
     pub engine_id: i32,
     pub state_id: i32,
 }
-// impl std::convert::Into<mxyz_universe::state::State> for State {
-//     fn into(self) -> mxyz_universe::state::State {
-//         let other_state_id = self.state_id as usize;
-//         let mut state = mxyz_universe::state::State::new(other_state_id);
-//         state.systems = crate::system::get_systems(self.engine_id, self.state_id);
-//         state
-//     }
-// }
 impl std::convert::Into<mxyz_universe::state::SizedState> for State {
     fn into(self) -> mxyz_universe::state::SizedState {
         let other_state_id = self.state_id as usize;
@@ -43,23 +36,35 @@ pub fn create_state<'a>(conn: &PgConnection, new_state: NewState) -> State {
         .expect("Error saving new state")
 }
 
+// const NR_OF_STATES_PER_SYNC: i32 = 100;
+
 pub fn get_db_states(
     conn: &PgConnection,
     engine_query: i32,
     state_query: &StateQuery,
 ) -> Vec<State> {
     match state_query {
-        StateQuery::Since(id) => states
+        // Get all states since a given state-id.
+        StateQuery::BatchSince(batch_size, last_sync) => states
             .filter(engine_id.eq(&engine_query))
-            .filter(state_id.ge(id))
+            .filter(state_id.gt(last_sync))
+            .filter(state_id.le(last_sync + batch_size))
             .load::<State>(conn)
             .expect("Error loading states"),
+        // Get all states since a given state-id.
+        StateQuery::AllSince(last_sync) => states
+            .filter(engine_id.eq(&engine_query))
+            .filter(state_id.gt(last_sync))
+            .load::<State>(conn)
+            .expect("Error loading states"),
+        // Get all states between two state-ids.
         StateQuery::Between(from, to) => states
             .filter(engine_id.eq(&engine_query))
             .filter(state_id.ge(from))
             .filter(state_id.lt(to))
             .load::<State>(conn)
             .expect("Error loading states"),
+        // Get all states from list of state-ids.
         StateQuery::FromIds(_ids) => todo!("db-states from state-id list"),
     }
 }
@@ -72,18 +77,6 @@ pub fn get_states(
     let db_states = get_db_states(conn, engine_query, &state_query);
     db_states
         .into_iter()
-        .map(|db_state| {
-            // println!("{:?}", db_state);
-            db_state.into()
-        })
+        .map(|db_state| db_state.into())
         .collect()
-}
-
-// ============================================================================
-
-#[derive(Debug)]
-pub enum StateQuery {
-    Since(i32),
-    Between(i32, i32),
-    FromIds(Vec<i32>),
 }

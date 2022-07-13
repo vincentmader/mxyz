@@ -1,17 +1,19 @@
-use crate::renderer::Renderer;
 use crate::utils::dom;
 use mxyz_network::package::command::Command;
 use mxyz_network::package::request;
-use mxyz_network::package::request::Request;
 use mxyz_network::package::response::Response;
 use mxyz_network::package::Package;
 use mxyz_universe::preset::SimulationVariant;
+use mxyz_universe::state::StateQuery;
 use mxyz_universe::system::sized::SizedSystemVariant;
 use std::sync::mpsc;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::BinaryType::Arraybuffer;
 use web_sys::{ErrorEvent, MessageEvent, WebSocket};
+// use crate::renderer::Renderer;
+
+const STATE_BATCH_SIZE: i32 = 10;
 
 macro_rules! console_log {
     ($($t:tt)*) => (log(&format_args!($($t)*).to_string()))
@@ -152,7 +154,6 @@ pub fn handle_onmessage_package(
                 Response::AddedClient(client_id) => {
                     // TODO Get simulation-variant from HTML/JS.
                     let sim_variant = SimulationVariant::ThreeBodyMoon;
-
                     // Request engine to be started on server.
                     let request = request::Request::AddEngine(client_id, sim_variant);
                     let request = Package::Request(request).to_bytes();
@@ -162,22 +163,19 @@ pub fn handle_onmessage_package(
                 Response::AddedEngine(engine_id) => {
                     // Initialize state-id of last sync with server.
                     let last_sync_id = 0;
+                    //
+                    let state_query = StateQuery::BatchSince(last_sync_id, STATE_BATCH_SIZE);
                     // Start sync-loop for this engine's states.
-                    let request = request::Request::GetUpdatedStates(engine_id, last_sync_id);
+                    let request = request::Request::GetUpdatedStates(engine_id, state_query);
                     let request = Package::Request(request).to_bytes();
                     ws.send_with_u8_array(&request).unwrap();
                 }
 
                 Response::StateVector(engine_id, state_vector) => {
-                    // console_log!("Received states, {}", state_vector.len());
+                    // update state-id of last sync
                     let state_id = if state_vector.len() == 0 {
                         0
                     } else {
-                        // console_log!(
-                        //     "Received states: {:?} to {:?}",
-                        //     state_vector[0].state_id,
-                        //     state_vector[state_vector.len() - 1].state_id
-                        // );
                         state_vector[state_vector.len() - 1].state_id // last update
                     };
 
@@ -187,7 +185,6 @@ pub fn handle_onmessage_package(
                     canvas.init();
 
                     for state in state_vector.iter() {
-                        // console_log!("{:#?}", state);
                         for system in state.systems.iter() {
                             match &system.variant {
                                 SizedSystemVariant::EntitiesV1(system) => {
@@ -205,10 +202,8 @@ pub fn handle_onmessage_package(
                         }
                     }
 
-                    // let package = Package::StateVec(state_vec);
-                    // tx_web_to_render.send(package);
-
-                    let request = request::Request::GetUpdatedStates(engine_id, state_id);
+                    let state_query = StateQuery::BatchSince(STATE_BATCH_SIZE, state_id as i32);
+                    let request = request::Request::GetUpdatedStates(engine_id, state_query);
                     let request = Package::Request(request).to_bytes();
                     ws.send_with_u8_array(&request).unwrap();
 
@@ -216,7 +211,6 @@ pub fn handle_onmessage_package(
                     // let duration = core::time::Duration::new(secs, nanos);
                     // wasm_timer::Delay::new(duration);
                     // wasm_timer::sleep(duration);
-
                     // use gloo_timers::callback::Timeout;
                     // let timeout = Timeout::new(1_000, move || {
                     // Do something after the one second timeout is up!
@@ -231,10 +225,11 @@ pub fn handle_onmessage_package(
 
         Package::Command(cmd) => match cmd {
             Command::SaveStatesToDatabase => todo!(),
+            _ => todo!(),
         },
 
         Package::Request(req) => match req {
-            _ => todo!("handle requests (?)"),
+            _ => todo!(),
         },
     }
 }
