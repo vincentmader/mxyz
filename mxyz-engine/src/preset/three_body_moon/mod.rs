@@ -26,7 +26,7 @@ pub fn preset(systems: &mut Vec<System>, config: &mut EngineConfig) {
     let dist = 1.;
     let M = 1000.;
     let speed = (G * M / dist).powf(0.5) * 0.5;
-    let N = 100;
+    let N = 1;
     let r0 = 0.8;
     let v0 = speed;
 

@@ -184,7 +184,7 @@ pub fn handle_onmessage_package(
                     canvas.init();
 
                     for state in state_vector.iter() {
-                        canvas.clear();
+                        // canvas.clear();
                         let text = format!("state {}", state.state_id);
                         let (x, y) = (50., 50.);
                         canvas.fill_text(&text, x, y);
@@ -205,7 +205,8 @@ pub fn handle_onmessage_package(
                         }
                     }
 
-                    let state_query = StateQuery::BatchSince(STATE_BATCH_SIZE, state_id as i32);
+                    let state_query =
+                        StateQuery::Between(state_id as i32, state_id as i32 + STATE_BATCH_SIZE);
                     let request = request::Request::GetUpdatedStates(engine_id, state_query);
                     let request = Package::Request(request).to_bytes();
                     ws.send_with_u8_array(&request).unwrap();
