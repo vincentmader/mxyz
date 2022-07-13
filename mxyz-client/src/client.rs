@@ -1,10 +1,12 @@
-use crate::config::ClientConfig;
+// use crate::config::ClientConfig;
 use crate::renderer::Renderer;
 use crate::utils::dom;
 use crate::websocket::client::WebSocketClient;
+use mxyz_config::ClientConfig;
 use std::cell::RefCell;
 use std::rc::Rc;
 use std::sync::mpsc;
+// use std::sync::{Arc, Mutex};
 use wasm_bindgen::prelude::*;
 
 const HOST: &str = "127.0.0.1";
@@ -42,23 +44,27 @@ impl SimulationClientV1 {
         self.websocket.init().unwrap();
     }
     /// Runs Renderer-Client in Animation Loop
-    pub async fn run(mut self) -> Result<(), JsValue> {
-        // ANIMATION LOOP
-        // TODO move to utils/dom/mod.rs (?)
-        let f = Rc::new(RefCell::new(None));
-        let g = f.clone();
-        *g.borrow_mut() = Some(Closure::wrap(Box::new(move || {
-            if self.config.frame_id.0 > self.config.frame_id.1 {
-                let _ = f.borrow_mut().take();
-                return;
-            }
-            // std::thread::spawn(|| {});
-            // self.step(&tx); //
-            self.step(); //
-            dom::request_animation_frame(f.borrow().as_ref().unwrap());
-        }) as Box<dyn FnMut()>));
-        dom::request_animation_frame(g.borrow().as_ref().unwrap());
-        Ok(())
+    pub async fn run(&mut self) {
+        // let arc = Arc::new(Mutex::new(&mut self.config));
+        // fn step() {}
+        // async fn foo() {}
+        // async fn bar(cfg: &'static Arc<Mutex<&mut ClientConfig>>) -> Result<(), JsValue> {
+        //     let f = Rc::new(RefCell::new(None));
+        //     let g = f.clone();
+        //     *g.borrow_mut() = Some(Closure::wrap(Box::new(move || {
+        //         let cfg = cfg.lock().unwrap();
+        //         if cfg.frame_id.0 > cfg.frame_id.1 {
+        //             let _ = f.borrow_mut().take();
+        //             return;
+        //         }
+        //         step(); //
+        //         dom::request_animation_frame(f.borrow().as_ref().unwrap());
+        //     }) as Box<dyn FnMut()>));
+        //     dom::request_animation_frame(g.borrow().as_ref().unwrap());
+        //     Ok(())
+        // }
+        // foo().await;
+        // bar(&arc).await;
     }
     /// Forwards Renderer to Next Time-Step
     pub fn step(&mut self) {
