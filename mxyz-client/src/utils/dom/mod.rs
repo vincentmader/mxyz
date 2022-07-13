@@ -1,5 +1,6 @@
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
+// #[macro_export]
 
 // Window, Document, Body
 // ============================================================================
@@ -47,18 +48,32 @@ pub fn set_panic_hook() {
     console_error_panic_hook::set_once();
 }
 
-/// Manually Logs String to Browser Console
-pub fn console_log(message: &str) {
-    let array = js_sys::Array::new();
-    array.push(&message.into());
-    web_sys::console::log(&array);
-}
-
 /// Performs JS Alert
 #[wasm_bindgen]
 extern "C" {
+    // #[wasm_bindgen(js_namespace = console)]
+
     fn alert(s: &str);
+    fn warn(s: &str);
+    // fn log(s: &str);  // not working
 }
+
+/// Manually Logs String to Browser Console
+macro_rules! console_log {
+    ($($t:tt)*) => {
+        let msg = format_args!($($t)*).to_string();
+        let array = js_sys::Array::new();
+        array.push(&msg.into());
+        web_sys::console::log(&array);
+    };
+}
+pub(crate) use console_log;
+
+/// Manually Logs String as Warning to Browser Console
+macro_rules! console_warn {
+    ($($t:tt)*) => (warn(&format_args!($($t)*).to_string()))
+}
+pub(crate) use console_warn;
 
 // ============================================================================
 

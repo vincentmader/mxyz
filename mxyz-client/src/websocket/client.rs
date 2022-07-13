@@ -44,7 +44,7 @@ impl WebSocketClient {
 
     /// Initializes Web Socket Client
     pub fn init(&mut self) -> Result<(), JsValue> {
-        dom::console_log("Starting WebSocket Client...");
+        dom::console_log!("Starting WebSocket Client...");
         self.socket.set_binary_type(Arraybuffer); // for small bin. msgs, like CBOR, Arraybuffer is more efficient than Blob handling
         self.create_onmessage_callback(self.tx_web_to_render.clone());
         self.create_onerror_callback();
@@ -58,7 +58,7 @@ impl WebSocketClient {
 
         let cloned_ws = ws.clone();
         let onopen_callback = Closure::wrap(Box::new(move |_| {
-            console_log!("TCP socket opened");
+            dom::console_log!("TCP socket opened");
             // Add new client.
             let request = Package::Request(request::Request::AddClient).to_bytes();
             cloned_ws.send_with_u8_array(&request).unwrap();
@@ -73,7 +73,7 @@ impl WebSocketClient {
         let ws = &mut self.socket;
 
         let onerror_callback = Closure::wrap(Box::new(move |e: ErrorEvent| {
-            console_log!("ERROR Event: {:?}", e);
+            dom::console_log!("ERROR Event: {:?}", e);
         }) as Box<dyn FnMut(ErrorEvent)>);
 
         ws.set_onerror(Some(onerror_callback.as_ref().unchecked_ref()));
