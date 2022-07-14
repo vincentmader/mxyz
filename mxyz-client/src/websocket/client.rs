@@ -4,7 +4,7 @@ use mxyz_network::package::response::Response;
 use mxyz_network::package::Package;
 use mxyz_universe::preset::SimulationVariant;
 use mxyz_universe::state::StateQuery;
-use mxyz_universe::system::sized::SizedSystemVariant;
+use mxyz_universe::system::SizedSystemVariant;
 use std::sync::mpsc;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
@@ -136,7 +136,7 @@ pub fn handle_blob(_ws: &mut WebSocket, blob: web_sys::Blob) {
 pub fn handle_onmessage_package(
     ws: &mut WebSocket,
     package: Package,
-    _tx_web_to_render: std::sync::mpsc::Sender<Package>,
+    tx_web_to_render: std::sync::mpsc::Sender<Package>,
 ) {
     match package {
         Package::Response(res) => {
@@ -163,13 +163,19 @@ pub fn handle_onmessage_package(
                     ws.send_with_u8_array(&request).unwrap();
                 }
 
-                Response::StateVector(engine_id, state_vector) => {
+                Response::StateVector(engine_id, states) => {
                     // update state-id of last sync
-                    let state_id = if state_vector.len() == 0 {
+                    let state_id = if states.len() == 0 {
                         0
                     } else {
-                        state_vector[state_vector.len() - 1].state_id // last update
+                        states[states.len() - 1].state_id // last update
                     };
+
+                    let state_query =
+                        StateQuery::Between(state_id as i32, state_id as i32 + STATE_BATCH_SIZE);
+                    let request = request::Request::GetUpdatedStates(engine_id, state_query);
+                    let request = Package::Request(request).to_bytes();
+                    ws.send_with_u8_array(&request).unwrap();
 
                     use crate::renderer::components::canvas::Canvas;
                     let mut canvas = Canvas::new(0);
@@ -178,7 +184,8 @@ pub fn handle_onmessage_package(
                     canvas.set_fill_style("purple");
                     canvas.set_stroke_style("purple");
 
-                    for state in state_vector.iter() {
+                    //
+                    for state in states.iter() {
                         // canvas.clear();
 
                         // let text = format!("state {}", state.state_id);
@@ -202,11 +209,8 @@ pub fn handle_onmessage_package(
                         }
                     }
 
-                    let state_query =
-                        StateQuery::Between(state_id as i32, state_id as i32 + STATE_BATCH_SIZE);
-                    let request = request::Request::GetUpdatedStates(engine_id, state_query);
-                    let request = Package::Request(request).to_bytes();
-                    ws.send_with_u8_array(&request).unwrap();
+                    // let pkg = Package::StateVec(states);
+                    // tx_web_to_render.send(pkg);
 
                     // let (secs, nanos) = (1, 0);
                     // let duration = core::time::Duration::new(secs, nanos);
@@ -221,6 +225,7 @@ pub fn handle_onmessage_package(
                 }
 
                 Response::Empty => {}
+                _ => todo!(),
             }
         }
 
@@ -231,5 +236,6 @@ pub fn handle_onmessage_package(
         Package::Request(req) => match req {
             _ => todo!(),
         },
+        _ => todo!(),
     }
 }

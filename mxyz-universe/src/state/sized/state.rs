@@ -1,4 +1,4 @@
-use crate::system::sized::SizedSystem;
+use crate::system::SizedSystem;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]

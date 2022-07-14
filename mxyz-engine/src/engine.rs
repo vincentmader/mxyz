@@ -6,7 +6,7 @@ use mxyz_universe::integrator::Integrator;
 use mxyz_universe::integrator::IntegratorVariant;
 use mxyz_universe::preset::SimulationVariant;
 use mxyz_universe::state::State;
-use mxyz_universe::system::system::System;
+use mxyz_universe::system::System;
 
 // ============================================================================
 

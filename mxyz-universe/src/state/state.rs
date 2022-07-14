@@ -1,4 +1,4 @@
-use crate::system::system::System;
+use crate::system::System;
 use serde::{Deserialize, Serialize};
 
 /// State

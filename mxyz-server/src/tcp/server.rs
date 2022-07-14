@@ -73,11 +73,11 @@ pub fn handle_message(msg: MessageResult, tx: &mpsc::Sender<Package>) -> Message
     match &msg {
         Ok(e) => match e {
             Message::Binary(bytes) => handle_binary_message(bytes.to_vec(), tx),
-            _ => todo!("handle non-binary messages")
+            Message::Close(_) => msg, // TODO find out: can I shutdown engines with this? (remove from db etc)
+            _ => todo!("handle non-binary messages"),
             // Message::Text(_) => msg,
             // Message::Ping(_) => Ok(Message::Pong(vec![7, 4, 1])),
             // Message::Pong(_) => Ok(Message::Ping(vec![1, 4, 7])),
-            // Message::Close(_) => msg,
             // Message::Frame(_) => msg,
         },
         Err(e) => {
@@ -96,6 +96,7 @@ pub fn handle_binary_message(bytes: Vec<u8>, tx: &mpsc::Sender<Package>) -> Mess
         Package::Request(request) => handle_request(request, &tx),
         Package::Response(response) => handle_response(response),
         Package::Command(command) => handle_command(command),
+        _ => todo!(),
     };
     // Convert package to bytes and return.
     let bytes = response.to_bytes();

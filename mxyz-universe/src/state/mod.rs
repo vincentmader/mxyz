@@ -1,5 +1,5 @@
-mod sized_state;
+mod sized;
 mod state;
-pub use sized_state::SizedState;
+pub use sized::SizedState;
 pub use state::State;
 pub use state::StateQuery;

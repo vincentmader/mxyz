@@ -4,7 +4,7 @@ use mxyz_network::package::command::Command;
 use mxyz_network::package::request::Request;
 use mxyz_network::package::Package;
 use mxyz_universe::preset::SimulationVariant;
-use mxyz_universe::system::system::SystemVariant;
+use mxyz_universe::system::SystemVariant;
 use std::sync::mpsc;
 
 pub struct EngineRunner {

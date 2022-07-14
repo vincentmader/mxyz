@@ -2,6 +2,8 @@ use crate::renderer::Renderer;
 use crate::utils::dom;
 use crate::websocket::client::WebSocketClient;
 use mxyz_config::ClientConfig;
+use mxyz_network::package::Package;
+use mxyz_universe::system::SizedSystemVariant;
 use std::cell::RefCell;
 use std::rc::Rc;
 use std::sync::mpsc;
@@ -44,14 +46,16 @@ impl SimulationClientV1 {
     }
     /// Runs Renderer-Client in Animation Loop
     pub async fn run(self) {
+        let (tx_web_to_render, rx_web_to_render) = mpsc::channel();
+
         // let arc = Arc::new(Mutex::new(&mut self));
         // DB Sync via TCP (WebSocket)
-        let _ = self.loop_state_getter().await;
+        let _ = self.loop_state_getter(tx_web_to_render).await;
         // let _ = self.loop_state_getter(&arc).await;
         // let _ = arc.clone().lock().unwrap().loop_state_getter().await;
 
         // Renderer
-        let _ = self.loop_state_renderer().await;
+        let _ = self.loop_state_renderer(rx_web_to_render).await;
         // let _ = self.loop_state_renderer(&arc).await;
         // let _ = arc.clone().lock().unwrap().loop_state_renderer().await;
 
@@ -61,7 +65,10 @@ impl SimulationClientV1 {
         &self,
         // self: Arc<Mutex<Self>>,
         // arc: &'static Arc<Mutex<&mut SimulationClientV1>>,
+        tx_web_to_render: mpsc::Sender<Package>,
     ) -> Result<(), JsValue> {
+        let websocket = WebSocketClient::new(HOST, PORT, tx_web_to_render);
+
         let f = Rc::new(RefCell::new(None));
         let g = f.clone();
         let mut i = 0;
@@ -84,6 +91,7 @@ impl SimulationClientV1 {
 
     async fn loop_state_renderer(
         &self,
+        rx_web_to_render: mpsc::Receiver<Package>,
         // arc: &Arc<Mutex<&mut SimulationClientV1>>,
     ) -> Result<(), JsValue> {
         let f = Rc::new(RefCell::new(None));
@@ -94,6 +102,47 @@ impl SimulationClientV1 {
             //     let _ = f.borrow_mut().take();
             //     return;
             // }
+
+            //let rx = rx_web_to_render.recv().unwrap();
+            //match rx {
+            //    Package::Request(_) => {}
+            //    Package::Response(_) => {}
+            //    Package::Command(_) => {}
+            //    Package::StateVec(states) => {
+            //        use crate::renderer::components::canvas::Canvas;
+            //        let mut canvas = Canvas::new(0);
+            //        let cnv_dim = canvas.dimensions;
+            //        canvas.init();
+            //        canvas.set_fill_style("purple");
+            //        canvas.set_stroke_style("purple");
+
+            //        //
+            //        for state in states.iter() {
+            //            // canvas.clear();
+
+            //            // let text = format!("state {}", state.state_id);
+            //            // let (x, y) = (50., 50.);
+            //            // canvas.fill_text(&text, x, y);
+
+            //            for system in state.systems.iter() {
+            //                match &system.variant {
+            //                    SizedSystemVariant::EntitiesV1(system) => {
+            //                        for planet in system.entities.iter() {
+            //                            let pos = planet.position;
+            //                            let pos = (pos[0], pos[1]);
+            //                            let pos = (pos.0 * cnv_dim.0 / 2., pos.1 * cnv_dim.1 / 2.);
+            //                            let pos = (pos.0 + cnv_dim.0 / 2., pos.1 + cnv_dim.1 / 2.);
+            //                            let r = 1.;
+            //                            canvas.draw_circle(pos, r, true);
+            //                        }
+            //                    }
+            //                    _ => todo!(),
+            //                }
+            //            }
+            //        }
+            //    }
+            //}
+
             dom::console_log!("{:?}", i);
             // std::thread::spawn(|| {});
             // self.step(&tx); //

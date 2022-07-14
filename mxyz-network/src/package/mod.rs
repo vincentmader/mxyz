@@ -1,3 +1,4 @@
+use mxyz_universe::state::SizedState;
 use serde::{Deserialize, Serialize};
 
 pub mod command;
@@ -10,7 +11,7 @@ pub enum Package {
     Response(response::Response),
 
     Command(command::Command),
-    // StateVec(Vec<State>),
+    StateVec(Vec<SizedState>),
 }
 impl Package {
     pub fn to_bytes(self) -> Vec<u8> {
