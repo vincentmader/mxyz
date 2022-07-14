@@ -5,8 +5,8 @@ use mxyz_config::ClientConfig;
 use std::cell::RefCell;
 use std::rc::Rc;
 use std::sync::mpsc;
-use std::sync::{Arc, Mutex};
 use wasm_bindgen::prelude::*;
+// use std::sync::{Arc, Mutex};
 
 const HOST: &str = "127.0.0.1";
 const PORT: u16 = 1234;
@@ -24,7 +24,7 @@ impl SimulationClientV1 {
     /// Creates new Simulation-Renderer-Client
     pub fn new(client_id: usize) -> Self {
         let channel_ws_to_rndr = mpsc::channel();
-        let (tx_web_to_render, rx_web_to_render) = channel_ws_to_rndr;
+        let (tx_web_to_render, _rx_web_to_render) = channel_ws_to_rndr;
 
         let config = ClientConfig::new(client_id);
         let renderer = Renderer::new();
@@ -37,14 +37,14 @@ impl SimulationClientV1 {
         }
     }
     /// Initializes Renderer-Client
-    pub fn init(&mut self, simulation_variant: &str) {
+    pub fn init(&mut self, _simulation_variant: &str) {
         dom::set_panic_hook();
         self.renderer.init();
         self.websocket.init().unwrap();
     }
     /// Runs Renderer-Client in Animation Loop
-    pub async fn run(mut self) {
-        let arc = Arc::new(Mutex::new(&mut self));
+    pub async fn run(self) {
+        // let arc = Arc::new(Mutex::new(&mut self));
         // DB Sync via TCP (WebSocket)
         let _ = self.loop_state_getter().await;
         // let _ = self.loop_state_getter(&arc).await;
@@ -59,6 +59,7 @@ impl SimulationClientV1 {
     }
     async fn loop_state_getter(
         &self,
+        // self: Arc<Mutex<Self>>,
         // arc: &'static Arc<Mutex<&mut SimulationClientV1>>,
     ) -> Result<(), JsValue> {
         let f = Rc::new(RefCell::new(None));
@@ -106,7 +107,7 @@ impl SimulationClientV1 {
 
     /// Forwards Renderer to Next Time-Step
     pub fn step(&mut self) {
-        let frame_id = self.config.frame_id.0;
+        let _frame_id = self.config.frame_id.0;
         // tmp::draw(i); // TODO create renderer with loop over systems & entities
         self.config.frame_id.0 += 1;
     }

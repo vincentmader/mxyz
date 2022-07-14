@@ -9,34 +9,26 @@ use std::sync::mpsc;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::BinaryType::Arraybuffer;
-use web_sys::{ErrorEvent, MessageEvent, WebSocket};
+use web_sys::WebSocket;
+use web_sys::{ErrorEvent, MessageEvent};
 // use crate::renderer::Renderer;
 
 const STATE_BATCH_SIZE: i32 = 50;
 
-macro_rules! console_log {
-    ($($t:tt)*) => (log(&format_args!($($t)*).to_string()))
-}
-
-#[wasm_bindgen]
-extern "C" {
-    #[wasm_bindgen(js_namespace = console)]
-    fn log(s: &str);
-}
-
+/// Web-Socket Client
 pub struct WebSocketClient {
-    client_id: usize,
+    _client_id: usize,
     socket: WebSocket,
     tx_web_to_render: mpsc::Sender<Package>,
 }
 impl WebSocketClient {
     /// Creates new instance of Web Socket Client
     pub fn new(host: &str, port: u16, tx_web_to_render: mpsc::Sender<Package>) -> Self {
-        let client_id = 0; // TODO
+        let _client_id = 0; // TODO
         let address = format!("ws://{}:{}", host, port);
         let socket = WebSocket::new(&address).unwrap();
         WebSocketClient {
-            client_id,
+            _client_id,
             socket,
             tx_web_to_render,
         }
@@ -97,10 +89,10 @@ impl WebSocketClient {
                 handle_blob(&mut cloned_ws, blob);
             // Handle Text.
             } else if let Ok(txt) = e.data().dyn_into::<js_sys::JsString>() {
-                console_log!("message event, received Text: {:?}", txt);
+                dom::console_log!("message event, received Text: {:?}", txt);
             // Handle Other.
             } else {
-                console_log!("message event, received Unknown: {:?}", e.data());
+                dom::console_log!("message event, received Unknown: {:?}", e.data());
             }
         }) as Box<dyn FnMut(MessageEvent)>);
 
@@ -115,7 +107,7 @@ pub fn handle_arraybuffer(
     tx_web_to_render: std::sync::mpsc::Sender<Package>,
 ) {
     let array = js_sys::Uint8Array::new(&abuf);
-    let len = array.byte_length() as usize;
+    let _len = array.byte_length() as usize;
     let package = Package::from_bytes(array.to_vec());
     // console_log!("\nArraybuffer received {} bytes", len);
     // console_log!("\nArraybuffer received {} bytes -> {:?}", len, &package);
@@ -123,7 +115,7 @@ pub fn handle_arraybuffer(
 }
 
 pub fn handle_blob(_ws: &mut WebSocket, blob: web_sys::Blob) {
-    console_log!("UNHANDLED message event, received blob: {:?}", blob);
+    dom::console_log!("UNHANDLED message event, received blob: {:?}", blob);
     // better alternative to juggling with FileReader is to use https://crates.io/crates/gloo-file
     let fr = web_sys::FileReader::new().unwrap();
     let fr_c = fr.clone();
@@ -132,7 +124,7 @@ pub fn handle_blob(_ws: &mut WebSocket, blob: web_sys::Blob) {
     let onloadend_cb = Closure::wrap(Box::new(move |_e: web_sys::ProgressEvent| {
         let array = js_sys::Uint8Array::new(&fr_c.result().unwrap());
         let len = array.byte_length() as usize;
-        console_log!("Blob received {}bytes: {:?}", len, array.to_vec());
+        dom::console_log!("Blob received {}bytes: {:?}", len, array.to_vec());
         // here you can for example use the received image/png data
     }) as Box<dyn FnMut(web_sys::ProgressEvent)>);
 
@@ -144,15 +136,18 @@ pub fn handle_blob(_ws: &mut WebSocket, blob: web_sys::Blob) {
 pub fn handle_onmessage_package(
     ws: &mut WebSocket,
     package: Package,
-    tx_web_to_render: std::sync::mpsc::Sender<Package>,
+    _tx_web_to_render: std::sync::mpsc::Sender<Package>,
 ) {
-    // console_log!("\nArraybuffer-Package received: {:?}", package);
     match package {
         Package::Response(res) => {
             match res {
                 Response::AddedClient(client_id) => {
+                    // TODO load client-id into client struct field
+                    // self.client_id = Some(client_id);
+
                     // TODO Get simulation-variant from HTML/JS.
                     let sim_variant = SimulationVariant::ThreeBodyMoon;
+
                     // Request engine to be started on server.
                     let request = request::Request::AddEngine(client_id, sim_variant);
                     let request = Package::Request(request).to_bytes();
@@ -160,10 +155,8 @@ pub fn handle_onmessage_package(
                 }
 
                 Response::AddedEngine(engine_id) => {
-                    // Initialize state-id of last sync with server.
-                    let last_sync_id = 0;
-                    //
-                    let state_query = StateQuery::BatchSince(last_sync_id, STATE_BATCH_SIZE);
+                    // Formulate state-query.
+                    let state_query = StateQuery::Between(0, STATE_BATCH_SIZE);
                     // Start sync-loop for this engine's states.
                     let request = request::Request::GetUpdatedStates(engine_id, state_query);
                     let request = Package::Request(request).to_bytes();

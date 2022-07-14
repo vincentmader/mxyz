@@ -1,6 +1,5 @@
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
-// #[macro_export]
 
 // Window, Document, Body
 // ============================================================================

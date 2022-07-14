@@ -15,7 +15,7 @@ def check_dir(path, length):
     files = os.listdir(path)
     for item in sorted(files):
 
-        if item in ['out', 'target', '.git', 'pkg', 'Cargo.lock']:
+        if item in ['out', 'target', '.git', 'pkg', 'Cargo.lock', 'fuse.txt', '.DS_Store']:
             continue
         if item.endswith('.png') or item.endswith('.jpg') or item.endswith('.ico'):
             continue
