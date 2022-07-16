@@ -1,7 +1,7 @@
 use crate::system::SizedSystem;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)] // TODO remove clone again
 pub struct SizedState {
     pub state_id: usize,
     pub systems: Vec<SizedSystem>,

@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 // use crate::system::discrete_field::DiscreteField;
 use crate::entity::EntityV1;
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Clone, Deserialize, Debug)] // TODO remove clone again
 /// System: EntitiesV1
 pub struct EntitiesV1 {
     pub entities: Vec<EntityV1>,

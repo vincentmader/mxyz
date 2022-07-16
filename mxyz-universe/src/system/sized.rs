@@ -6,7 +6,7 @@ use crate::system::EntitiesV1;
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)] // TODO remove clone again
 pub struct SizedSystem {
     pub system_id: usize,
     pub variant: SizedSystemVariant,
@@ -57,7 +57,7 @@ impl From<System> for SizedSystem {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)] // TODO remove clone again
 pub enum SizedSystemVariant {
     EntitiesV1(EntitiesV1),
     Field(SizedFieldVariant),
@@ -65,11 +65,11 @@ pub enum SizedSystemVariant {
     Network(SizedNetworkVariant),
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)] // TODO remove clone again
 pub enum SizedFieldVariant {}
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)] // TODO remove clone again
 pub enum SizedObjectsVariant {}
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)] // TODO remove clone again
 pub enum SizedNetworkVariant {}

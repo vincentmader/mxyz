@@ -6,6 +6,7 @@ use mxyz_universe::preset::SimulationVariant;
 use mxyz_universe::state::StateQuery;
 use mxyz_universe::system::SizedSystemVariant;
 use std::sync::mpsc;
+use std::sync::{Arc, Mutex};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::BinaryType::Arraybuffer;
@@ -19,14 +20,19 @@ const STATE_BATCH_SIZE: i32 = 50;
 pub struct WebSocketClient {
     _client_id: usize,
     socket: WebSocket,
-    tx_web_to_render: mpsc::Sender<Package>,
+    tx_web_to_render: Arc<Mutex<mpsc::Sender<Package>>>,
 }
 impl WebSocketClient {
     /// Creates new instance of Web Socket Client
-    pub fn new(host: &str, port: u16, tx_web_to_render: mpsc::Sender<Package>) -> Self {
+    pub fn new(
+        host: &str,
+        port: u16,
+        tx_web_to_render: &Arc<Mutex<mpsc::Sender<Package>>>,
+    ) -> Self {
         let _client_id = 0; // TODO
         let address = format!("ws://{}:{}", host, port);
         let socket = WebSocket::new(&address).unwrap();
+        let tx_web_to_render = tx_web_to_render.clone();
         WebSocketClient {
             _client_id,
             socket,
@@ -38,7 +44,7 @@ impl WebSocketClient {
     pub fn init(&mut self) -> Result<(), JsValue> {
         dom::console_log!("Starting WebSocket Client...");
         self.socket.set_binary_type(Arraybuffer); // for small bin. msgs, like CBOR, Arraybuffer is more efficient than Blob handling
-        self.create_onmessage_callback(self.tx_web_to_render.clone());
+        self.create_onmessage_callback(&self.tx_web_to_render.clone());
         self.create_onerror_callback();
         self.create_onopen_callback();
         Ok(())
@@ -50,9 +56,10 @@ impl WebSocketClient {
 
         let cloned_ws = ws.clone();
         let onopen_callback = Closure::wrap(Box::new(move |_| {
-            dom::console_log!("TCP socket opened");
+            dom::console_log!("TCP socket opened.");
             // Add new client.
             let request = Package::Request(request::Request::AddClient).to_bytes();
+            dom::console_log!("Requesting new Client...");
             cloned_ws.send_with_u8_array(&request).unwrap();
         }) as Box<dyn FnMut(JsValue)>);
 
@@ -75,9 +82,11 @@ impl WebSocketClient {
     /// Creates OnMessage Callback.
     pub fn create_onmessage_callback(
         &mut self,
-        tx_web_to_render: std::sync::mpsc::Sender<Package>,
+        // tx_web_to_render: std::sync::mpsc::Sender<Package>,
+        tx_web_to_render: &Arc<Mutex<mpsc::Sender<Package>>>,
     ) {
         let ws = &mut self.socket;
+        let tx_web_to_render = tx_web_to_render.clone();
 
         let mut cloned_ws = ws.clone();
         let onmessage_callback = Closure::wrap(Box::new(move |e: MessageEvent| {
@@ -104,7 +113,8 @@ impl WebSocketClient {
 pub fn handle_arraybuffer(
     ws: &mut WebSocket,
     abuf: js_sys::ArrayBuffer,
-    tx_web_to_render: std::sync::mpsc::Sender<Package>,
+    // tx_web_to_render: std::sync::mpsc::Sender<Package>,
+    tx_web_to_render: Arc<Mutex<mpsc::Sender<Package>>>,
 ) {
     let array = js_sys::Uint8Array::new(&abuf);
     let _len = array.byte_length() as usize;
@@ -136,12 +146,14 @@ pub fn handle_blob(_ws: &mut WebSocket, blob: web_sys::Blob) {
 pub fn handle_onmessage_package(
     ws: &mut WebSocket,
     package: Package,
-    tx_web_to_render: std::sync::mpsc::Sender<Package>,
+    // tx_web_to_render: std::sync::mpsc::Sender<Package>,
+    tx_web_to_render: Arc<Mutex<mpsc::Sender<Package>>>,
 ) {
     match package {
         Package::Response(res) => {
             match res {
                 Response::AddedClient(client_id) => {
+                    dom::console_log!("New Client confirmed. (id={:?})", client_id);
                     // TODO load client-id into client struct field
                     // self.client_id = Some(client_id);
 
@@ -149,14 +161,17 @@ pub fn handle_onmessage_package(
                     let sim_variant = SimulationVariant::ThreeBodyMoon;
 
                     // Request engine to be started on server.
+                    dom::console_log!("Requesting new Engine...");
                     let request = request::Request::AddEngine(client_id, sim_variant);
                     let request = Package::Request(request).to_bytes();
                     ws.send_with_u8_array(&request).unwrap();
                 }
 
                 Response::AddedEngine(engine_id) => {
+                    dom::console_log!("New Engine confirmed. (id={:?})", engine_id);
                     // Formulate state-query.
                     let state_query = StateQuery::Between(0, STATE_BATCH_SIZE);
+                    dom::console_log!("Requesting States...");
                     // Start sync-loop for this engine's states.
                     let request = request::Request::GetUpdatedStates(engine_id, state_query);
                     let request = Package::Request(request).to_bytes();
@@ -164,6 +179,11 @@ pub fn handle_onmessage_package(
                 }
 
                 Response::StateVector(engine_id, states) => {
+                    dom::console_log!(
+                        "Received {} states for engine {}...",
+                        states.len(),
+                        engine_id
+                    );
                     // update state-id of last sync
                     let state_id = if states.len() == 0 {
                         0
@@ -171,57 +191,23 @@ pub fn handle_onmessage_package(
                         states[states.len() - 1].state_id // last update
                     };
 
+                    let tx_web_to_render = tx_web_to_render.clone();
+
+                    let pkg = Package::StateVec(states.clone());
+                    // tx_web_to_render
+                    //     .lock()
+                    //     .expect("a")
+                    //     .clone()
+                    //     .send(pkg)
+                    //     .expect("b");
+
+                    // Request next states.
+                    dom::console_log!("Requesting States...");
                     let state_query =
                         StateQuery::Between(state_id as i32, state_id as i32 + STATE_BATCH_SIZE);
                     let request = request::Request::GetUpdatedStates(engine_id, state_query);
                     let request = Package::Request(request).to_bytes();
                     ws.send_with_u8_array(&request).unwrap();
-
-                    use crate::renderer::components::canvas::Canvas;
-                    let mut canvas = Canvas::new(0);
-                    let cnv_dim = canvas.dimensions;
-                    canvas.init();
-                    canvas.set_fill_style("purple");
-                    canvas.set_stroke_style("purple");
-
-                    //
-                    for state in states.iter() {
-                        // canvas.clear();
-
-                        // let text = format!("state {}", state.state_id);
-                        // let (x, y) = (50., 50.);
-                        // canvas.fill_text(&text, x, y);
-
-                        for system in state.systems.iter() {
-                            match &system.variant {
-                                SizedSystemVariant::EntitiesV1(system) => {
-                                    for planet in system.entities.iter() {
-                                        let pos = planet.position;
-                                        let pos = (pos[0], pos[1]);
-                                        let pos = (pos.0 * cnv_dim.0 / 2., pos.1 * cnv_dim.1 / 2.);
-                                        let pos = (pos.0 + cnv_dim.0 / 2., pos.1 + cnv_dim.1 / 2.);
-                                        let r = 1.;
-                                        canvas.draw_circle(pos, r, true);
-                                    }
-                                }
-                                _ => todo!(),
-                            }
-                        }
-                    }
-
-                    // let pkg = Package::StateVec(states);
-                    // tx_web_to_render.send(pkg);
-
-                    // let (secs, nanos) = (1, 0);
-                    // let duration = core::time::Duration::new(secs, nanos);
-                    // wasm_timer::Delay::new(duration);
-                    // wasm_timer::sleep(duration);
-                    // use gloo_timers::callback::Timeout;
-                    // let timeout = Timeout::new(1_000, move || {
-                    // Do something after the one second timeout is up!
-                    // });
-                    // Since we don't plan on cancelling the timeout, call `forget`.
-                    // timeout.forget();
                 }
 
                 Response::Empty => {}
