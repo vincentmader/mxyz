@@ -3,12 +3,12 @@ use crate::utils::dom;
 use crate::websocket::client::WebSocketClient;
 use mxyz_config::ClientConfig;
 use mxyz_network::package::Package;
-use mxyz_universe::system::SizedSystemVariant;
-use std::cell::RefCell;
-use std::rc::Rc;
 use std::sync::mpsc;
 use std::sync::{Arc, Mutex};
 use wasm_bindgen::prelude::*;
+// use mxyz_universe::system::SizedSystemVariant;
+// use std::cell::RefCell;
+// use std::rc::Rc;
 
 const HOST: &str = "127.0.0.1";
 const PORT: u16 = 1234;
@@ -73,23 +73,24 @@ impl SimulationClientV1 {
         let mut websocket = WebSocketClient::new(HOST, PORT, &tx_web_to_render);
         websocket.init().unwrap();
 
-        let f = Rc::new(RefCell::new(None));
-        let g = f.clone();
-        let mut i = 0;
-        *g.borrow_mut() = Some(Closure::wrap(Box::new(move || {
-            // let arc = arc.lock().unwrap();
-            // if arc.config.frame_id.0 > arc.config.frame_id.1 {
-            //     let _ = f.borrow_mut().take();
-            //     return;
-            // }
-            dom::console_log!("\t\t{:?} (state-getter-step)", i);
-            // std::thread::spawn(|| {});
-            // self.step(&tx); //
-            // self.step(); //
-            i += 1;
-            dom::request_animation_frame(f.borrow().as_ref().unwrap());
-        }) as Box<dyn FnMut()>));
-        dom::request_animation_frame(g.borrow().as_ref().unwrap());
+        // let f = Rc::new(RefCell::new(None));
+        // let g = f.clone();
+        // let mut i = 0;
+        // *g.borrow_mut() = Some(Closure::wrap(Box::new(move || {
+        //     // let arc = arc.lock().unwrap();
+        //     // if arc.config.frame_id.0 > arc.config.frame_id.1 {
+        //     //     let _ = f.borrow_mut().take();
+        //     //     return;
+        //     // }
+        //     dom::console_log!("\t\t{:?} (state-getter-step)", i);
+        //     // TODO get states from here?
+        //     // std::thread::spawn(|| {});
+        //     // self.step(&tx); //
+        //     // self.step(); //
+        //     i += 1;
+        //     dom::request_animation_frame(f.borrow().as_ref().unwrap());
+        // }) as Box<dyn FnMut()>));
+        // dom::request_animation_frame(g.borrow().as_ref().unwrap());
         Ok(())
     }
 
@@ -99,7 +100,7 @@ impl SimulationClientV1 {
         // rx_web_to_render: mpsc::Receiver<Package>,
         // arc: &Arc<Mutex<&mut SimulationClientV1>>
     ) -> Result<(), JsValue> {
-        let rx_web_to_render = rx_web_to_render.clone();
+        let _rx_web_to_render = rx_web_to_render.clone();
         // let pkg = rx_web_to_render.lock().unwrap().recv().unwrap();
 
         // use crate::renderer::components::canvas::Canvas;
@@ -109,107 +110,107 @@ impl SimulationClientV1 {
         // canvas.set_fill_style("purple");
         // canvas.set_stroke_style("purple");
 
-        let f = Rc::new(RefCell::new(None));
-        let g = f.clone();
-        let mut i = 0;
-        *g.borrow_mut() = Some(Closure::wrap(Box::new(move || {
-            // let pkg = rx_web_to_render.lock().unwrap().recv().unwrap();
-            //match pkg {
-            //    Package::StateVec(states) => {
-            //        //
-            //        // for state in states.iter() {
-            //        //     // canvas.clear();
+        //let f = Rc::new(RefCell::new(None));
+        //let g = f.clone();
+        //let mut i = 0;
+        //*g.borrow_mut() = Some(Closure::wrap(Box::new(move || {
+        //    // let pkg = rx_web_to_render.lock().unwrap().recv().unwrap();
+        //    //match pkg {
+        //    //    Package::StateVec(states) => {
+        //    //        //
+        //    //        // for state in states.iter() {
+        //    //        //     // canvas.clear();
 
-            //        //     // let text = format!("state {}", state.state_id);
-            //        //     // let (x, y) = (50., 50.);
-            //        //     // canvas.fill_text(&text, x, y);
+        //    //        //     // let text = format!("state {}", state.state_id);
+        //    //        //     // let (x, y) = (50., 50.);
+        //    //        //     // canvas.fill_text(&text, x, y);
 
-            //        //     for system in state.systems.iter() {
-            //        //         match &system.variant {
-            //        //             SizedSystemVariant::EntitiesV1(system) => {
-            //        //                 for planet in system.entities.iter() {
-            //        //                     let pos = planet.position;
-            //        //                     let pos = (pos[0], pos[1]);
-            //        //                     let pos = (pos.0 * cnv_dim.0 / 2., pos.1 * cnv_dim.1 / 2.);
-            //        //                     let pos = (pos.0 + cnv_dim.0 / 2., pos.1 + cnv_dim.1 / 2.);
-            //        //                     let r = 1.;
-            //        //                     canvas.draw_circle(pos, r, true);
-            //        //                 }
-            //        //             }
-            //        //             _ => todo!(),
-            //        //         }
-            //        //     }
-            //        // }
+        //    //        //     for system in state.systems.iter() {
+        //    //        //         match &system.variant {
+        //    //        //             SizedSystemVariant::EntitiesV1(system) => {
+        //    //        //                 for planet in system.entities.iter() {
+        //    //        //                     let pos = planet.position;
+        //    //        //                     let pos = (pos[0], pos[1]);
+        //    //        //                     let pos = (pos.0 * cnv_dim.0 / 2., pos.1 * cnv_dim.1 / 2.);
+        //    //        //                     let pos = (pos.0 + cnv_dim.0 / 2., pos.1 + cnv_dim.1 / 2.);
+        //    //        //                     let r = 1.;
+        //    //        //                     canvas.draw_circle(pos, r, true);
+        //    //        //                 }
+        //    //        //             }
+        //    //        //             _ => todo!(),
+        //    //        //         }
+        //    //        //     }
+        //    //        // }
 
-            //        // let pkg = Package::StateVec(states);
-            //        // tx_web_to_render.send(pkg);
+        //    //        // let pkg = Package::StateVec(states);
+        //    //        // tx_web_to_render.send(pkg);
 
-            //        // let (secs, nanos) = (1, 0);
-            //        // let duration = core::time::Duration::new(secs, nanos);
-            //        // wasm_timer::Delay::new(duration);
-            //        // wasm_timer::sleep(duration);
-            //        // use gloo_timers::callback::Timeout;
-            //        // let timeout = Timeout::new(1_000, move || {
-            //        // Do something after the one second timeout is up!
-            //        // });
-            //        // Since we don't plan on cancelling the timeout, call `forget`.
-            //        // timeout.forget();
-            // }
-            //    _ => todo!(),
-            // }
-            // if self.config.frame_id.0 > self.config.frame_id.1 {
-            //     let _ = f.borrow_mut().take();
-            //     return;
-            // }
+        //    //        // let (secs, nanos) = (1, 0);
+        //    //        // let duration = core::time::Duration::new(secs, nanos);
+        //    //        // wasm_timer::Delay::new(duration);
+        //    //        // wasm_timer::sleep(duration);
+        //    //        // use gloo_timers::callback::Timeout;
+        //    //        // let timeout = Timeout::new(1_000, move || {
+        //    //        // Do something after the one second timeout is up!
+        //    //        // });
+        //    //        // Since we don't plan on cancelling the timeout, call `forget`.
+        //    //        // timeout.forget();
+        //    // }
+        //    //    _ => todo!(),
+        //    // }
+        //    // if self.config.frame_id.0 > self.config.frame_id.1 {
+        //    //     let _ = f.borrow_mut().take();
+        //    //     return;
+        //    // }
 
-            // let rx = rx_web_to_render.clone().lock().unwrap().recv().unwrap();
-            //match rx {
-            //    Package::Request(_) => {}
-            //    Package::Response(_) => {}
-            //    Package::Command(_) => {}
-            //    Package::StateVec(states) => {
-            //        use crate::renderer::components::canvas::Canvas;
-            //        let mut canvas = Canvas::new(0);
-            //        let cnv_dim = canvas.dimensions;
-            //        canvas.init();
-            //        canvas.set_fill_style("purple");
-            //        canvas.set_stroke_style("purple");
+        //    // let rx = rx_web_to_render.clone().lock().unwrap().recv().unwrap();
+        //    //match rx {
+        //    //    Package::Request(_) => {}
+        //    //    Package::Response(_) => {}
+        //    //    Package::Command(_) => {}
+        //    //    Package::StateVec(states) => {
+        //    //        use crate::renderer::components::canvas::Canvas;
+        //    //        let mut canvas = Canvas::new(0);
+        //    //        let cnv_dim = canvas.dimensions;
+        //    //        canvas.init();
+        //    //        canvas.set_fill_style("purple");
+        //    //        canvas.set_stroke_style("purple");
 
-            //        //
-            //        for state in states.iter() {
-            //            // canvas.clear();
+        //    //        //
+        //    //        for state in states.iter() {
+        //    //            // canvas.clear();
 
-            //            // let text = format!("state {}", state.state_id);
-            //            // let (x, y) = (50., 50.);
-            //            // canvas.fill_text(&text, x, y);
+        //    //            // let text = format!("state {}", state.state_id);
+        //    //            // let (x, y) = (50., 50.);
+        //    //            // canvas.fill_text(&text, x, y);
 
-            //            for system in state.systems.iter() {
-            //                match &system.variant {
-            //                    SizedSystemVariant::EntitiesV1(system) => {
-            //                        for planet in system.entities.iter() {
-            //                            let pos = planet.position;
-            //                            let pos = (pos[0], pos[1]);
-            //                            let pos = (pos.0 * cnv_dim.0 / 2., pos.1 * cnv_dim.1 / 2.);
-            //                            let pos = (pos.0 + cnv_dim.0 / 2., pos.1 + cnv_dim.1 / 2.);
-            //                            let r = 1.;
-            //                            canvas.draw_circle(pos, r, true);
-            //                        }
-            //                    }
-            //                    _ => todo!(),
-            //                }
-            //            }
-            //        }
-            //    }
-            //}
+        //    //            for system in state.systems.iter() {
+        //    //                match &system.variant {
+        //    //                    SizedSystemVariant::EntitiesV1(system) => {
+        //    //                        for planet in system.entities.iter() {
+        //    //                            let pos = planet.position;
+        //    //                            let pos = (pos[0], pos[1]);
+        //    //                            let pos = (pos.0 * cnv_dim.0 / 2., pos.1 * cnv_dim.1 / 2.);
+        //    //                            let pos = (pos.0 + cnv_dim.0 / 2., pos.1 + cnv_dim.1 / 2.);
+        //    //                            let r = 1.;
+        //    //                            canvas.draw_circle(pos, r, true);
+        //    //                        }
+        //    //                    }
+        //    //                    _ => todo!(),
+        //    //                }
+        //    //            }
+        //    //        }
+        //    //    }
+        //    //}
 
-            dom::console_log!("{:?} (renderer-step)", i);
-            // std::thread::spawn(|| {});
-            // self.step(&tx); //
-            // self.step(); //
-            i += 1;
-            dom::request_animation_frame(f.borrow().as_ref().unwrap());
-        }) as Box<dyn FnMut()>));
-        dom::request_animation_frame(g.borrow().as_ref().unwrap());
+        //    dom::console_log!("{:?} (renderer-step)", i);
+        //    // std::thread::spawn(|| {});
+        //    // self.step(&tx); //
+        //    // self.step(); //
+        //    i += 1;
+        //    dom::request_animation_frame(f.borrow().as_ref().unwrap());
+        //}) as Box<dyn FnMut()>));
+        //dom::request_animation_frame(g.borrow().as_ref().unwrap());
         Ok(())
     }
 

@@ -147,7 +147,7 @@ pub fn handle_onmessage_package(
     ws: &mut WebSocket,
     package: Package,
     // tx_web_to_render: std::sync::mpsc::Sender<Package>,
-    tx_web_to_render: Arc<Mutex<mpsc::Sender<Package>>>,
+    _tx_web_to_render: Arc<Mutex<mpsc::Sender<Package>>>,
 ) {
     match package {
         Package::Response(res) => {
@@ -191,9 +191,14 @@ pub fn handle_onmessage_package(
                         states[states.len() - 1].state_id // last update
                     };
 
-                    let tx_web_to_render = tx_web_to_render.clone();
+                    //std::thread::spawn(move || {
+                    //    //
+                    //});
 
-                    let pkg = Package::StateVec(states.clone());
+                    // let tx_web_to_render = tx_web_to_render.clone();
+                    //
+
+                    // let _pkg = Package::StateVec(states.clone());
                     // tx_web_to_render
                     //     .lock()
                     //     .expect("a")
