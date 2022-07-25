@@ -19,8 +19,11 @@ pub struct Engine {
 impl Engine {
     /// Creates a new Engine instance
     pub fn new(engine_id: usize) -> Self {
+        // Create new engine-config.
         let config = EngineConfig::new();
+        // Initialize empty state-vector.
         let states = vec![];
+
         Engine {
             engine_id,
             config,

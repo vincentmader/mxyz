@@ -44,8 +44,8 @@ impl WebSocketClient {
     /// Creates OnOpen Callback.
     pub fn create_onopen_callback(&mut self) {
         let ws = &mut self.socket;
-
         let cloned_ws = ws.clone();
+
         let onopen_callback = Closure::wrap(Box::new(move |_| {
             dom::console_log!("TCP socket opened.");
             // Add new client.
@@ -73,15 +73,20 @@ impl WebSocketClient {
     /// Creates OnMessage Callback.
     pub fn create_onmessage_callback(&mut self) {
         let ws = &mut self.socket;
-
         let mut cloned_ws = ws.clone();
+
         let onmessage_callback = Closure::wrap(Box::new(move |e: MessageEvent| {
             // Handle ArrayBuffer.
             if let Ok(abuf) = e.data().dyn_into::<js_sys::ArrayBuffer>() {
-                handle_arraybuffer(&mut cloned_ws, abuf);
-            // Handle Blob.
+                let array = js_sys::Uint8Array::new(&abuf);
+                let _len = array.byte_length() as usize;
+                let package = Package::from_bytes(array.to_vec());
+                // // console_log!("\nArraybuffer received {} bytes", len);
+                // // console_log!("\nArraybuffer received {} bytes -> {:?}", len, &package);
+                handle_onmessage_package(&mut cloned_ws, package);
+                // Handle Blob.
             } else if let Ok(blob) = e.data().dyn_into::<web_sys::Blob>() {
-                handle_blob(&mut cloned_ws, blob);
+                dom::console_log!("message event, received Blob: {:?}", blob);
             // Handle Text.
             } else if let Ok(txt) = e.data().dyn_into::<js_sys::JsString>() {
                 dom::console_log!("message event, received Text: {:?}", txt);
@@ -96,35 +101,7 @@ impl WebSocketClient {
     }
 }
 
-pub fn handle_arraybuffer(ws: &mut WebSocket, abuf: js_sys::ArrayBuffer) {
-    let array = js_sys::Uint8Array::new(&abuf);
-    let _len = array.byte_length() as usize;
-    let package = Package::from_bytes(array.to_vec());
-    // console_log!("\nArraybuffer received {} bytes", len);
-    // console_log!("\nArraybuffer received {} bytes -> {:?}", len, &package);
-    handle_onmessage_package(ws, package);
-}
-
-pub fn handle_blob(_ws: &mut WebSocket, blob: web_sys::Blob) {
-    dom::console_log!("UNHANDLED message event, received blob: {:?}", blob);
-    // better alternative to juggling with FileReader is to use https://crates.io/crates/gloo-file
-    let fr = web_sys::FileReader::new().unwrap();
-    let fr_c = fr.clone();
-
-    // create onLoadEnd callback
-    let onloadend_cb = Closure::wrap(Box::new(move |_e: web_sys::ProgressEvent| {
-        let array = js_sys::Uint8Array::new(&fr_c.result().unwrap());
-        let len = array.byte_length() as usize;
-        dom::console_log!("Blob received {}bytes: {:?}", len, array.to_vec());
-        // here you can for example use the received image/png data
-    }) as Box<dyn FnMut(web_sys::ProgressEvent)>);
-
-    fr.set_onloadend(Some(onloadend_cb.as_ref().unchecked_ref()));
-    fr.read_as_array_buffer(&blob).expect("blob not readable");
-    onloadend_cb.forget();
-}
-
-pub fn handle_onmessage_package(ws: &mut WebSocket, package: Package) {
+pub fn handle_onmessage_package(ws: &mut WebSocket, package: Package) -> usize {
     match package {
         Package::Response(res) => {
             match res {
@@ -132,10 +109,8 @@ pub fn handle_onmessage_package(ws: &mut WebSocket, package: Package) {
                     dom::console_log!("New Client confirmed. (id={:?})", client_id);
                     // TODO load client-id into client struct field
                     // self.client_id = Some(client_id);
-
                     // TODO Get simulation-variant from HTML/JS.
                     let sim_variant = SimulationVariant::ThreeBodyMoon;
-
                     // Request engine to be started on server.
                     dom::console_log!("Requesting new Engine...");
                     let request = request::Request::AddEngine(client_id, sim_variant);
@@ -148,7 +123,7 @@ pub fn handle_onmessage_package(ws: &mut WebSocket, package: Package) {
                     // Formulate state-query.
                     let state_query = StateQuery::Between(0, STATE_BATCH_SIZE);
                     dom::console_log!("Requesting States...");
-                    // Start sync-loop for this engine's states.
+                    // Start sync-loop for this engine's states. TODO (?)
                     let request = request::Request::GetUpdatedStates(engine_id, state_query);
                     let request = Package::Request(request).to_bytes();
                     ws.send_with_u8_array(&request).unwrap();
@@ -184,6 +159,7 @@ pub fn handle_onmessage_package(ws: &mut WebSocket, package: Package) {
         },
         _ => todo!(),
     }
+    1
 }
 
 fn draw_states(states: Vec<SizedState>) {}

@@ -3,16 +3,25 @@ use crate::utils::dom;
 use crate::websocket::client::WebSocketClient;
 use mxyz_config::ClientConfig;
 use mxyz_network::package::request;
+use mxyz_network::package::response::Response;
 use mxyz_network::package::Package;
+use mxyz_universe::preset::SimulationVariant;
+use mxyz_universe::state::SizedState;
 use mxyz_universe::state::StateQuery;
+use mxyz_universe::system::SizedSystemVariant;
 use wasm_bindgen::prelude::*;
+use wasm_bindgen::JsCast;
+use web_sys::BinaryType::Arraybuffer;
+use web_sys::WebSocket;
+use web_sys::{ErrorEvent, MessageEvent};
 // use mxyz_universe::system::SizedSystemVariant;
 // use std::sync::mpsc;
-// use std::sync::{Arc, Mutex};
-// use std::cell::RefCell;
-// use std::rc::Rc;
+use std::cell::RefCell;
+use std::rc::Rc;
+use std::sync::{Arc, Mutex};
 
 const HOST: &str = "127.0.0.1";
+const STATE_BATCH_SIZE: i32 = 50;
 const PORT: u16 = 1234;
 
 #[wasm_bindgen]
@@ -48,190 +57,359 @@ impl SimulationClientV1 {
         // loop {
         // TODO Get states.
         let state_id = 0;
-        let engine_id = 0;
-        let STATE_BATCH_SIZE = 10;
-        // Request next states.
-        // let ws = self.websocket.socket.clone();
-        // dom::console_log!("Requesting States...");
-        // let state_query = StateQuery::Between(state_id as i32, state_id as i32 + STATE_BATCH_SIZE);
-        // let request = request::Request::GetUpdatedStates(engine_id, state_query);
-        // dom::console_log!("{:?}", request);
-        // let request = Package::Request(request).to_bytes();
-        // ws.send_with_u8_array(&request).unwrap();
+        let engine_id = 1; // TODO
+                           // let STATE_BATCH_SIZE = 10;
+                           // Request next states.
+                           // let ws = self.websocket.socket.clone();
+                           // dom::console_log!("Requesting States...");
+                           // let state_query = StateQuery::Between(state_id as i32, state_id as i32 + STATE_BATCH_SIZE);
+                           // let request = request::Request::GetUpdatedStates(engine_id, state_query);
+                           // dom::console_log!("{:?}", request);
+                           // let request = Package::Request(request).to_bytes();
+                           // ws.send_with_u8_array(&request).unwrap();
+
+        let mut last_sync = 0;
+
+        let cloned_ws = self.websocket.socket.clone();
+        let arc = Arc::new(Mutex::new(cloned_ws));
 
         // TODO Display states.
         // }
+        let f = Rc::new(RefCell::new(None));
+        let g = f.clone();
+        let mut i = 0;
+        *g.borrow_mut() = Some(Closure::wrap(Box::new(move || {
+            // let arc = arc.lock().unwrap();
+            // if arc.config.frame_id.0 > arc.config.frame_id.1 {
+            //     let _ = f.borrow_mut().take();
+            //     return;
+            // }
+            dom::console_log!("\t\t{:?} (state-getter-step)", i);
+
+            let state_query = StateQuery::Between(0, 100);
+            // Start sync-loop for this engine's states.
+            let request = request::Request::GetUpdatedStates(engine_id, state_query);
+            let request = Package::Request(request).to_bytes();
+            // let states = cloned_ws.send_with_u8_array(&request).unwrap();
+            arc.lock().unwrap().send_with_u8_array(&request).unwrap();
+
+            // for state in states.iter() {}
+            last_sync = 1;
+
+            // TODO get states from here?
+            // std::thread::spawn(|| {});
+            // self.step(&tx); //
+            // self.step(); //
+            i += 1;
+            dom::request_animation_frame(f.borrow().as_ref().unwrap());
+        }) as Box<dyn FnMut()>));
+        dom::request_animation_frame(g.borrow().as_ref().unwrap());
+
+        let _client_id = 0; // TODO
+        let address = format!("ws://{}:{}", HOST, PORT);
+        let ws = WebSocket::new(&address).unwrap();
+
+        let cloned_ws = ws.clone();
+        let onopen_callback = Closure::wrap(Box::new(move |_| {
+            dom::console_log!("TCP socket opened.");
+            // Add new client.
+            let request = Package::Request(request::Request::AddClient).to_bytes();
+            dom::console_log!("Requesting new Client...");
+            cloned_ws.send_with_u8_array(&request).unwrap();
+        }) as Box<dyn FnMut(JsValue)>);
+        ws.set_onopen(Some(onopen_callback.as_ref().unchecked_ref()));
+        onopen_callback.forget();
+
+        let cloned_ws = ws.clone();
+        let onerror_callback = Closure::wrap(Box::new(move |e: ErrorEvent| {
+            dom::console_log!("ERROR Event: {:?}", e);
+        }) as Box<dyn FnMut(ErrorEvent)>);
+        cloned_ws.set_onerror(Some(onerror_callback.as_ref().unchecked_ref()));
+        onerror_callback.forget();
+
+        let mut states_a = vec![];
+        let states_a = Arc::new(Mutex::new(states_a));
+        let states_b = states_a.clone();
+
+        let mut cloned_ws = ws.clone();
+        let onmessage_callback = Closure::wrap(Box::new(move |e: MessageEvent| {
+            // Handle ArrayBuffer.
+            if let Ok(abuf) = e.data().dyn_into::<js_sys::ArrayBuffer>() {
+                let array = js_sys::Uint8Array::new(&abuf);
+                let _len = array.byte_length() as usize;
+                let package = Package::from_bytes(array.to_vec());
+                // // console_log!("\nArraybuffer received {} bytes", len);
+                // // console_log!("\nArraybuffer received {} bytes -> {:?}", len, &package);
+                match &package {
+                    Package::Response(res) => match &res {
+                        Response::StateVector(engine_id, states) => {
+                            for s in states.iter() {
+                                states_b.lock().unwrap().push(s.clone());
+                            }
+                            // states_a = *states;
+                        }
+                        _ => todo!(),
+                    },
+                    _ => todo!(),
+                }
+                // handle_onmessage_package(&mut cloned_ws, package);
+                // Handle Blob.
+            } else if let Ok(blob) = e.data().dyn_into::<web_sys::Blob>() {
+                dom::console_log!("message event, received Blob: {:?}", blob);
+            // Handle Text.
+            } else if let Ok(txt) = e.data().dyn_into::<js_sys::JsString>() {
+                dom::console_log!("message event, received Text: {:?}", txt);
+            // Handle Other.
+            } else {
+                dom::console_log!("message event, received Unknown: {:?}", e.data());
+            }
+        }) as Box<dyn FnMut(MessageEvent)>);
+        ws.set_onmessage(Some(onmessage_callback.as_ref().unchecked_ref()));
+        onmessage_callback.forget();
+
+        use crate::renderer::components::canvas::Canvas;
+        let mut canvas = Canvas::new(0);
+        let cnv_dim = canvas.dimensions;
+        canvas.init();
+        canvas.set_fill_style("purple");
+        canvas.set_stroke_style("purple");
+
+        let canvas = Arc::new(Mutex::new(canvas));
+        canvas
+            .clone()
+            .lock()
+            .unwrap()
+            .draw_circle((100., 100.), 3., true);
+
+        dom::console_log!("{:?}", states_a.clone().lock().unwrap().len());
+        for state in states_a.clone().lock().unwrap().iter() {
+            dom::console_log!("{:?}", state);
+            //       // canvas.clear();
+            //      // let text = format!("state {}", state.state_id);
+            //      // let (x, y) = (50., 50.);
+            //      // canvas.fill_text(&text, x, y);
+
+            for system in state.systems.iter() {
+                match &system.variant {
+                    SizedSystemVariant::EntitiesV1(system) => {
+                        for planet in system.entities.iter() {
+                            dom::console_log!("planet {:?}", planet);
+                            let pos = planet.position;
+                            let pos = (pos[0], pos[1]);
+                            let pos = (pos.0 * cnv_dim.0 / 2., pos.1 * cnv_dim.1 / 2.);
+                            let pos = (pos.0 + cnv_dim.0 / 2., pos.1 + cnv_dim.1 / 2.);
+                            let r = 1.;
+                            // canvas.clone().lock().unwrap().draw_circle(pos, r, true);
+                        }
+                    }
+                    _ => todo!(),
+                }
+            }
+        }
     }
 }
-//async fn loop_state_getter(
-//    &self,
-//    tx_web_to_render: Arc<Mutex<mpsc::Sender<Package>>>,
-//) -> Result<(), JsValue> {
-//    // let f = Rc::new(RefCell::new(None));
-//    // let g = f.clone();
-//    // let mut i = 0;
-//    // *g.borrow_mut() = Some(Closure::wrap(Box::new(move || {
-//    //     // let arc = arc.lock().unwrap();
-//    //     // if arc.config.frame_id.0 > arc.config.frame_id.1 {
-//    //     //     let _ = f.borrow_mut().take();
-//    //     //     return;
-//    //     // }
-//    //     dom::console_log!("\t\t{:?} (state-getter-step)", i);
-//    //     // TODO get states from here?
-//    //     // std::thread::spawn(|| {});
-//    //     // self.step(&tx); //
-//    //     // self.step(); //
-//    //     i += 1;
-//    //     dom::request_animation_frame(f.borrow().as_ref().unwrap());
-//    // }) as Box<dyn FnMut()>));
-//    // dom::request_animation_frame(g.borrow().as_ref().unwrap());
-//    Ok(())
-//}
 
-//async fn loop_state_renderer(
-//    &self,
-//    rx_web_to_render: Arc<Mutex<mpsc::Receiver<Package>>>,
-//    // rx_web_to_render: mpsc::Receiver<Package>,
-//    // arc: &Arc<Mutex<&mut SimulationClientV1>>
-//) -> Result<(), JsValue> {
-//    let _rx_web_to_render = rx_web_to_render.clone();
-//    // let pkg = rx_web_to_render.lock().unwrap().recv().unwrap();
+pub fn handle_onmessage_package(ws: &mut WebSocket, package: Package) -> usize {
+    match package {
+        Package::Response(res) => {
+            match res {
+                Response::AddedClient(client_id) => {
+                    dom::console_log!("New Client confirmed. (id={:?})", client_id);
+                    // TODO load client-id into client struct field
+                    // self.client_id = Some(client_id);
+                    // TODO Get simulation-variant from HTML/JS.
+                    let sim_variant = SimulationVariant::ThreeBodyMoon;
+                    // Request engine to be started on server.
+                    dom::console_log!("Requesting new Engine...");
+                    let request = request::Request::AddEngine(client_id, sim_variant);
+                    let request = Package::Request(request).to_bytes();
+                    ws.send_with_u8_array(&request).unwrap();
+                }
 
-//    // use crate::renderer::components::canvas::Canvas;
-//    // let mut canvas = Canvas::new(0);
-//    // let cnv_dim = canvas.dimensions;
-//    // canvas.init();
-//    // canvas.set_fill_style("purple");
-//    // canvas.set_stroke_style("purple");
+                Response::AddedEngine(engine_id) => {
+                    dom::console_log!("New Engine confirmed. (id={:?})", engine_id);
+                    // Formulate state-query.
+                    let state_query = StateQuery::Between(0, STATE_BATCH_SIZE);
+                    dom::console_log!("Requesting States...");
+                    // Start sync-loop for this engine's states. TODO (?)
+                    let request = request::Request::GetUpdatedStates(engine_id, state_query);
+                    let request = Package::Request(request).to_bytes();
+                    ws.send_with_u8_array(&request).unwrap();
+                }
 
-//    //let f = Rc::new(RefCell::new(None));
-//    //let g = f.clone();
-//    //let mut i = 0;
-//    //*g.borrow_mut() = Some(Closure::wrap(Box::new(move || {
-//    //    // let pkg = rx_web_to_render.lock().unwrap().recv().unwrap();
-//    //    //match pkg {
-//    //    //    Package::StateVec(states) => {
-//    //    //        //
-//    //    //        // for state in states.iter() {
-//    //    //        //     // canvas.clear();
+                Response::StateVector(engine_id, states) => {
+                    dom::console_log!(
+                        "Received {} states for engine {}...",
+                        states.len(),
+                        engine_id
+                    );
+                    // update state-id of most-recent sync
+                    let state_id = if states.len() == 0 {
+                        0
+                    } else {
+                        states[states.len() - 1].state_id // last update
+                    };
 
-//    //    //        //     // let text = format!("state {}", state.state_id);
-//    //    //        //     // let (x, y) = (50., 50.);
-//    //    //        //     // canvas.fill_text(&text, x, y);
+                    // TODO do stuff with states (?)
+                }
 
-//    //    //        //     for system in state.systems.iter() {
-//    //    //        //         match &system.variant {
-//    //    //        //             SizedSystemVariant::EntitiesV1(system) => {
-//    //    //        //                 for planet in system.entities.iter() {
-//    //    //        //                     let pos = planet.position;
-//    //    //        //                     let pos = (pos[0], pos[1]);
-//    //    //        //                     let pos = (pos.0 * cnv_dim.0 / 2., pos.1 * cnv_dim.1 / 2.);
-//    //    //        //                     let pos = (pos.0 + cnv_dim.0 / 2., pos.1 + cnv_dim.1 / 2.);
-//    //    //        //                     let r = 1.;
-//    //    //        //                     canvas.draw_circle(pos, r, true);
-//    //    //        //                 }
-//    //    //        //             }
-//    //    //        //             _ => todo!(),
-//    //    //        //         }
-//    //    //        //     }
-//    //    //        // }
+                Response::Empty => {}
+                _ => todo!(),
+            }
+        }
 
-//    //    //        // let pkg = Package::StateVec(states);
-//    //    //        // tx_web_to_render.send(pkg);
+        Package::Command(cmd) => match cmd {
+            _ => todo!(),
+        },
 
-//    //    //        // let (secs, nanos) = (1, 0);
-//    //    //        // let duration = core::time::Duration::new(secs, nanos);
-//    //    //        // wasm_timer::Delay::new(duration);
-//    //    //        // wasm_timer::sleep(duration);
-//    //    //        // use gloo_timers::callback::Timeout;
-//    //    //        // let timeout = Timeout::new(1_000, move || {
-//    //    //        // Do something after the one second timeout is up!
-//    //    //        // });
-//    //    //        // Since we don't plan on cancelling the timeout, call `forget`.
-//    //    //        // timeout.forget();
-//    //    // }
-//    //    //    _ => todo!(),
-//    //    // }
-//    //    // if self.config.frame_id.0 > self.config.frame_id.1 {
-//    //    //     let _ = f.borrow_mut().take();
-//    //    //     return;
-//    //    // }
+        Package::Request(req) => match req {
+            _ => todo!(),
+        },
+        _ => todo!(),
+    }
+    1
+}
 
-//    //    // let rx = rx_web_to_render.clone().lock().unwrap().recv().unwrap();
-//    //    //match rx {
-//    //    //    Package::Request(_) => {}
-//    //    //    Package::Response(_) => {}
-//    //    //    Package::Command(_) => {}
-//    //    //    Package::StateVec(states) => {
-//    //    //        use crate::renderer::components::canvas::Canvas;
-//    //    //        let mut canvas = Canvas::new(0);
-//    //    //        let cnv_dim = canvas.dimensions;
-//    //    //        canvas.init();
-//    //    //        canvas.set_fill_style("purple");
-//    //    //        canvas.set_stroke_style("purple");
+////async fn loop_state_getter(
+////    &self,
+////    tx_web_to_render: Arc<Mutex<mpsc::Sender<Package>>>,
+////) -> Result<(), JsValue> {
+////    // let f = Rc::new(RefCell::new(None));
+////    // let g = f.clone();
+////    // let mut i = 0;
+////    // *g.borrow_mut() = Some(Closure::wrap(Box::new(move || {
+////    //     // let arc = arc.lock().unwrap();
+////    //     // if arc.config.frame_id.0 > arc.config.frame_id.1 {
+////    //     //     let _ = f.borrow_mut().take();
+////    //     //     return;
+////    //     // }
+////    //     dom::console_log!("\t\t{:?} (state-getter-step)", i);
+////    //     // TODO get states from here?
+////    //     // std::thread::spawn(|| {});
+////    //     // self.step(&tx); //
+////    //     // self.step(); //
+////    //     i += 1;
+////    //     dom::request_animation_frame(f.borrow().as_ref().unwrap());
+////    // }) as Box<dyn FnMut()>));
+////    // dom::request_animation_frame(g.borrow().as_ref().unwrap());
+////    Ok(())
+////}
 
-//    //    //        //
-//    //    //        for state in states.iter() {
-//    //    //            // canvas.clear();
+////async fn loop_state_renderer(
+////    &self,
+////    rx_web_to_render: Arc<Mutex<mpsc::Receiver<Package>>>,
+////    // rx_web_to_render: mpsc::Receiver<Package>,
+////    // arc: &Arc<Mutex<&mut SimulationClientV1>>
+////) -> Result<(), JsValue> {
+////    let _rx_web_to_render = rx_web_to_render.clone();
+////    // let pkg = rx_web_to_render.lock().unwrap().recv().unwrap();
 
-//    //    //            // let text = format!("state {}", state.state_id);
-//    //    //            // let (x, y) = (50., 50.);
-//    //    //            // canvas.fill_text(&text, x, y);
+////    //let f = Rc::new(RefCell::new(None));
+////    //let g = f.clone();
+////    //let mut i = 0;
+////    //*g.borrow_mut() = Some(Closure::wrap(Box::new(move || {
+////    //    // let pkg = rx_web_to_render.lock().unwrap().recv().unwrap();
+////    //    //match pkg {
+////    //    //    Package::StateVec(states) => {
+////    //    //        //
+////    ////    //    //        // }
 
-//    //    //            for system in state.systems.iter() {
-//    //    //                match &system.variant {
-//    //    //                    SizedSystemVariant::EntitiesV1(system) => {
-//    //    //                        for planet in system.entities.iter() {
-//    //    //                            let pos = planet.position;
-//    //    //                            let pos = (pos[0], pos[1]);
-//    //    //                            let pos = (pos.0 * cnv_dim.0 / 2., pos.1 * cnv_dim.1 / 2.);
-//    //    //                            let pos = (pos.0 + cnv_dim.0 / 2., pos.1 + cnv_dim.1 / 2.);
-//    //    //                            let r = 1.;
-//    //    //                            canvas.draw_circle(pos, r, true);
-//    //    //                        }
-//    //    //                    }
-//    //    //                    _ => todo!(),
-//    //    //                }
-//    //    //            }
-//    //    //        }
-//    //    //    }
-//    //    //}
+////    //    //        // let pkg = Package::StateVec(states);
+////    //    //        // tx_web_to_render.send(pkg);
 
-//    //    dom::console_log!("{:?} (renderer-step)", i);
-//    //    // std::thread::spawn(|| {});
-//    //    // self.step(&tx); //
-//    //    // self.step(); //
-//    //    i += 1;
-//    //    dom::request_animation_frame(f.borrow().as_ref().unwrap());
-//    //}) as Box<dyn FnMut()>));
-//    //dom::request_animation_frame(g.borrow().as_ref().unwrap());
-//    Ok(())
-//}
+////    //    //        // let (secs, nanos) = (1, 0);
+////    //    //        // let duration = core::time::Duration::new(secs, nanos);
+////    //    //        // wasm_timer::Delay::new(duration);
+////    //    //        // wasm_timer::sleep(duration);
+////    //    //        // use gloo_timers::callback::Timeout;
+////    //    //        // let timeout = Timeout::new(1_000, move || {
+////    //    //        // Do something after the one second timeout is up!
+////    //    //        // });
+////    //    //        // Since we don't plan on cancelling the timeout, call `forget`.
+////    //    //        // timeout.forget();
+////    //    // }
+////    //    //    _ => todo!(),
+////    //    // }
+////    //    // if self.config.frame_id.0 > self.config.frame_id.1 {
+////    //    //     let _ = f.borrow_mut().take();
+////    //    //     return;
+////    //    // }
 
-// /// Forwards Renderer to Next Time-Step
-// pub fn step(&mut self) {
-//     let _frame_id = self.config.frame_id.0;
-//     // tmp::draw(i); // TODO create renderer with loop over systems & entities
-//     self.config.frame_id.0 += 1;
-// }
+////    //    // let rx = rx_web_to_render.clone().lock().unwrap().recv().unwrap();
+////    //    //match rx {
+////    //    //    Package::Request(_) => {}
+////    //    //    Package::Response(_) => {}
+////    //    //    Package::Command(_) => {}
+////    //    //    Package::StateVec(states) => {
+////    //    //        use crate::renderer::components::canvas::Canvas;
+////    //    //        let mut canvas = Canvas::new(0);
+////    //    //        let cnv_dim = canvas.dimensions;
+////    //    //        canvas.init();
+////    //    //        canvas.set_fill_style("purple");
+////    //    //        canvas.set_stroke_style("purple");
 
-// fn foo<F>(h: F) -> Result<(), JsValue>
-// where
-//     F: FnMut() -> (),
-// {
-//     let f = Rc::new(RefCell::new(None));
-//     let g = f.clone();
-//     *g.borrow_mut() = Some(Closure::wrap(Box::new(move || {
-//         h();
-//         // if self.config.frame_id.0 > self.config.frame_id.1 {
-//         //     let _ = f.borrow_mut().take();
-//         //     return;
-//         // }
-//         // // std::thread::spawn(|| {});
-//         // // self.step(&tx); //
-//         // self.step(); //
-//         dom::request_animation_frame(f.borrow().as_ref().unwrap());
-//     }) as Box<dyn FnMut()>));
-//     dom::request_animation_frame(g.borrow().as_ref().unwrap());
-//     Ok(())
-// }
+////    //    //        //
+////    //    //        for state in states.iter() {
+////    //    //            // canvas.clear();
+
+////    //    //            // let text = format!("state {}", state.state_id);
+////    //    //            // let (x, y) = (50., 50.);
+////    //    //            // canvas.fill_text(&text, x, y);
+
+////    //    //            for system in state.systems.iter() {
+////    //    //                match &system.variant {
+////    //    //                    SizedSystemVariant::EntitiesV1(system) => {
+////    //    //                        for planet in system.entities.iter() {
+////    //    //                            let pos = planet.position;
+////    //    //                            let pos = (pos[0], pos[1]);
+////    //    //                            let pos = (pos.0 * cnv_dim.0 / 2., pos.1 * cnv_dim.1 / 2.);
+////    //    //                            let pos = (pos.0 + cnv_dim.0 / 2., pos.1 + cnv_dim.1 / 2.);
+////    //    //                            let r = 1.;
+////    //    //                            canvas.draw_circle(pos, r, true);
+////    //    //                        }
+////    //    //                    }
+////    //    //                    _ => todo!(),
+////    //    //                }
+////    //    //            }
+////    //    //        }
+////    //    //    }
+////    //    //}
+
+////    //    dom::console_log!("{:?} (renderer-step)", i);
+////    //    // std::thread::spawn(|| {});
+////    //    // self.step(&tx); //
+////    //    // self.step(); //
+////    //    i += 1;
+////    //    dom::request_animation_frame(f.borrow().as_ref().unwrap());
+////    //}) as Box<dyn FnMut()>));
+////    //dom::request_animation_frame(g.borrow().as_ref().unwrap());
+////    Ok(())
+////}
+
+//// /// Forwards Renderer to Next Time-Step
+//// pub fn step(&mut self) {
+////     let _frame_id = self.config.frame_id.0;
+////     // tmp::draw(i); // TODO create renderer with loop over systems & entities
+////     self.config.frame_id.0 += 1;
+//// }
+
+//// fn foo<F>(h: F) -> Result<(), JsValue>
+//// where
+////     F: FnMut() -> (),
+//// {
+////     let f = Rc::new(RefCell::new(None));
+////     let g = f.clone();
+////     *g.borrow_mut() = Some(Closure::wrap(Box::new(move || {
+////         h();
+////         // if self.config.frame_id.0 > self.config.frame_id.1 {
+////         //     let _ = f.borrow_mut().take();
+////         //     return;
+////         // }
+////         // // std::thread::spawn(|| {});
+////         // // self.step(&tx); //
+////         // self.step(); //
+////         dom::request_animation_frame(f.borrow().as_ref().unwrap());
+////     }) as Box<dyn FnMut()>));
+////     dom::request_animation_frame(g.borrow().as_ref().unwrap());
+////     Ok(())
+//// }
