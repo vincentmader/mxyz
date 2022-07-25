@@ -1,9 +1,9 @@
 #![allow(unreachable_code)]
 use crate::integrator::euler;
-use crate::preset;
 use mxyz_config::EngineConfig;
 use mxyz_universe::integrator::Integrator;
 use mxyz_universe::integrator::IntegratorVariant;
+use mxyz_universe::preset;
 use mxyz_universe::preset::SimulationVariant;
 use mxyz_universe::state::State;
 use mxyz_universe::system::System;
