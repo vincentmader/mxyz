@@ -1,4 +1,4 @@
-#![allow(unused_doc_comments)]
+// #![allow(unused_doc_comments)]
 use mxyz_config::ExportVariant;
 use mxyz_engine::Engine;
 use mxyz_universe::preset::SimulationVariant;
@@ -7,14 +7,19 @@ const EXPORT_VARIANT: ExportVariant = ExportVariant::ToDatabase;
 const ENGINE_ID: usize = 0;
 
 fn main() {
-    /// Creates & Initializes Engine
+    // Create new engine.
     let mut engine = Engine::new(ENGINE_ID);
+    // Initialize engine's state-vector.
     engine.init(Some(SimulationVariant::ThreeBodyMoon));
+    // Initialize engine-config.
     engine.config.export_variant = EXPORT_VARIANT;
 
-    /// Runs Engine & Records Execution Time
+    // Run engine & record execution time.
     let start_time = std::time::Instant::now();
-    engine.run();
+    {
+        engine.run();
+    }
     let duration = start_time.elapsed().as_millis();
-    println!("\nruntime:\t{} ms", duration);
+    // Print information about execution time.
+    println!("\nRuntime:   {} ms\t ({} h)", duration, duration / 3600000);
 }

@@ -112,9 +112,11 @@ pub fn apply_interaction(
     // println!("{:?} {:?}", ent.get_position(), other_ent.get_position());
     match &interaction.variant {
         InteractionVariant::Force(force) => {
+            use crate::interaction::force::coulomb_interaction;
             use crate::interaction::force::newtonian_gravity;
             let force = match force.variant {
                 ForceVariant::NewtonianGravity => newtonian_gravity::from(&ent, other_ent),
+                ForceVariant::Coulomb => coulomb_interaction::from(&ent, other_ent),
                 _ => todo!(),
             };
             // Update acceleration from force.

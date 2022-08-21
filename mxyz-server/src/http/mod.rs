@@ -1,6 +1,7 @@
 use rocket::routes;
 // use rocket::response::content;
 // use rocket::get;
+pub mod cors;
 pub mod error;
 pub mod index;
 pub mod simulation;

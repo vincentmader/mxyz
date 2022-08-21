@@ -53,7 +53,7 @@ impl RocketServer {
         rocket::build()
             .mount("/", self.routes)
             .mount("/static", self.file_server)
-            .attach(crate::misc::cors::CORS)
+            .attach(crate::http::cors::CORS)
             .attach(Template::fairing())
             .register("/", self.catchers)
             .launch()
