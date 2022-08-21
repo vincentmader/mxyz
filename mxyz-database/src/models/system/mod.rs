@@ -67,17 +67,16 @@ use crate::establish_connection;
 use crate::schema::systems::dsl::*;
 use diesel::prelude::*;
 
-pub fn get_db_systems(engine_query: i32, state_query: i32) -> Vec<System> {
-    let db_conn = crate::establish_connection();
+pub fn get_db_systems(conn: &PgConnection, engine_query: i32, state_query: i32) -> Vec<System> {
     systems
         .filter(engine_id.eq(&engine_query))
         .filter(state_id.eq(state_query))
-        .load::<System>(&db_conn)
+        .load::<System>(conn)
         .expect("Error loading systems")
 }
 
-pub fn get_systems(engine_query: i32, state_query: i32) -> Vec<SizedSystem> {
-    let db_systems = get_db_systems(engine_query, state_query);
+pub fn get_systems(conn: &PgConnection, engine_query: i32, state_query: i32) -> Vec<SizedSystem> {
+    let db_systems = get_db_systems(conn, engine_query, state_query);
     // println!("{:?}", db_systems);
     db_systems
         .into_iter()

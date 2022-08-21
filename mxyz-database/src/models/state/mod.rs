@@ -22,7 +22,8 @@ impl std::convert::Into<mxyz_universe::state::SizedState> for State {
     fn into(self) -> mxyz_universe::state::SizedState {
         let other_state_id = self.state_id as usize;
         let mut state = mxyz_universe::state::SizedState::new(other_state_id);
-        state.systems = crate::system::get_systems(self.engine_id, self.state_id);
+        let conn = crate::establish_connection();
+        state.systems = crate::system::get_systems(&conn, self.engine_id, self.state_id);
         state
     }
 }
@@ -42,6 +43,8 @@ pub fn get_db_states(
     state_query: &StateQuery,
 ) -> Vec<State> {
     match state_query {
+        // TODO Get batch of newest states.
+
         // Get all states since a given state-id.
         StateQuery::BatchSince(batch_size, last_sync) => states
             .filter(engine_id.eq(&engine_query))
@@ -49,12 +52,14 @@ pub fn get_db_states(
             .filter(state_id.le(last_sync + batch_size))
             .load::<State>(conn)
             .expect("Error loading states"),
+
         // Get all states since a given state-id.
         StateQuery::AllSince(last_sync) => states
             .filter(engine_id.eq(&engine_query))
             .filter(state_id.gt(last_sync))
             .load::<State>(conn)
             .expect("Error loading states"),
+
         // Get all states between two state-ids.
         StateQuery::Between(from, to) => states
             .filter(engine_id.eq(&engine_query))
@@ -62,9 +67,9 @@ pub fn get_db_states(
             .filter(state_id.lt(to))
             .load::<State>(conn)
             .expect("Error loading states"),
+
         // Get all states from list of state-ids.
         StateQuery::FromIds(_ids) => todo!("db-states from state-id list"),
-        // TODO Get batch of newest states.
     }
 }
 

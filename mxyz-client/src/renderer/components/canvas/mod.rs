@@ -127,8 +127,9 @@ impl Canvas {
     /// Draws Circle on Canvas
     pub fn draw_circle(&mut self, center: [f64; 2], radius: f64, fill: bool) {
         // let center = self.rescale_vec(center);
+        let center = fix_coords(center, self.dimensions);
         // let radius = self.rescale_dist(radius);
-        let center = [center[0] * self.dimensions.0, center[1] * self.dimensions.1];
+        // let center = [center[0] * self.dimensions.0, center[1] * self.dimensions.1];
         self.context.begin_path();
         self.context
             .arc(center[0], center[1], radius, 0.0, TAU)
@@ -146,4 +147,13 @@ impl Canvas {
         self.context.begin_path();
         self.context.fill_rect(center[0], center[1], width, height)
     }
+}
+
+fn fix_coords(pos: [f64; 2], cnv_dim: (f64, f64)) -> [f64; 2] {
+    // let res = [pos[0] * cnv_dim.0, pos[1] * cnv_dim.1];
+    let res = [
+        0.5 * (pos[0] + 1.) * cnv_dim.0,
+        0.5 * (pos[1] + 1.) * cnv_dim.1,
+    ];
+    res
 }

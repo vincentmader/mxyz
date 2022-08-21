@@ -1,3 +1,4 @@
+use crate::renderer::components::canvas::Canvas;
 use crate::utils::dom;
 use mxyz_network::package::command;
 use mxyz_network::package::command::Command;
@@ -11,13 +12,16 @@ use mxyz_universe::state::SizedState;
 use mxyz_universe::state::StateQuery;
 use mxyz_universe::system::SizedSystem;
 use mxyz_universe::system::SizedSystemVariant;
+use std::cell::RefCell;
+use std::rc::Rc;
+use std::sync::{Arc, Mutex};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::BinaryType::Arraybuffer;
 use web_sys::WebSocket;
 use web_sys::{ErrorEvent, MessageEvent};
 
-const STATE_BATCH_SIZE: i32 = 500;
+const STATE_BATCH_SIZE: i32 = 50;
 
 /// Web-Socket TCP Client
 pub struct WebSocketClient {
@@ -180,7 +184,9 @@ pub fn handle_received_states(
     };
 
     // TODO do stuff with states (?)
-    draw_states(&states);
+    if states.len() > 0 {
+        draw_states(states);
+    }
 
     // Ask for new States once again.
     let request = request::Request::GetUpdatedStates(engine_id, state_query);
@@ -190,13 +196,35 @@ pub fn handle_received_states(
 
 // =============================================================================
 
-use crate::renderer::components::canvas::Canvas;
 const r: f64 = 1.;
 
-fn draw_states(states: &Vec<SizedState>) {
-    for state in states.iter() {
+fn window() -> web_sys::Window {
+    web_sys::window().expect("no global `window` exists")
+}
+
+fn request_animation_frame(f: &Closure<dyn FnMut()>) {
+    window()
+        .request_animation_frame(f.as_ref().unchecked_ref())
+        .expect("should register `requestAnimationFrame` OK");
+}
+
+pub fn draw_states(states: Vec<SizedState>) -> Result<(), JsValue> {
+    let states = Arc::new(Mutex::new(states));
+
+    let f = Rc::new(RefCell::new(None));
+    let g = f.clone();
+    let mut i = 0;
+    *g.borrow_mut() = Some(Closure::wrap(Box::new(move || {
+        if i >= STATE_BATCH_SIZE {
+            let _ = f.borrow_mut().take();
+            return;
+        }
+
+        let states = states.clone();
+        let state = states.lock().unwrap();
+        dom::console_log!("{}", i);
+        let state = state.get(i as usize).expect("b");
         for system in state.systems.iter() {
-            println!("{:?}", system);
             match &system.variant {
                 SizedSystemVariant::EntitiesV1(sys) => {
                     //
@@ -210,12 +238,18 @@ fn draw_states(states: &Vec<SizedState>) {
                         canvas.init();
                         canvas.set_fill_style("purple");
                         canvas.set_stroke_style("purple");
-                        dom::console_log!("{} {}", pos[0], pos[1]);
                         canvas.draw_circle([pos[0], pos[1]], r, true);
                     }
                 }
                 _ => {}
             }
         }
-    }
+
+        i += 1;
+        // Schedule ourself for another requestAnimationFrame callback.
+        request_animation_frame(f.borrow().as_ref().unwrap());
+    }) as Box<dyn FnMut()>));
+
+    request_animation_frame(g.borrow().as_ref().unwrap());
+    Ok(())
 }
