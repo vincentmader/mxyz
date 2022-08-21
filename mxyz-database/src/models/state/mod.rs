@@ -36,8 +36,6 @@ pub fn create_state<'a>(conn: &PgConnection, new_state: NewState) -> State {
         .expect("Error saving new state")
 }
 
-// const NR_OF_STATES_PER_SYNC: i32 = 100;
-
 pub fn get_db_states(
     conn: &PgConnection,
     engine_query: i32,
@@ -66,6 +64,7 @@ pub fn get_db_states(
             .expect("Error loading states"),
         // Get all states from list of state-ids.
         StateQuery::FromIds(_ids) => todo!("db-states from state-id list"),
+        // TODO Get batch of newest states.
     }
 }
 

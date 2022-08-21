@@ -18,14 +18,6 @@ pub struct Canvas {
     pub scale: f64, // TODO
     pub zoom: f64, // TODO
 }
-// impl HTMLObject for Canvas {
-//     fn update(&mut self) {
-//         let from = (0., 0.);
-//         let to = (1000., 1000.);
-//         self.set_stroke_style("white");
-//         self.draw_line(from, to);
-//     }
-// }
 impl Canvas {
     /// Creates new Canvas Instance from Canvas-ID
     pub fn new(id: u8) -> Self {
@@ -108,12 +100,12 @@ impl Canvas {
     //     dist * self.dimensions.1 * self.zoom / self.scale // only works for square
     // }
     /// Draws Line on Canvas
-    pub fn draw_line(&mut self, from: (f64, f64), to: (f64, f64)) {
+    pub fn draw_line(&mut self, from: [f64; 2], to: [f64; 2]) {
         // from = self.rescale_vec(from);
         // to = self.rescale_vec(to);
         self.context.begin_path();
-        self.context.move_to(from.0, from.1);
-        self.context.line_to(to.0, to.1);
+        self.context.move_to(from[0], from[1]);
+        self.context.line_to(to[0], to[1]);
         self.context.stroke();
     }
     // pub fn draw_triangle(
@@ -133,12 +125,13 @@ impl Canvas {
     //     self.context.fill()
     // }
     /// Draws Circle on Canvas
-    pub fn draw_circle(&mut self, center: (f64, f64), radius: f64, fill: bool) {
+    pub fn draw_circle(&mut self, center: [f64; 2], radius: f64, fill: bool) {
         // let center = self.rescale_vec(center);
         // let radius = self.rescale_dist(radius);
+        let center = [center[0] * self.dimensions.0, center[1] * self.dimensions.1];
         self.context.begin_path();
         self.context
-            .arc(center.0, center.1, radius, 0.0, TAU)
+            .arc(center[0], center[1], radius, 0.0, TAU)
             .unwrap();
         self.context.stroke();
         if fill {
@@ -146,11 +139,11 @@ impl Canvas {
         }
     }
     /// Fills Rectangle on Canvas
-    pub fn fill_rect(&mut self, center: (f64, f64), width: f64, height: f64) {
+    pub fn fill_rect(&mut self, center: [f64; 2], width: f64, height: f64) {
         // let center = self.rescale_vec(center);
         // let width = self.rescale_dist(width);
         // let height = self.rescale_dist(height);
         self.context.begin_path();
-        self.context.fill_rect(center.0, center.1, width, height)
+        self.context.fill_rect(center[0], center[1], width, height)
     }
 }

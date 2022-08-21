@@ -109,8 +109,8 @@ pub fn handle_request(request: Request, tx: &mpsc::Sender<Package>) -> Package {
     match request {
         Request::AddClient => {
             // Add client to database.
-            let db_conn = mxyz_database::establish_connection();
-            let client = models::client::create_client(&db_conn);
+            let conn = mxyz_database::establish_connection();
+            let client = models::client::create_client(&conn);
             let client_id = client.client_id as usize;
             // Send back added-client response to client.
             let response = Response::AddedClient(client_id);
@@ -119,8 +119,8 @@ pub fn handle_request(request: Request, tx: &mpsc::Sender<Package>) -> Package {
 
         Request::AddEngine(client_id, simulation_variant) => {
             // Add engine to database.
-            let db_conn = mxyz_database::establish_connection();
-            let engine = models::engine::create_engine(&db_conn, client_id);
+            let conn = mxyz_database::establish_connection();
+            let engine = models::engine::create_engine(&conn, client_id);
             let engine_id = engine.engine_id as usize;
             // Send add-engine command to engine-runner.
             let command = Command::AddEngine(engine_id, client_id, simulation_variant);
@@ -138,7 +138,7 @@ pub fn handle_request(request: Request, tx: &mpsc::Sender<Package>) -> Package {
             let states = models::state::get_states(&conn, engine_id as i32, &state_query);
             println!("Loaded {} db-states, query {:?}", states.len(), state_query);
             // Return state-vector response
-            let response = Response::StateVector(engine_id, states);
+            let response = Response::StateVector(engine_id, state_query, states);
             Package::Response(response)
         }
 

@@ -10,15 +10,15 @@ pub async fn route(category: &str, simulation_variant: &str) -> Template {
     // TODO
     // - get nr of engines from database
     // - client_id = nr_of_engines
-    let client_id = 0;
-    let client_id = format!("{}", client_id); // TODO make context serializable struct
+    // let client_id = mxyz_database::models::client::get_db_clients().len();
+    // let client_id = format!("{}", client_id); // TODO make context serializable struct
 
     let title = utils::get_title_from_simulation_variant(category, simulation_variant);
     let context: HashMap<&str, &str> = [
         ("category", category),
         ("simulation_variant", simulation_variant),
         ("title", &title),
-        ("client_id", &client_id),
+        // ("client_id", &client_id),
     ]
     .iter()
     .cloned()

@@ -23,7 +23,7 @@
         src="../../static/js/simulation/base.js"
         category="{{ category }}"
         simulation_variant="{{ simulation_variant }}"
-        client_id="{{ client_id }}"
+        <!-- client_id="{ client_id }" -->
     ></script>
 
     <!-- ====== COLUMN VIEW (big screen only) ============= -->
