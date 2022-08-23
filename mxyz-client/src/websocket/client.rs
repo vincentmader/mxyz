@@ -1,16 +1,12 @@
 use crate::renderer::components::canvas::Canvas;
 use crate::utils::dom;
-use mxyz_network::package::command;
-use mxyz_network::package::command::Command;
-use mxyz_network::package::request;
-use mxyz_network::package::request::Request;
-use mxyz_network::package::response;
-use mxyz_network::package::response::Response;
-use mxyz_network::package::Package;
+use mxyz_network::tcp_pkg::request;
+use mxyz_network::tcp_pkg::request::Request;
+use mxyz_network::tcp_pkg::response::Response;
+use mxyz_network::tcp_pkg::TcpPackage;
 use mxyz_universe::preset::SimulationVariant;
 use mxyz_universe::state::SizedState;
 use mxyz_universe::state::StateQuery;
-use mxyz_universe::system::SizedSystem;
 use mxyz_universe::system::SizedSystemVariant;
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -52,7 +48,7 @@ impl WebSocketClient {
             dom::console_log!("TCP socket opened. Requesting new Client...");
             let req = request::Request::AddClient;
             // TODO ^ include page-id / sim-var as well?
-            let req = Package::Request(req);
+            let req = TcpPackage::Request(req);
             let req = req.to_bytes();
             cloned_ws.send_with_u8_array(&req).unwrap();
         }) as Box<dyn FnMut(JsValue)>);
@@ -77,7 +73,7 @@ impl WebSocketClient {
         let onmessage_callback = Closure::wrap(Box::new(move |e: MessageEvent| {
             if let Ok(abuf) = e.data().dyn_into::<js_sys::ArrayBuffer>() {
                 let array = js_sys::Uint8Array::new(&abuf);
-                let package = Package::from_bytes(array.to_vec());
+                let package = TcpPackage::from_bytes(array.to_vec());
                 handle_package(&mut cloned_ws, package);
             } else if let Ok(blob) = e.data().dyn_into::<web_sys::Blob>() {
                 dom::console_log!("message event, received Blob: {:?}", blob);
@@ -94,29 +90,29 @@ impl WebSocketClient {
 
 // =============================================================================
 
-/// Handles Incoming Package
+/// Handles Incoming Tcp Package
 ///
 /// Different Variants:
 /// - Request    (not relevant)
 /// - Response   (relevant!)
-/// - Command    (maybe relevant later)
-pub fn handle_package(ws: &mut WebSocket, package: Package) {
+// /// - Command    (maybe relevant later)
+pub fn handle_package(ws: &mut WebSocket, package: TcpPackage) {
     match package {
-        Package::Response(res) => handle_response(ws, res),
-        Package::Command(cmd) => handle_command(ws, cmd),
-        Package::Request(req) => handle_request(ws, req),
+        TcpPackage::Response(res) => handle_response(ws, res),
+        // TcpPackage::Command(cmd) => handle_command(ws, cmd),
+        TcpPackage::Request(req) => handle_request(ws, req),
         _ => todo!(),
     }
 }
 
 // =============================================================================
 
-/// Handle Incoming Command
-pub fn handle_command(_ws: &mut WebSocket, command: Command) {
-    match command {
-        _ => {}
-    };
-}
+// /// Handle Incoming Command
+// pub fn handle_command(_ws: &mut WebSocket, command: Command) {
+//     match command {
+//         _ => {}
+//     };
+// }
 
 /// Handle Incoming Request
 pub fn handle_request(_ws: &mut WebSocket, request: Request) {
@@ -147,7 +143,7 @@ pub fn handle_added_client(ws: &mut WebSocket, client_id: usize) {
     let sim_variant = SimulationVariant::ThreeBodyMoon;
     // Request engine to be started on server.
     let request = request::Request::AddEngine(client_id, sim_variant);
-    let request = Package::Request(request).to_bytes();
+    let request = TcpPackage::Request(request).to_bytes();
     ws.send_with_u8_array(&request).unwrap();
 }
 
@@ -158,7 +154,7 @@ pub fn handle_added_engine(ws: &mut WebSocket, engine_id: usize) {
     let state_query = StateQuery::Between(0, STATE_BATCH_SIZE);
     // Start sync-loop for this engine's states. TODO (?)
     let request = request::Request::GetUpdatedStates(engine_id, state_query);
-    let request = Package::Request(request).to_bytes();
+    let request = TcpPackage::Request(request).to_bytes();
     ws.send_with_u8_array(&request).unwrap();
 }
 
@@ -190,7 +186,7 @@ pub fn handle_received_states(
 
     // Ask for new States once again.
     let request = request::Request::GetUpdatedStates(engine_id, state_query);
-    let request = Package::Request(request).to_bytes();
+    let request = TcpPackage::Request(request).to_bytes();
     ws.send_with_u8_array(&request).unwrap();
 }
 

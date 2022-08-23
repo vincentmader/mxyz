@@ -2,9 +2,9 @@ use crate::config::ClientConfig;
 use crate::renderer::Renderer;
 use crate::utils::dom;
 use crate::websocket::client::WebSocketClient;
-use mxyz_network::package::request;
-use mxyz_network::package::response::Response;
-use mxyz_network::package::Package;
+use mxyz_network::tcp_pkg::request;
+use mxyz_network::tcp_pkg::response::Response;
+use mxyz_network::tcp_pkg::TcpPackage;
 use mxyz_universe::preset::SimulationVariant;
 use mxyz_universe::state::SizedState;
 use mxyz_universe::state::StateQuery;
@@ -75,7 +75,7 @@ impl SimulationClientV1 {
     //         // let state_query = StateQuery::Between(0, 100);
     //         // Start sync-loop for this engine's states.
     //         // let request = request::Request::GetUpdatedStates(engine_id, state_query);
-    //         // let request = Package::Request(request).to_bytes();
+    //         // let request = TcpPackage::Request(request).to_bytes();
     //         // let states = cloned_ws.send_with_u8_array(&request).unwrap();
     //         // arc.lock()
     //         //     .unwrap()
@@ -104,7 +104,7 @@ impl SimulationClientV1 {
     //                    // let state_query = StateQuery::Between(state_id as i32, state_id as i32 + STATE_BATCH_SIZE);
     //                    // let request = request::Request::GetUpdatedStates(engine_id, state_query);
     //                    // dom::console_log!("{:?}", request);
-    //                    // let request = Package::Request(request).to_bytes();
+    //                    // let request = TcpPackage::Request(request).to_bytes();
     //                    // ws.send_with_u8_array(&request).unwrap();
 
     // let mut last_sync = 0;
@@ -128,7 +128,7 @@ impl SimulationClientV1 {
     //     let state_query = StateQuery::Between(0, 100);
     //     // Start sync-loop for this engine's states.
     //     let request = request::Request::GetUpdatedStates(engine_id, state_query);
-    //     let request = Package::Request(request).to_bytes();
+    //     let request = TcpPackage::Request(request).to_bytes();
     //     // let states = cloned_ws.send_with_u8_array(&request).unwrap();
     //     arc.lock()
     //         .unwrap()
@@ -157,7 +157,7 @@ impl SimulationClientV1 {
     // let onopen_callback = Closure::wrap(Box::new(move |_| {
     //     dom::console_log!("TCP socket opened.");
     //     // Add new client.
-    //     let request = Package::Request(request::Request::AddClient).to_bytes();
+    //     let request = TcpPackage::Request(request::Request::AddClient).to_bytes();
     //     dom::console_log!("Requesting new Client...");
     //     cloned_ws.send_with_u8_array(&request).unwrap();
     // }) as Box<dyn FnMut(JsValue)>);
@@ -181,12 +181,12 @@ impl SimulationClientV1 {
     //     if let Ok(abuf) = e.data().dyn_into::<js_sys::ArrayBuffer>() {
     //         let array = js_sys::Uint8Array::new(&abuf);
     //         let _len = array.byte_length() as usize;
-    //         let package = Package::from_bytes(array.to_vec());
+    //         let package = TcpPackage::from_bytes(array.to_vec());
 
     //         // // console_log!("\nArraybuffer received {} bytes", len);
     //         // // console_log!("\nArraybuffer received {} bytes -> {:?}", len, &package);
     //         match &package {
-    //             Package::Response(res) => match &res {
+    //             TcpPackage::Response(res) => match &res {
     //                 Response::StateVector(engine_id, states) => {
     //                     for s in states.iter() {
     //                         // states_b.lock().unwrap().push(s.clone());
@@ -257,9 +257,9 @@ impl SimulationClientV1 {
     // // }
     // }
 
-    // pub fn handle_onmessage_package(ws: &mut WebSocket, package: Package) -> usize {
+    // pub fn handle_onmessage_package(ws: &mut WebSocket, package: TcpPackage) -> usize {
     // match package {
-    // Package::Response(res) => {
+    // TcpPackage::Response(res) => {
     //     match res {
     //         Response::AddedClient(client_id) => {
     //             dom::console_log!("New Client confirmed. (id={:?})", client_id);
@@ -270,7 +270,7 @@ impl SimulationClientV1 {
     //             // Request engine to be started on server.
     //             dom::console_log!("Requesting new Engine...");
     //             let request = request::Request::AddEngine(client_id, sim_variant);
-    //             let request = Package::Request(request).to_bytes();
+    //             let request = TcpPackage::Request(request).to_bytes();
     //             ws.send_with_u8_array(&request).unwrap();
     //         }
 
@@ -281,7 +281,7 @@ impl SimulationClientV1 {
     //             dom::console_log!("Requesting States...");
     //             // Start sync-loop for this engine's states. TODO (?)
     //             let request = request::Request::GetUpdatedStates(engine_id, state_query);
-    //             let request = Package::Request(request).to_bytes();
+    //             let request = TcpPackage::Request(request).to_bytes();
     //             ws.send_with_u8_array(&request).unwrap();
     //         }
 
@@ -306,11 +306,11 @@ impl SimulationClientV1 {
     //     }
     // }
 
-    // Package::Command(cmd) => match cmd {
+    // TcpPackage::Command(cmd) => match cmd {
     //     _ => todo!(),
     // },
 
-    // Package::Request(req) => match req {
+    // TcpPackage::Request(req) => match req {
     //     _ => todo!(),
     // },
     // _ => todo!(),

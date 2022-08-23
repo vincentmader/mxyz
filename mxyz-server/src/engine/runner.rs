@@ -1,18 +1,17 @@
 use mxyz_engine::config::ExportVariant;
 use mxyz_engine::Engine;
-use mxyz_network::package::command::Command;
-use mxyz_network::package::request::Request;
-use mxyz_network::package::Package;
+use mxyz_network::mpsc_msg;
+use mxyz_network::mpsc_msg::MpscMessage;
 use mxyz_universe::preset::SimulationVariant;
 use mxyz_universe::system::SystemVariant;
 use std::sync::mpsc;
 
 pub struct EngineRunner {
-    rx: mpsc::Receiver<Package>,
+    rx: mpsc::Receiver<MpscMessage>,
 }
 impl EngineRunner {
     /// Creates a new Engine-Runner instance
-    pub fn new(rx: mpsc::Receiver<Package>) -> Self {
+    pub fn new(rx: mpsc::Receiver<MpscMessage>) -> Self {
         EngineRunner { rx }
     }
 
@@ -30,12 +29,8 @@ impl EngineRunner {
         let msg = self.rx.recv().unwrap();
         println!("Engine Runner received msg: {:?}", msg);
         match &msg {
-            Package::Request(req) => match req {
-                Request::RemoveEngine(engine_id) => self.remove_engine(engine_id),
-                _ => todo!(),
-            },
-            Package::Command(cmd) => match cmd {
-                Command::AddEngine(engine_id, client_id, simulation_variant) => {
+            MpscMessage::Command(cmd) => match cmd {
+                mpsc_msg::command::Command::AddEngine(engine_id, client_id, simulation_variant) => {
                     self.add_engine(*engine_id, *client_id, simulation_variant)
                 }
                 _ => todo!(),

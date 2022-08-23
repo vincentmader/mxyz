@@ -1,2 +1,2 @@
-pub mod message; // mpsc
-pub mod package; // tcp
+pub mod mpsc_msg;
+pub mod tcp_pkg;

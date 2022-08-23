@@ -1,19 +1,17 @@
 use mxyz_universe::state::SizedState;
 use serde::{Deserialize, Serialize};
 
-pub mod command;
 pub mod request;
 pub mod response;
 
 #[derive(Debug, Serialize, Deserialize)]
-pub enum Package {
+pub enum TcpPackage {
     Request(request::Request),
     Response(response::Response),
-
-    Command(command::Command),
-    StateVec(Vec<SizedState>),
+    // Command(command::Command),
+    // StateVec(Vec<SizedState>),
 }
-impl Package {
+impl TcpPackage {
     pub fn to_bytes(self) -> Vec<u8> {
         bincode::serialize(&self).unwrap()
     }

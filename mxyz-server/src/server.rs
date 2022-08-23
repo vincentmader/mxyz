@@ -1,5 +1,6 @@
 #![allow(unused_must_use)]
-use mxyz_network::package::Package;
+use mxyz_network::mpsc_msg::MpscMessage;
+use mxyz_network::tcp_pkg::TcpPackage;
 use rocket::fs::{relative, FileServer};
 use rocket::{catchers, Catcher, Route};
 use rocket_dyn_templates::Template;
@@ -37,7 +38,7 @@ impl RocketServer {
         let _db_conn = mxyz_database::establish_connection();
 
         // Create MPSC channel for Server-Engine Communication.
-        let (tx_1, rx_1) = mpsc::channel::<Package>();
+        let (tx_1, rx_1) = mpsc::channel::<MpscMessage>();
 
         // Server-Client Communication: Start TCP-Listener in separate thread.
         std::thread::spawn(move || {
