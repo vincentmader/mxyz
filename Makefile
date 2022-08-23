@@ -18,3 +18,5 @@ client:
 stats:
 	./scripts/stats/fuse.py
 	./scripts/stats/show_nr_of_lines_in_proj.py
+dc:
+	docker-compose up # --build -d
