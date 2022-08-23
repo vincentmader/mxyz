@@ -1,15 +1,14 @@
 [workspace]
     default-members=[
         "mxyz-engine",  
-        # "mxyz-server",
     ]
     members = [
-        # "mxyz-config",
         "mxyz-client",
         "mxyz-database",
         "mxyz-engine",
-        # "mxyz-network",
-        # "mxyz-universe",
+        "mxyz-engine-base",
+        "mxyz-network",
+        "mxyz-universe",
         "mxyz-server",
         "mxyz-utils",
     ]
