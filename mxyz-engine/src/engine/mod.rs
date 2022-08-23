@@ -1,8 +1,8 @@
 #![allow(unreachable_code)]
+use crate::config::EngineConfig;
 use crate::integrator::euler;
 use crate::integrator::runge_kutta;
 use crate::preset;
-use mxyz_config::EngineConfig;
 use mxyz_universe::integrator::Integrator;
 use mxyz_universe::integrator::IntegratorVariant;
 use mxyz_universe::preset::SimulationVariant;
