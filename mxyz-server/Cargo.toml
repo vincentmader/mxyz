@@ -9,7 +9,7 @@
     diesel = "1.4.8"
     futures-util = { version = "0.3", default-features = false, features = ["sink", "std"] }
     log = "0.4"
-    mxyz-config = { path = "../mxyz-config" }
+    # mxyz-config = { path = "../mxyz-config" }
     mxyz-database = { path = "../mxyz-database" }
     mxyz-engine = { path = "../mxyz-engine" }
     mxyz-network = { path = "../mxyz-network" }

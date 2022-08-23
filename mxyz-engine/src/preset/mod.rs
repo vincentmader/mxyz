@@ -1,7 +1,7 @@
 #![allow(unreachable_patterns)]
 pub mod three_body_figure_eight;
 pub mod three_body_moon;
-use mxyz_config::EngineConfig;
+use crate::config::EngineConfig;
 use mxyz_universe::preset::SimulationVariant;
 use mxyz_universe::state::State;
 

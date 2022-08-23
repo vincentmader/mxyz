@@ -4,7 +4,7 @@
         # "mxyz-server",
     ]
     members = [
-        "mxyz-config",
+        # "mxyz-config",
         "mxyz-client",
         "mxyz-database",
         "mxyz-engine",

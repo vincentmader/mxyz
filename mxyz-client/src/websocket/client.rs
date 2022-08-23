@@ -196,7 +196,7 @@ pub fn handle_received_states(
 
 // =============================================================================
 
-const r: f64 = 1.;
+const r: f64 = 3.;
 
 fn window() -> web_sys::Window {
     web_sys::window().expect("no global `window` exists")
@@ -208,8 +208,10 @@ fn request_animation_frame(f: &Closure<dyn FnMut()>) {
         .expect("should register `requestAnimationFrame` OK");
 }
 
-pub fn draw_states(states: Vec<SizedState>) -> Result<(), JsValue> {
+pub async fn draw_states(states: Vec<SizedState>) -> Result<(), JsValue> {
     let states = Arc::new(Mutex::new(states));
+
+    let mut canvas = Canvas::new(0);
 
     let f = Rc::new(RefCell::new(None));
     let g = f.clone();
@@ -219,6 +221,8 @@ pub fn draw_states(states: Vec<SizedState>) -> Result<(), JsValue> {
             let _ = f.borrow_mut().take();
             return;
         }
+
+        canvas.clear();
 
         let states = states.clone();
         let state = states.lock().unwrap();
@@ -233,7 +237,6 @@ pub fn draw_states(states: Vec<SizedState>) -> Result<(), JsValue> {
                         let pos = entity.position;
                         let vel = entity.velocity;
 
-                        let mut canvas = Canvas::new(0);
                         let cnv_dim = canvas.dimensions;
                         canvas.init();
                         canvas.set_fill_style("purple");

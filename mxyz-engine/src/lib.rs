@@ -5,6 +5,7 @@
 // #![allow(unreachable_patterns)]
 // #![allow(non_snake_case)]
 
+pub mod config;
 pub mod engine;
 pub mod integrator;
 pub mod interaction;

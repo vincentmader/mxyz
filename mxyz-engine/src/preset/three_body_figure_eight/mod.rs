@@ -1,4 +1,4 @@
-use mxyz_config::EngineConfig;
+use crate::config::EngineConfig;
 use mxyz_universe::system::System;
 // use crate::entity;
 // use crate::integrator::{Integrator, IntegratorVariant};

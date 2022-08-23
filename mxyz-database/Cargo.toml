@@ -6,7 +6,7 @@
 
 [dependencies]
     dotenv = "0.15.0"
-    mxyz-config = { path = "../mxyz-config" }
+    # mxyz-config = { path = "../mxyz-config" }
     mxyz-utils = { path="../mxyz-utils" }
     mxyz-universe = { path="../mxyz-universe" }
     mxyz-engine = { path="../mxyz-engine" }

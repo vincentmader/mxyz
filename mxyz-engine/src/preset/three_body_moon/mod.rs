@@ -1,5 +1,5 @@
 #![allow(unused_variables)]
-use mxyz_config::EngineConfig;
+use crate::config::EngineConfig;
 use mxyz_universe::entity::EntityV1;
 use mxyz_universe::integrator::Integrator;
 use mxyz_universe::integrator::IntegratorVariant;
