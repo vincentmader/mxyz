@@ -1,5 +1,5 @@
 [toolchain]
-    channel = "nightly-2022-02-02"
+    channel = "nightly-2022-08-11"
         # macOS -> https://rust-lang.github.io/rustup-components-history/aarch64-apple-darwin.html
         # linux -> https://rust-lang.github.io/rustup-components-history/
     components = [ "rustfmt", "rustc-dev" ]
