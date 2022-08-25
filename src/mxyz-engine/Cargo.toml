@@ -7,7 +7,7 @@
 [dependencies]
     # mxyz-config = { path="../mxyz-config" }
     mxyz-universe = { path="../mxyz-universe" }
-    mxyz-utils = { path="../mxyz-utils" }
+    utils = { path="../utils" }
     rand = "0.8.5"
     rayon = "1.5"
 

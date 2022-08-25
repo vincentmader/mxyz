@@ -17,7 +17,8 @@ use web_sys::BinaryType::Arraybuffer;
 use web_sys::WebSocket;
 use web_sys::{ErrorEvent, MessageEvent};
 
-const STATE_BATCH_SIZE: i32 = 50;
+const STATE_BATCH_SIZE: i32 = 100;
+const r: f64 = 10.;
 
 /// Web-Socket TCP Client
 pub struct WebSocketClient {
@@ -179,20 +180,21 @@ pub fn handle_received_states(
         false => query,
     };
 
-    // TODO do stuff with states (?)
-    if states.len() > 0 {
-        draw_states(states);
-    }
-
     // Ask for new States once again.
     let request = request::Request::GetUpdatedStates(engine_id, state_query);
     let request = TcpPackage::Request(request).to_bytes();
     ws.send_with_u8_array(&request).unwrap();
+
+    // TODO do stuff with states (?)
+    let mut finished_with_last_render = false;
+    // if states.len() > 0 && finished_with_last_render {
+    if states.len() > 0 {
+        // finished_with_last_render = false;
+        draw_states(states, &mut finished_with_last_render).unwrap();
+    }
 }
 
 // =============================================================================
-
-const r: f64 = 3.;
 
 fn window() -> web_sys::Window {
     web_sys::window().expect("no global `window` exists")
@@ -204,7 +206,10 @@ fn request_animation_frame(f: &Closure<dyn FnMut()>) {
         .expect("should register `requestAnimationFrame` OK");
 }
 
-pub async fn draw_states(states: Vec<SizedState>) -> Result<(), JsValue> {
+pub fn draw_states(
+    states: Vec<SizedState>,
+    finished_with_last_render: &mut bool,
+) -> Result<(), JsValue> {
     let states = Arc::new(Mutex::new(states));
 
     let mut canvas = Canvas::new(0);
@@ -212,18 +217,23 @@ pub async fn draw_states(states: Vec<SizedState>) -> Result<(), JsValue> {
     let f = Rc::new(RefCell::new(None));
     let g = f.clone();
     let mut i = 0;
+    let mut nr_of_states = 0;
     *g.borrow_mut() = Some(Closure::wrap(Box::new(move || {
         if i >= STATE_BATCH_SIZE {
             let _ = f.borrow_mut().take();
             return;
         }
 
-        canvas.clear();
-
         let states = states.clone();
-        let state = states.lock().unwrap();
-        dom::console_log!("{}", i);
-        let state = state.get(i as usize).expect("b");
+        let states = states.lock().unwrap();
+        if nr_of_states == states.len() {
+            canvas.clear();
+        } else {
+            nr_of_states = states.len();
+        }
+
+        // dom::console_log!("{}", i);
+        let state = states.get(i as usize).expect("b");
         for system in state.systems.iter() {
             match &system.variant {
                 SizedSystemVariant::EntitiesV1(sys) => {
@@ -248,7 +258,8 @@ pub async fn draw_states(states: Vec<SizedState>) -> Result<(), JsValue> {
         // Schedule ourself for another requestAnimationFrame callback.
         request_animation_frame(f.borrow().as_ref().unwrap());
     }) as Box<dyn FnMut()>));
-
     request_animation_frame(g.borrow().as_ref().unwrap());
+
+    *finished_with_last_render = true;
     Ok(())
 }

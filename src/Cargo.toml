@@ -10,5 +10,5 @@
         "mxyz-network",
         "mxyz-universe",
         "mxyz-server",
-        "mxyz-utils",
+        "utils",
     ]
