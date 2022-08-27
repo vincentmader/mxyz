@@ -54,6 +54,7 @@
         "TcpSocket",
         "WebSocket",
         "Window",
+        "Worker",
         "console",
     ]
 

@@ -4,7 +4,9 @@ use crate::websocket::client::WebSocketClient;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
-/// Simulation-Client: Renderer
+/// Simulation-Client v1
+/// - Receive states via WebSocket.
+/// - Render to Canvas (Animation Loop).
 pub struct SimulationClientV1 {
     config: ClientConfig,
     websocket: WebSocketClient,
@@ -12,18 +14,28 @@ pub struct SimulationClientV1 {
 
 #[wasm_bindgen]
 impl SimulationClientV1 {
-    /// Creates new Simulation-Renderer-Client
+    /// Create new Simulation-Renderer-Client.
+    /// - Create Client Config.
+    /// - Create WebSocket Client.
     pub fn new() -> Self {
+        // Create config.
         let config = ClientConfig::new();
+        // Create WebSocket Client using host & port from Client Config.
         let websocket = WebSocketClient::new(&config.websocket_host, config.websocket_port);
+
         SimulationClientV1 { config, websocket }
     }
 
-    /// Initializes Renderer-Client
+    /// Initialize Renderer-Client.
+    /// - ... page-id
+    /// - ... panic hook
+    /// - Initialize WebSocket Client.
     pub fn init(&mut self, category: &str, simulation_variant: &str) {
         let page_id = (category, simulation_variant);
         dom::console_log!("page-id: {:?}", page_id);
+        // ...
         dom::set_panic_hook();
+        // Initialize WebSocket Client.
         self.websocket.init().unwrap();
     }
 }

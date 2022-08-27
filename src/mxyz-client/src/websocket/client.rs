@@ -25,14 +25,17 @@ pub struct WebSocketClient {
     pub socket: WebSocket,
 }
 impl WebSocketClient {
-    /// Creates new instance of Client
+    /// Create new instance of Client.
     pub fn new(host: &str, port: u16) -> Self {
         let address = format!("ws://{}:{}", host, port);
         let socket = WebSocket::new(&address).unwrap();
         WebSocketClient { socket }
     }
 
-    /// Initializes Client
+    /// Initialize Client, i.e. Create Callbacks:
+    /// - on-open
+    /// - on-message
+    /// - on-error
     pub fn init(&mut self) -> Result<(), JsValue> {
         self.socket.set_binary_type(Arraybuffer);
         self.create_onmessage_callback();
@@ -41,7 +44,7 @@ impl WebSocketClient {
         Ok(())
     }
 
-    /// Creates TCP OnOpen Callback.
+    /// Create TCP OnOpen Callback.
     pub fn create_onopen_callback(&mut self) {
         let ws = &mut self.socket;
         let cloned_ws = ws.clone();
@@ -58,7 +61,7 @@ impl WebSocketClient {
         onopen_callback.forget();
     }
 
-    /// Creates TCP OnError Callback.
+    /// Create TCP OnError Callback.
     pub fn create_onerror_callback(&mut self) {
         let ws = &mut self.socket;
         let onerror_callback = Closure::wrap(Box::new(move |e: ErrorEvent| {
@@ -68,7 +71,7 @@ impl WebSocketClient {
         onerror_callback.forget();
     }
 
-    /// Creates TCP OnMessage Callback.
+    /// Create TCP OnMessage Callback.
     pub fn create_onmessage_callback(&mut self) {
         let ws = &mut self.socket;
         let mut cloned_ws = ws.clone();
@@ -93,7 +96,7 @@ impl WebSocketClient {
 
 // =============================================================================
 
-/// Handles Incoming Tcp Package
+/// Handle Incoming Tcp Package.
 ///
 /// Different Variants:
 /// - Request    (not relevant)
@@ -104,13 +107,13 @@ pub fn handle_package(ws: &mut WebSocket, package: TcpPackage) {
         TcpPackage::Response(res) => handle_response(ws, res),
     }
 }
-/// Handle Incoming Request
+/// Handle Incoming Request.
 pub fn handle_request(_ws: &mut WebSocket, request: Request) {
     match request {
         _ => {}
     };
 }
-/// Handle Incoming Response
+/// Handle Incoming Response.
 pub fn handle_response(ws: &mut WebSocket, response: Response) {
     match response {
         Response::AddedClient(client_id) => handle_added_client(ws, client_id),
@@ -124,7 +127,7 @@ pub fn handle_response(ws: &mut WebSocket, response: Response) {
 
 // =============================================================================
 
-/// Handle Response: Added Client
+/// Handle Response: Added Client.
 pub fn handle_added_client(ws: &mut WebSocket, client_id: usize) {
     dom::console_log!("Client ({:?}) confirmed. Requesting Engine...", client_id);
     // TODO [#1] Get simulation-variant from HTML/JS.
@@ -135,7 +138,7 @@ pub fn handle_added_client(ws: &mut WebSocket, client_id: usize) {
     ws.send_with_u8_array(&request).unwrap();
 }
 
-/// Handle Response: Added Engine
+/// Handle Response: Added Engine.
 pub fn handle_added_engine(ws: &mut WebSocket, engine_id: usize) {
     dom::console_log!("Engine ({:?}) confirmed. Requesting States...", engine_id);
     // Formulate state-query.
@@ -146,7 +149,7 @@ pub fn handle_added_engine(ws: &mut WebSocket, engine_id: usize) {
     ws.send_with_u8_array(&request).unwrap();
 }
 
-/// Handle Response: Received States
+/// Handle Response: Received States.
 pub fn handle_received_states(
     ws: &mut WebSocket,
     engine_id: usize,
