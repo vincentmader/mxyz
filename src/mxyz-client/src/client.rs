@@ -1,13 +1,12 @@
+use crate::config::ClientConfig;
 use crate::utils::dom;
 use crate::websocket::client::WebSocketClient;
 use wasm_bindgen::prelude::*;
 
-const WEBSOCKET_HOST: &str = "127.0.0.1";
-const WEBSOCKET_PORT: u16 = 1234;
-
 #[wasm_bindgen]
 /// Simulation-Client: Renderer
 pub struct SimulationClientV1 {
+    config: ClientConfig,
     websocket: WebSocketClient,
 }
 
@@ -15,8 +14,9 @@ pub struct SimulationClientV1 {
 impl SimulationClientV1 {
     /// Creates new Simulation-Renderer-Client
     pub fn new() -> Self {
-        let websocket = WebSocketClient::new(WEBSOCKET_HOST, WEBSOCKET_PORT);
-        SimulationClientV1 { websocket }
+        let config = ClientConfig::new();
+        let websocket = WebSocketClient::new(&config.websocket_host, config.websocket_port);
+        SimulationClientV1 { config, websocket }
     }
 
     /// Initializes Renderer-Client
