@@ -3,7 +3,7 @@ use crate::schema::states;
 use crate::schema::states::dsl::*;
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
-use mxyz_universe::state::StateQuery;
+use mxyz_engine_universe::state::StateQuery;
 
 #[derive(Insertable, Debug)]
 #[table_name = "states"]
@@ -18,10 +18,11 @@ pub struct State {
     pub engine_id: i32,
     pub state_id: i32,
 }
-impl std::convert::Into<mxyz_universe::state::SizedState> for State {
-    fn into(self) -> mxyz_universe::state::SizedState {
+// impl std::convert::Into<mxyz_engine_universe::state::SizedState> for State {
+impl State {
+    fn into(self) -> mxyz_engine_universe::state::SizedState {
         let other_state_id = self.state_id as usize;
-        let mut state = mxyz_universe::state::SizedState::new(other_state_id);
+        let mut state = mxyz_engine_universe::state::SizedState::new(other_state_id);
         let conn = crate::establish_connection();
         state.systems = crate::system::get_systems(&conn, self.engine_id, self.state_id);
         state
@@ -77,7 +78,7 @@ pub fn get_states(
     conn: &PgConnection,
     engine_query: i32,
     state_query: &StateQuery,
-) -> Vec<mxyz_universe::state::SizedState> {
+) -> Vec<mxyz_engine_universe::state::SizedState> {
     let db_states = get_db_states(conn, engine_query, &state_query);
     db_states
         .into_iter()

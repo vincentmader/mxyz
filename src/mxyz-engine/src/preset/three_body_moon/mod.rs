@@ -1,14 +1,14 @@
 #![allow(unused_variables)]
 use crate::config::EngineConfig;
-use mxyz_universe::entity::EntityV1;
-use mxyz_universe::integrator::Integrator;
-use mxyz_universe::integrator::IntegratorVariant;
-use mxyz_universe::interaction::force::Force;
-use mxyz_universe::interaction::force::ForceVariant;
-use mxyz_universe::interaction::Interaction;
-use mxyz_universe::interaction::InteractionVariant;
-use mxyz_universe::system::System;
-use mxyz_universe::system::SystemVariant;
+use mxyz_engine_universe::entity::EntityV1;
+use mxyz_engine_universe::integrator::Integrator;
+use mxyz_engine_universe::integrator::IntegratorVariant;
+use mxyz_engine_universe::interaction::force::Force;
+use mxyz_engine_universe::interaction::force::ForceVariant;
+use mxyz_engine_universe::interaction::Interaction;
+use mxyz_engine_universe::interaction::InteractionVariant;
+use mxyz_engine_universe::system::System;
+use mxyz_engine_universe::system::SystemVariant;
 // use mxyz_universe::system::SystemVariant;
 // use mxyz_universe::entity;
 // use mxyz_universe::system::planets::Planets;

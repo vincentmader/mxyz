@@ -1,4 +1,4 @@
-use mxyz_universe::preset::SimulationVariant;
+use mxyz_engine_universe::preset::SimulationVariant;
 
 pub struct EngineConfig {
     pub step_id: (usize, usize),

@@ -7,8 +7,8 @@
         "mxyz-database",
         "mxyz-engine",
         "mxyz-engine-base",
+        "mxyz-engine-universe",
         "mxyz-network",
-        "mxyz-universe",
         "mxyz-server",
         "utils",
     ]

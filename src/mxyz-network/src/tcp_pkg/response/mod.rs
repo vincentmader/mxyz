@@ -1,5 +1,5 @@
-use mxyz_universe::state::SizedState;
-use mxyz_universe::state::StateQuery;
+use mxyz_engine_universe::state::SizedState;
+use mxyz_engine_universe::state::StateQuery;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]

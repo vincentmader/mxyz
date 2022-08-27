@@ -1,5 +1,5 @@
-use mxyz_universe::preset::SimulationVariant;
-use mxyz_universe::state::StateQuery;
+use mxyz_engine_universe::preset::SimulationVariant;
+use mxyz_engine_universe::state::StateQuery;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]

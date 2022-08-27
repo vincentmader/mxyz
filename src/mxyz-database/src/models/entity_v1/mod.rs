@@ -35,9 +35,9 @@ pub struct EntityV1 {
     pub vel_y: f64,
     pub vel_z: f64,
 }
-impl std::convert::Into<mxyz_universe::entity::EntityV1> for EntityV1 {
-    fn into(self) -> mxyz_universe::entity::EntityV1 {
-        mxyz_universe::entity::EntityV1 {
+impl std::convert::Into<mxyz_engine_universe::entity::EntityV1> for EntityV1 {
+    fn into(self) -> mxyz_engine_universe::entity::EntityV1 {
+        mxyz_engine_universe::entity::EntityV1 {
             mass: self.mass,
             position: [self.pos_x, self.pos_y, self.pos_z],
             velocity: [self.vel_x, self.vel_y, self.vel_z],
@@ -74,7 +74,7 @@ pub fn get_entities(
     engine_query: i32,
     state_query: i32,
     system_query: i32,
-) -> Vec<mxyz_universe::entity::EntityV1> {
+) -> Vec<mxyz_engine_universe::entity::EntityV1> {
     let db_entities = get_db_entities(conn, engine_query, state_query, system_query);
     db_entities
         .into_iter()

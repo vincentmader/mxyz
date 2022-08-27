@@ -1,5 +1,5 @@
 [package]
-    name = "mxyz-universe"
+    name = "mxyz-engine-universe"
     authors = ["Vincent C. Mader <vincent@mader.xyz>"]
     edition = "2018"
     version = "0.1.0"

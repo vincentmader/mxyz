@@ -1,13 +1,13 @@
 use crate::renderer::components::canvas::Canvas;
 use crate::utils::dom;
+use mxyz_engine_universe::preset::SimulationVariant;
+use mxyz_engine_universe::state::SizedState;
+use mxyz_engine_universe::state::StateQuery;
+use mxyz_engine_universe::system::SizedSystemVariant;
 use mxyz_network::tcp_pkg::request;
 use mxyz_network::tcp_pkg::request::Request;
 use mxyz_network::tcp_pkg::response::Response;
 use mxyz_network::tcp_pkg::TcpPackage;
-use mxyz_universe::preset::SimulationVariant;
-use mxyz_universe::state::SizedState;
-use mxyz_universe::state::StateQuery;
-use mxyz_universe::system::SizedSystemVariant;
 use std::cell::RefCell;
 use std::rc::Rc;
 use std::sync::{Arc, Mutex};
@@ -47,10 +47,11 @@ impl WebSocketClient {
         let cloned_ws = ws.clone();
         let onopen_callback = Closure::wrap(Box::new(move |_| {
             dom::console_log!("TCP socket opened. Requesting new Client...");
-            let req = request::Request::AddClient;
-            // TODO ^ include page-id / sim-var as well?
+            // Define Request: Add new Client on Server.
+            let req = request::Request::AddClient; // TODO [#1] include page-id as well?
             let req = TcpPackage::Request(req);
             let req = req.to_bytes();
+            // Send Request via TCP Stream to Server.
             cloned_ws.send_with_u8_array(&req).unwrap();
         }) as Box<dyn FnMut(JsValue)>);
         ws.set_onopen(Some(onopen_callback.as_ref().unchecked_ref()));
@@ -72,16 +73,17 @@ impl WebSocketClient {
         let ws = &mut self.socket;
         let mut cloned_ws = ws.clone();
         let onmessage_callback = Closure::wrap(Box::new(move |e: MessageEvent| {
+            // Handle ArrayBuffer Packages.
             if let Ok(abuf) = e.data().dyn_into::<js_sys::ArrayBuffer>() {
                 let array = js_sys::Uint8Array::new(&abuf);
                 let package = TcpPackage::from_bytes(array.to_vec());
                 handle_package(&mut cloned_ws, package);
             } else if let Ok(blob) = e.data().dyn_into::<web_sys::Blob>() {
-                dom::console_log!("message event, received Blob: {:?}", blob);
+                dom::console_log!("TCP event, received Blob: {:?}", blob);
             } else if let Ok(txt) = e.data().dyn_into::<js_sys::JsString>() {
-                dom::console_log!("message event, received Text: {:?}", txt);
+                dom::console_log!("TCP event, received Text: {:?}", txt);
             } else {
-                dom::console_log!("message event, received Unknown: {:?}", e.data());
+                dom::console_log!("TCP event, received Unknown: {:?}", e.data());
             }
         }) as Box<dyn FnMut(MessageEvent)>);
         ws.set_onmessage(Some(onmessage_callback.as_ref().unchecked_ref()));
@@ -96,32 +98,18 @@ impl WebSocketClient {
 /// Different Variants:
 /// - Request    (not relevant)
 /// - Response   (relevant!)
-// /// - Command    (maybe relevant later)
 pub fn handle_package(ws: &mut WebSocket, package: TcpPackage) {
     match package {
-        TcpPackage::Response(res) => handle_response(ws, res),
-        // TcpPackage::Command(cmd) => handle_command(ws, cmd),
         TcpPackage::Request(req) => handle_request(ws, req),
-        _ => todo!(),
+        TcpPackage::Response(res) => handle_response(ws, res),
     }
 }
-
-// =============================================================================
-
-// /// Handle Incoming Command
-// pub fn handle_command(_ws: &mut WebSocket, command: Command) {
-//     match command {
-//         _ => {}
-//     };
-// }
-
 /// Handle Incoming Request
 pub fn handle_request(_ws: &mut WebSocket, request: Request) {
     match request {
         _ => {}
     };
 }
-
 /// Handle Incoming Response
 pub fn handle_response(ws: &mut WebSocket, response: Response) {
     match response {
@@ -131,7 +119,6 @@ pub fn handle_response(ws: &mut WebSocket, response: Response) {
             handle_received_states(ws, engine_id, query, states)
         }
         Response::Empty => {}
-        _ => todo!(),
     }
 }
 
@@ -140,9 +127,9 @@ pub fn handle_response(ws: &mut WebSocket, response: Response) {
 /// Handle Response: Added Client
 pub fn handle_added_client(ws: &mut WebSocket, client_id: usize) {
     dom::console_log!("Client ({:?}) confirmed. Requesting Engine...", client_id);
-    // TODO Get simulation-variant from HTML/JS.
+    // TODO [#1] Get simulation-variant from HTML/JS.
     let sim_variant = SimulationVariant::ThreeBodyMoon;
-    // Request engine to be started on server.
+    // Request Engine to be started on Server.
     let request = request::Request::AddEngine(client_id, sim_variant);
     let request = TcpPackage::Request(request).to_bytes();
     ws.send_with_u8_array(&request).unwrap();
@@ -153,7 +140,7 @@ pub fn handle_added_engine(ws: &mut WebSocket, engine_id: usize) {
     dom::console_log!("Engine ({:?}) confirmed. Requesting States...", engine_id);
     // Formulate state-query.
     let state_query = StateQuery::Between(0, STATE_BATCH_SIZE);
-    // Start sync-loop for this engine's states. TODO (?)
+    // Start sync-loop for this Engine's States. TODO (?)
     let request = request::Request::GetUpdatedStates(engine_id, state_query);
     let request = TcpPackage::Request(request).to_bytes();
     ws.send_with_u8_array(&request).unwrap();
@@ -196,16 +183,6 @@ pub fn handle_received_states(
 
 // =============================================================================
 
-fn window() -> web_sys::Window {
-    web_sys::window().expect("no global `window` exists")
-}
-
-fn request_animation_frame(f: &Closure<dyn FnMut()>) {
-    window()
-        .request_animation_frame(f.as_ref().unchecked_ref())
-        .expect("should register `requestAnimationFrame` OK");
-}
-
 pub fn draw_states(
     states: Vec<SizedState>,
     finished_with_last_render: &mut bool,
@@ -213,6 +190,9 @@ pub fn draw_states(
     let states = Arc::new(Mutex::new(states));
 
     let mut canvas = Canvas::new(0);
+    canvas.init();
+    canvas.set_fill_style("purple");
+    canvas.set_stroke_style("purple");
 
     let f = Rc::new(RefCell::new(None));
     let g = f.clone();
@@ -231,22 +211,20 @@ pub fn draw_states(
         } else {
             nr_of_states = states.len();
         }
+        dom::console_log!("{} < {}", i, STATE_BATCH_SIZE);
 
         // dom::console_log!("{}", i);
-        let state = states.get(i as usize).expect("b");
+        let state = states.get(i as usize).unwrap(); // TODO
         for system in state.systems.iter() {
             match &system.variant {
                 SizedSystemVariant::EntitiesV1(sys) => {
                     //
                     for entity in sys.entities.iter() {
-                        let mass = entity.mass;
+                        let _mass = entity.mass;
                         let pos = entity.position;
-                        let vel = entity.velocity;
+                        let _vel = entity.velocity;
 
-                        let cnv_dim = canvas.dimensions;
-                        canvas.init();
-                        canvas.set_fill_style("purple");
-                        canvas.set_stroke_style("purple");
+                        let _cnv_dim = canvas.dimensions;
                         canvas.draw_circle([pos[0], pos[1]], r, true);
                     }
                 }
@@ -256,9 +234,9 @@ pub fn draw_states(
 
         i += 1;
         // Schedule ourself for another requestAnimationFrame callback.
-        request_animation_frame(f.borrow().as_ref().unwrap());
+        dom::request_animation_frame(f.borrow().as_ref().unwrap());
     }) as Box<dyn FnMut()>));
-    request_animation_frame(g.borrow().as_ref().unwrap());
+    dom::request_animation_frame(g.borrow().as_ref().unwrap());
 
     *finished_with_last_render = true;
     Ok(())

@@ -13,7 +13,7 @@
     mxyz-database = { path = "../mxyz-database" }
     mxyz-engine = { path = "../mxyz-engine" }
     mxyz-network = { path = "../mxyz-network" }
-    mxyz-universe = { path = "../mxyz-universe" }
+    mxyz-engine-universe = { path = "../mxyz-engine-universe" }
     utils = { path="../utils" }
     rayon = "1.5"
     rocket_contrib = "0.4.10"

@@ -1,10 +1,10 @@
 use crate::models::entity_v1;
 use crate::schema::systems;
 use diesel::pg::PgConnection;
-use mxyz_universe::system::objects::planets::Planets;
-use mxyz_universe::system::objects::ObjectsVariant;
-use mxyz_universe::system::EntitiesV1;
-use mxyz_universe::system::{SizedSystem, SizedSystemVariant, SystemVariant};
+use mxyz_engine_universe::system::objects::planets::Planets;
+use mxyz_engine_universe::system::objects::ObjectsVariant;
+use mxyz_engine_universe::system::EntitiesV1;
+use mxyz_engine_universe::system::{SizedSystem, SizedSystemVariant, SystemVariant};
 
 // ============================================================================
 
@@ -25,8 +25,9 @@ pub struct System {
     pub system_id: i32,
     pub system_variant_id: i32,
 }
-impl std::convert::Into<SizedSystem> for System {
-    fn into(self) -> SizedSystem {
+impl System {
+    // impl std::convert::Into<SizedSystem> for System {
+    fn into(self, conn: &PgConnection) -> SizedSystem {
         let conn = crate::establish_connection();
         let other_system_id = self.system_id as usize;
         let other_system_variant = SystemVariant::from(self.system_variant_id as usize);
@@ -80,7 +81,7 @@ pub fn get_systems(conn: &PgConnection, engine_query: i32, state_query: i32) -> 
     // println!("{:?}", db_systems);
     db_systems
         .into_iter()
-        .map(|db_system| db_system.into())
+        .map(|db_system| db_system.into(conn))
         .collect()
 }
 

@@ -1,9 +1,9 @@
 use mxyz_engine::config::ExportVariant;
 use mxyz_engine::Engine;
+use mxyz_engine_universe::preset::SimulationVariant;
+use mxyz_engine_universe::system::SystemVariant;
 use mxyz_network::mpsc_msg;
 use mxyz_network::mpsc_msg::MpscMessage;
-use mxyz_universe::preset::SimulationVariant;
-use mxyz_universe::system::SystemVariant;
 use std::sync::mpsc;
 
 pub struct EngineRunner {

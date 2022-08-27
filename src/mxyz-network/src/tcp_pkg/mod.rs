@@ -1,4 +1,4 @@
-use mxyz_universe::state::SizedState;
+use mxyz_engine_universe::state::SizedState;
 use serde::{Deserialize, Serialize};
 
 pub mod request;

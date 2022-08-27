@@ -1,5 +1,9 @@
 #!/bin/sh
 
+cd "$(dirname $0)"
+PWD="$(pwd)"
+
 dropdb mxyz-db_v1
 createdb mxyz-db_v1
-cd ./mxyz-database && diesel migration run
+
+cd "$PWD/../src/mxyz-database" && diesel migration run

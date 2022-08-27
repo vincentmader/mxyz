@@ -3,11 +3,11 @@ use crate::config::EngineConfig;
 use crate::integrator::euler;
 use crate::integrator::runge_kutta;
 use crate::preset;
-use mxyz_universe::integrator::Integrator;
-use mxyz_universe::integrator::IntegratorVariant;
-use mxyz_universe::preset::SimulationVariant;
-use mxyz_universe::state::State;
-use mxyz_universe::system::System;
+use mxyz_engine_universe::integrator::Integrator;
+use mxyz_engine_universe::integrator::IntegratorVariant;
+use mxyz_engine_universe::preset::SimulationVariant;
+use mxyz_engine_universe::state::State;
+use mxyz_engine_universe::system::System;
 
 // ============================================================================
 

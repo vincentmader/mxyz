@@ -1,5 +1,5 @@
 import init, {
-  // initThreadPool, (?)
+  // initThreadPool,
   SimulationClientV1,
 } from "../../../static/pkg/mxyz_client.js";
 
@@ -16,6 +16,11 @@ console.log(
 
 (async () => {
   await init();
+
+  // Thread pool initialization with the given number of threads
+  // (pass `navigator.hardwareConcurrency` if you want to use all cores).
+  // await initThreadPool(navigator.hardwareConcurrency);
+
   let simulation = SimulationClientV1.new();
   simulation.init(simulation_variant);
 })();
