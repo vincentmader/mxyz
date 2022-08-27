@@ -17,7 +17,7 @@ impl RocketServer {
     /// Creates a new Server instance
     pub fn new() -> Self {
         let routes = crate::http::get_all_routes();
-        let catchers = catchers![crate::http::error::not_found::route,];
+        let catchers = catchers![crate::http::page_routes::error::not_found::route,];
         let file_server = FileServer::from(relative!("static"));
 
         // use rayon::prelude::*;
