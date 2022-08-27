@@ -49,11 +49,6 @@ impl EngineRunner {
     ) {
         let simulation_variant = simulation_variant.clone();
 
-        // Save engine to database. (actually: only engine-id)
-        // let db_conn = mxyz_database::establish_connection();
-        // let db_engine = mxyz_database::models::engine::create_engine(&db_conn, client_id);
-        // let engine_id = db_engine.engine_id as usize;
-
         // Create & initialize new simulation engine.
         let mut engine = Engine::new(engine_id);
         engine.init(Some(simulation_variant));
