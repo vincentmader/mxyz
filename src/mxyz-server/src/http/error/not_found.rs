@@ -17,5 +17,5 @@ pub fn route(request: &Request<'_>) -> Template {
         .iter()
         .cloned()
         .collect();
-    Template::render("error/404", &context)
+    Template::render("tera/error/404", &context)
 }

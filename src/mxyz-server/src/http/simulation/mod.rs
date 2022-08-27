@@ -23,5 +23,5 @@ pub async fn route(category: &str, simulation_variant: &str) -> Template {
     .iter()
     .cloned()
     .collect();
-    Template::render("simulation/base", &context)
+    Template::render("tera/simulation/base", &context)
 }

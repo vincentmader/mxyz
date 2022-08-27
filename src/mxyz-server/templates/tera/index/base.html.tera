@@ -1,4 +1,4 @@
-{% extends "base" %}
+{% extends "tera/base" %}
 
 {% block head %}
     {{ super() }}
@@ -7,5 +7,5 @@
 
 {% block page_content %}
     {{ super() }}
-    {% include "index/navgrid" %}
+    {% include "tera/index/navgrid" %}
 {% endblock page_content %}

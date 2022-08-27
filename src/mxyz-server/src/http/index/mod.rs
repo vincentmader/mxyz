@@ -11,5 +11,5 @@ use navgrid::NavGrid;
 pub fn route() -> Template {
     let navgrid = NavGrid::new();
     let context: HashMap<&str, &NavGrid> = [("navgrid", &navgrid)].iter().cloned().collect();
-    Template::render("index/base", &context)
+    Template::render("tera/index/base", &context)
 }

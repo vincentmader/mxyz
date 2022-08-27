@@ -1,4 +1,4 @@
-{% extends "base" %}
+{% extends "tera/base" %}
 
 {% block head %}
     {{ super() }}
@@ -39,11 +39,11 @@
             </div>
         </div>
         <div id="page-column-right">
-            {% include "boilerplate/section" %}
-            {% include "boilerplate/section" %}
-            {% include "boilerplate/section" %}
-            {% include "boilerplate/section" %}
-            {% include "boilerplate/section" %}
+            {% include "tera/boilerplate/section" %}
+            {% include "tera/boilerplate/section" %}
+            {% include "tera/boilerplate/section" %}
+            {% include "tera/boilerplate/section" %}
+            {% include "tera/boilerplate/section" %}
         </div>
     </div>
 {% endblock page_content %}
