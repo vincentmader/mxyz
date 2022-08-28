@@ -1,3 +1,4 @@
+pub mod preset;
 use mxyz_engine_universe::preset::SimulationVariant;
 
 pub struct EngineConfig {

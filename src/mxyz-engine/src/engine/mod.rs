@@ -2,7 +2,6 @@
 use crate::config::EngineConfig;
 use crate::integrator::euler;
 use crate::integrator::runge_kutta;
-use crate::preset;
 use mxyz_engine_universe::integrator::Integrator;
 use mxyz_engine_universe::integrator::IntegratorVariant;
 use mxyz_engine_universe::preset::SimulationVariant;
@@ -34,7 +33,7 @@ impl Engine {
 
     /// Initializes state & engine-config.
     pub fn init(&mut self, sim_variant: Option<SimulationVariant>) {
-        let initial_state = preset::initialize(sim_variant, &mut self.config);
+        let initial_state = crate::config::preset::initialize(sim_variant, &mut self.config);
         self.states.push(initial_state);
     }
 

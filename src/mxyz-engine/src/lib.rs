@@ -9,5 +9,4 @@ pub mod config;
 pub mod engine;
 pub mod integrator;
 pub mod interaction;
-pub mod preset;
 pub use engine::Engine;
