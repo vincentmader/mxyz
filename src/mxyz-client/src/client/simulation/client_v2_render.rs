@@ -7,13 +7,13 @@ use wasm_bindgen::prelude::*;
 /// Simulation-Client v1
 /// - Receive states via WebSocket.
 /// - Render to Canvas (Animation Loop).
-pub struct SimulationClientV1 {
+pub struct SimulationClientV2Render {
     config: ClientConfig,
     websocket: WebSocketClient,
 }
 
 #[wasm_bindgen]
-impl SimulationClientV1 {
+impl SimulationClientV2Render {
     /// Create new Simulation-Renderer-Client.
     /// - Create Client Config.
     /// - Create WebSocket Client.
@@ -23,7 +23,7 @@ impl SimulationClientV1 {
         // Create WebSocket Client using host & port from Client Config.
         let websocket = WebSocketClient::new(&config.websocket_host, config.websocket_port);
 
-        SimulationClientV1 { config, websocket }
+        SimulationClientV2Render { config, websocket }
     }
 
     /// Initialize Renderer-Client.

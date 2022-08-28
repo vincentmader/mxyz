@@ -17,7 +17,7 @@ use web_sys::BinaryType::Arraybuffer;
 use web_sys::WebSocket;
 use web_sys::{ErrorEvent, MessageEvent};
 
-const STATE_BATCH_SIZE: i32 = 100;
+const STATE_BATCH_SIZE: i32 = 500;
 const r: f64 = 10.;
 
 /// Web-Socket TCP Client
