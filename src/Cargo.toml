@@ -4,11 +4,12 @@
     ]
     members = [
         "mxyz-client",
+        "mxyz-client-engine",
         "mxyz-database",
         "mxyz-engine",
-        "mxyz-engine-base",
         "mxyz-engine-universe",
         "mxyz-network",
         "mxyz-server",
+        "mxyz-server-engine",
         "utils",
     ]

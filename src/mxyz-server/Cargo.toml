@@ -9,17 +9,17 @@
     diesel = "1.4.8"
     futures-util = { version = "0.3", default-features = false, features = ["sink", "std"] }
     log = "0.4"
-    # mxyz-config = { path = "../mxyz-config" }
     mxyz-database = { path = "../mxyz-database" }
     mxyz-engine = { path = "../mxyz-engine" }
-    mxyz-network = { path = "../mxyz-network" }
     mxyz-engine-universe = { path = "../mxyz-engine-universe" }
-    utils = { path="../utils" }
+    mxyz-network = { path = "../mxyz-network" }
+    mxyz-server-engine = { path = "../mxyz-server-engine" }
     rayon = "1.5"
     rocket_contrib = "0.4.10"
-    tokio-util = "0.7.3"
     serde_json = "1.0"
     tokio-tungstenite = "0.17.1"
+    tokio-util = "0.7.3"
+    utils = { path="../utils" }
     websocket = "0.26.4"
 
 [dependencies.futures]

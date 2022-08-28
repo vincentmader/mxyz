@@ -16,6 +16,7 @@
     # gloo-timers = "0.2.4"
     js-sys = "0.3"
     # mxyz-config = { path = "../mxyz-config" }
+    mxyz-client-engine = { path = "../mxyz-client-engine" }
     mxyz-network = { path = "../mxyz-network" }
     mxyz-engine-universe = { path = "../mxyz-engine-universe" }
     # rand = "0.8.5"

@@ -1,7 +1,0 @@
-[package]
-    name = "mxyz-engine-base"
-    authors = ["Vincent C. Mader <vincent@mader.xyz>"]
-    edition = "2021"
-    version = "0.1.0"
-
-[dependencies]
