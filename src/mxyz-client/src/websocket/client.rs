@@ -1,6 +1,6 @@
 use crate::components::canvas::Canvas;
 use crate::utils::dom;
-use mxyz_engine::config::preset::simulation_variant::SimulationVariant;
+use mxyz_engine::config::simulation_variant::SimulationVariant;
 use mxyz_engine::state::SizedState;
 use mxyz_engine::state::StateQuery;
 use mxyz_engine::system::SizedSystemVariant;

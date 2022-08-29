@@ -1,4 +1,4 @@
-use mxyz_engine::config::preset::simulation_variant::SimulationVariant;
+use mxyz_engine::config::simulation_variant::SimulationVariant;
 
 pub fn get_simulation_variant_from_str(simulation_variant: &str) -> Option<SimulationVariant> {
     let simulation_variant = match simulation_variant {
