@@ -1,10 +1,10 @@
 use crate::models::entity_v1;
 use crate::schema::systems;
 use diesel::pg::PgConnection;
-use mxyz_engine_universe::system::objects::planets::Planets;
-use mxyz_engine_universe::system::objects::ObjectsVariant;
-use mxyz_engine_universe::system::EntitiesV1;
-use mxyz_engine_universe::system::{SizedSystem, SizedSystemVariant, SystemVariant};
+use mxyz_engine::system::objects::planets::Planets;
+use mxyz_engine::system::objects::ObjectsVariant;
+use mxyz_engine::system::EntitiesV1;
+use mxyz_engine::system::{SizedSystem, SizedSystemVariant, SystemVariant};
 
 // ============================================================================
 

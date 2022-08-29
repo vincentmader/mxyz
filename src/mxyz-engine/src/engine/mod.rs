@@ -1,16 +1,16 @@
 #![allow(unreachable_code)]
 use crate::config::preset;
 use crate::config::EngineConfig;
+use crate::entity::Entity;
 use crate::integrator::euler;
 use crate::integrator::runge_kutta;
-use mxyz_engine_universe::entity::Entity;
-use mxyz_engine_universe::integrator::Integrator;
-use mxyz_engine_universe::integrator::IntegratorVariant;
-use mxyz_engine_universe::interaction::force::ForceVariant;
-use mxyz_engine_universe::interaction::InteractionVariant;
-use mxyz_engine_universe::preset::SimulationVariant;
-use mxyz_engine_universe::state::State;
-use mxyz_engine_universe::system::System;
+use crate::integrator::Integrator;
+use crate::integrator::IntegratorVariant;
+use crate::interaction::force::ForceVariant;
+use crate::interaction::InteractionVariant;
+use crate::preset::SimulationVariant;
+use crate::state::State;
+use crate::system::System;
 
 /// MXYZ Simulation-Engine
 pub trait Engine {
@@ -98,7 +98,7 @@ pub trait Engine {
                         }
                     }
                 }
-                let entity = mxyz_engine_universe::entity::EntityV1::new(m, p, v);
+                let entity = crate::entity::EntityV1::new(m, p, v);
                 Box::new(entity)
             }
             _ => todo!("Integrator Variant"),

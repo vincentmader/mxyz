@@ -1,5 +1,5 @@
 use mxyz_engine::engine::Engine;
-use mxyz_engine_universe::preset::SimulationVariant;
+use mxyz_engine::preset::SimulationVariant;
 use mxyz_server_engine::SimulationEngineV2Server;
 
 fn main() {

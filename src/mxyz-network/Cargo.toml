@@ -7,8 +7,8 @@
 [dependencies]
     bincode = "1.3.3"
     # mxyz-config = { path = "../mxyz-config" }
-    mxyz-engine-universe = { path = "../mxyz-engine-universe" }
     wasm-bindgen = { version = "^0.2", features = ["nightly", "serde-serialize"] }
+    mxyz-engine = { path = "../mxyz-engine" }
 
 [dependencies.serde]
     features = ["derive"]

@@ -1,8 +1,8 @@
 use mxyz_client_engine::SimulationEngineV1Client;
 use mxyz_engine::config::ExportVariant;
 use mxyz_engine::engine::Engine;
-use mxyz_engine_universe::preset::SimulationVariant;
-use mxyz_engine_universe::system::SystemVariant;
+use mxyz_engine::preset::SimulationVariant;
+use mxyz_engine::system::SystemVariant;
 use mxyz_network::mpsc_msg;
 use mxyz_network::mpsc_msg::MpscMessage;
 use mxyz_server_engine::SimulationEngineV2Server;

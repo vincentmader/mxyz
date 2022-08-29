@@ -1,8 +1,8 @@
 use mxyz_engine::config::EngineConfig;
 use mxyz_engine::engine::Engine;
-use mxyz_engine_universe::integrator::Integrator;
-use mxyz_engine_universe::state::State;
-use mxyz_engine_universe::system::System;
+use mxyz_engine::integrator::Integrator;
+use mxyz_engine::state::State;
+use mxyz_engine::system::System;
 use rayon::prelude::*;
 
 pub struct SimulationEngineV2Server {

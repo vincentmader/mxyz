@@ -6,5 +6,4 @@
 
 [dependencies]
     mxyz-engine = { path="../mxyz-engine" }
-    mxyz-engine-universe = { path = "../mxyz-engine-universe" }
     rayon = "1.5"

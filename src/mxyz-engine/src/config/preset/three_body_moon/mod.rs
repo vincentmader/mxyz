@@ -1,14 +1,14 @@
 #![allow(unused_variables)]
 use crate::config::EngineConfig;
-use mxyz_engine_universe::entity::EntityV1;
-use mxyz_engine_universe::integrator::Integrator;
-use mxyz_engine_universe::integrator::IntegratorVariant;
-use mxyz_engine_universe::interaction::force::Force;
-use mxyz_engine_universe::interaction::force::ForceVariant;
-use mxyz_engine_universe::interaction::Interaction;
-use mxyz_engine_universe::interaction::InteractionVariant;
-use mxyz_engine_universe::system::System;
-use mxyz_engine_universe::system::SystemVariant;
+use crate::entity::EntityV1;
+use crate::integrator::Integrator;
+use crate::integrator::IntegratorVariant;
+use crate::interaction::force::Force;
+use crate::interaction::force::ForceVariant;
+use crate::interaction::Interaction;
+use crate::interaction::InteractionVariant;
+use crate::system::System;
+use crate::system::SystemVariant;
 
 const NR_OF_STEPS: usize = 10;
 const G: f64 = 1.;

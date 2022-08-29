@@ -11,7 +11,6 @@
     log = "0.4"
     mxyz-database = { path = "../mxyz-database" }
     mxyz-engine = { path = "../mxyz-engine" }
-    mxyz-engine-universe = { path = "../mxyz-engine-universe" }
     mxyz-network = { path = "../mxyz-network" }
     mxyz-server-engine = { path = "../mxyz-server-engine" }
     mxyz-client-engine = { path = "../mxyz-client-engine" }

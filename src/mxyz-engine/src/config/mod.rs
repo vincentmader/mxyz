@@ -1,5 +1,5 @@
 pub mod preset;
-use mxyz_engine_universe::preset::SimulationVariant;
+use crate::preset::SimulationVariant;
 
 pub struct EngineConfig {
     pub step_id: (usize, usize),

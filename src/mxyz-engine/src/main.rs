@@ -1,7 +1,7 @@
 // #![allow(unused_doc_comments)]
 use mxyz_engine::config::ExportVariant;
+use mxyz_engine::preset::SimulationVariant;
 use mxyz_engine::Engine;
-use mxyz_engine_universe::preset::SimulationVariant;
 
 const EXPORT_VARIANT: ExportVariant = ExportVariant::ToDatabase;
 const ENGINE_ID: usize = 0;

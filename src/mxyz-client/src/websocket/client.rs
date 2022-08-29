@@ -1,9 +1,9 @@
 use crate::components::canvas::Canvas;
 use crate::utils::dom;
-use mxyz_engine_universe::preset::SimulationVariant;
-use mxyz_engine_universe::state::SizedState;
-use mxyz_engine_universe::state::StateQuery;
-use mxyz_engine_universe::system::SizedSystemVariant;
+use mxyz_engine::preset::SimulationVariant;
+use mxyz_engine::state::SizedState;
+use mxyz_engine::state::StateQuery;
+use mxyz_engine::system::SizedSystemVariant;
 use mxyz_network::tcp_pkg::request;
 use mxyz_network::tcp_pkg::request::Request;
 use mxyz_network::tcp_pkg::response::Response;

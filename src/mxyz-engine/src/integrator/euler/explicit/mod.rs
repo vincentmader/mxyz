@@ -1,10 +1,10 @@
-use mxyz_engine_universe::entity::Entity;
-use mxyz_engine_universe::entity::EntityV1;
-use mxyz_engine_universe::interaction::force::ForceVariant;
-use mxyz_engine_universe::interaction::Interaction;
-use mxyz_engine_universe::interaction::InteractionVariant;
-use mxyz_engine_universe::state::State;
-use mxyz_engine_universe::system::{System, SystemVariant};
+use crate::entity::Entity;
+use crate::entity::EntityV1;
+use crate::interaction::force::ForceVariant;
+use crate::interaction::Interaction;
+use crate::interaction::InteractionVariant;
+use crate::state::State;
+use crate::system::{System, SystemVariant};
 use rayon::prelude::*;
 use std::sync::{Arc, Mutex};
 

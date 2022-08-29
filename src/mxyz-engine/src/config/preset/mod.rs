@@ -2,8 +2,8 @@
 pub mod three_body_figure_eight;
 pub mod three_body_moon;
 use crate::config::EngineConfig;
-use mxyz_engine_universe::preset::SimulationVariant;
-use mxyz_engine_universe::state::State;
+use crate::preset::SimulationVariant;
+use crate::state::State;
 
 /// Initialize State & Config
 pub fn initialize(simulation_variant: Option<SimulationVariant>, cfg: &mut EngineConfig) -> State {
