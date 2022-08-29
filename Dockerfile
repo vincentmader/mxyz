@@ -27,12 +27,13 @@ RUN apk add --no-cache libc-dev
 
 # Install `make` tool
 RUN apk add make
+RUN apk add libc-dev
 
 # RUN cargo install cargo-bundle
 RUN apk add mysql
 RUN apk add libpq
 RUN apk add libtool
-RUN cargo install diesel_cli
+RUN cargo install diesel_cli --no-default-features --features postgres
 
 #
 # RUN apk add build-base
