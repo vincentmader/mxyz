@@ -9,30 +9,10 @@ pub mod monte_carlo;
 pub mod runge_kutta;
 pub mod velocity_verlet;
 pub mod verlet;
-
+// -----------------------------------------------------------------------------
 use crate::interaction::Interaction;
 use serde::{Deserialize, Serialize};
-// use crate::interaction::Interaction;
-
-// ============================================================================
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct Integrator {
-    pub variant: IntegratorVariant,
-    pub interactions: Vec<Interaction>,
-}
-impl Integrator {
-    pub fn new(variant: IntegratorVariant) -> Self {
-        let interactions = vec![];
-        Integrator {
-            variant,
-            interactions,
-        }
-    }
-}
-
-// ============================================================================
-
+// -----------------------------------------------------------------------------
 #[derive(Debug, Serialize, Deserialize, Clone)]
 /// Entity Integrator
 pub enum IntegratorVariant {
@@ -48,4 +28,19 @@ pub enum IntegratorVariant {
     Collision,
     CellularAutomaton,
     MonteCarlo,
+}
+// -----------------------------------------------------------------------------
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Integrator {
+    pub variant: IntegratorVariant,
+    pub interactions: Vec<Interaction>,
+}
+impl Integrator {
+    pub fn new(variant: IntegratorVariant) -> Self {
+        let interactions = vec![];
+        Integrator {
+            variant,
+            interactions,
+        }
+    }
 }

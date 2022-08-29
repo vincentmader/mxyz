@@ -84,10 +84,6 @@ pub trait Engine {
         const DT: f64 = 0.01;
         match integrator.variant {
             IntegratorVariant::EulerExplicit => {
-                let mut m = entity.get_mass();
-                let mut p = *entity.get_position();
-                let mut v = *entity.get_velocity();
-
                 for system in state.systems.iter() {
                     for other in system.entities.iter() {
                         for interaction in interactions.iter() {
@@ -98,6 +94,9 @@ pub trait Engine {
                         }
                     }
                 }
+                let mut m = entity.get_mass();
+                let mut p = *entity.get_position();
+                let mut v = *entity.get_velocity();
                 let entity = crate::entity::EntityV1::new(m, p, v);
                 Box::new(entity)
             }

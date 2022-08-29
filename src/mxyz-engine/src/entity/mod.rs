@@ -76,4 +76,3 @@ impl Charge for EntityV1 {}
 impl Density for EntityV1 {}
 impl Force for EntityV1 {}
 impl Entity for EntityV1 {}
-// impl EntityClone for Entity {}

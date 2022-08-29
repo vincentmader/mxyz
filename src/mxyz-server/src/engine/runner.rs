@@ -1,11 +1,9 @@
-use mxyz_client_engine::SimulationEngineV1Client;
 use mxyz_engine::config::simulation_variant::SimulationVariant;
 use mxyz_engine::config::ExportVariant;
 use mxyz_engine::engine::Engine;
 use mxyz_engine::system::SystemVariant;
 use mxyz_network::mpsc_msg;
 use mxyz_network::mpsc_msg::MpscMessage;
-use mxyz_server_engine::SimulationEngineV2Server;
 use std::sync::mpsc;
 
 /// Engine Runner
@@ -54,7 +52,7 @@ impl EngineRunner {
         let simulation_variant = simulation_variant.clone();
 
         // Create & initialize new simulation engine.
-        let mut engine = SimulationEngineV2Server::new(engine_id);
+        let mut engine = mxyz_server_engine::SimulationEngineV2::new(engine_id);
         engine.init(Some(simulation_variant));
         engine.config.step_id.1 = usize::MAX;
 

@@ -5,24 +5,24 @@ use mxyz_engine::state::State;
 use mxyz_engine::system::System;
 use rayon::prelude::*;
 
-pub struct SimulationEngineV2Server {
+pub struct SimulationEngineV2 {
     pub config: EngineConfig,
     engine_id: usize,
     states: Vec<State>,
 }
-impl SimulationEngineV2Server {
+impl SimulationEngineV2 {
     pub fn new(engine_id: usize) -> Self {
         let config = EngineConfig::new();
         let states = vec![];
 
-        SimulationEngineV2Server {
+        SimulationEngineV2 {
             engine_id,
             config,
             states,
         }
     }
 }
-impl Engine for SimulationEngineV2Server {
+impl Engine for SimulationEngineV2 {
     fn forward_state(&self, state: &State) -> State {
         let systems = state
             .systems
@@ -33,19 +33,16 @@ impl Engine for SimulationEngineV2Server {
         State { state_id, systems }
     }
     fn integrate_system(&self, integrator: &Integrator, system: &System) -> System {
-        let system_id = system.system_id;
         let entities = system
             .entities
             .par_iter()
             .map(|x| self.integrate_entity(integrator, x))
             .collect();
-        let integrators = system.integrators.clone();
-        let variant = system.variant.clone();
         System {
-            system_id,
             entities,
-            integrators,
-            variant,
+            integrators: system.integrators.clone(), // todo: move to config
+            variant: system.variant.clone(),         // todo: move to config
+            system_id: system.system_id,
         }
     }
     fn engine_config(&self) -> &EngineConfig {

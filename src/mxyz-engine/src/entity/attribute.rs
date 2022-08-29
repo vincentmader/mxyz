@@ -1,5 +1,7 @@
 /// Massive Particle
 pub trait MassiveParticle: Mass + Position + Velocity {}
+/// Charged Particle
+pub trait ChargedParticle: Charge + Position + Velocity {}
 
 /// Position (3D)
 pub trait Position {
