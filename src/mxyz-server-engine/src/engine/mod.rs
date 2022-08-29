@@ -27,16 +27,19 @@ impl Engine for SimulationEngineV2 {
         let systems = state
             .systems
             .par_iter()
-            .map(|sys| self.forward_system(sys))
+            .enumerate()
+            .map(|(id, sys)| self.forward_system((id, sys)))
             .collect();
         let state_id = state.state_id + 1;
         State { state_id, systems }
     }
-    fn integrate_system(&self, integrator: &Integrator, system: &System) -> System {
+    fn integrate_system(&self, integrator: &Integrator, system: (usize, &System)) -> System {
+        let (sys_id, system) = system;
         let entities = system
             .entities
             .par_iter()
-            .map(|x| self.integrate_entity(integrator, x))
+            .enumerate()
+            .map(|(ent_id, ent)| self.integrate_entity(integrator, ((sys_id, ent_id), ent)))
             .collect();
         System {
             entities,

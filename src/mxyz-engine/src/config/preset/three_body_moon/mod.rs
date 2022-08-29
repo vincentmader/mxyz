@@ -2,6 +2,7 @@
 #![allow(non_snake_case)]
 use crate::config::EngineConfig;
 use crate::entity::EntityV1;
+use crate::integrator::ForceIntegratorVariant;
 use crate::integrator::Integrator;
 use crate::integrator::IntegratorVariant;
 use crate::interaction::force::Force;
@@ -21,7 +22,7 @@ pub fn preset(systems: &mut Vec<System>, config: &mut EngineConfig) {
     let M = 1.;
     let r0 = 0.7;
     let v0 = (G * M / r0).powf(0.5);
-    let N = 4;
+    let N = 2;
 
     // System 0: STAR
     // ------------------------------------------------------------------------
@@ -47,7 +48,8 @@ pub fn preset(systems: &mut Vec<System>, config: &mut EngineConfig) {
         system.entities.push(Box::new(entity));
     }
     // INTEGRATORS
-    let integrator_variant = IntegratorVariant::EulerExplicit;
+    let integrator_variant = ForceIntegratorVariant::EulerExplicit;
+    let integrator_variant = IntegratorVariant::ForceIntegratorV1(integrator_variant);
     let mut integrator = Integrator::new(integrator_variant);
     let mut interactions = vec![];
 
@@ -83,7 +85,8 @@ pub fn preset(systems: &mut Vec<System>, config: &mut EngineConfig) {
         system.entities.push(Box::new(entity));
     }
     // INTEGRATORS
-    let integrator_variant = IntegratorVariant::EulerExplicit;
+    let integrator_variant = ForceIntegratorVariant::EulerExplicit;
+    let integrator_variant = IntegratorVariant::ForceIntegratorV1(integrator_variant);
     let mut integrator = Integrator::new(integrator_variant);
     let mut interactions = vec![];
 

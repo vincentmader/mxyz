@@ -16,15 +16,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Serialize, Deserialize, Clone)]
 /// Entity Integrator
 pub enum IntegratorVariant {
-    EulerExplicit,
-    EulerImplicit,
-    RungeKutta2,
-    RungeKutta4,
-    RungeKuttaN,
-    VelocityVerlet,
-    Verlet,
-    LeapFrog,
-    BulirschStoer,
+    ForceIntegratorV1(ForceIntegratorVariant),
     Collision,
     CellularAutomaton,
     MonteCarlo,
@@ -43,4 +35,17 @@ impl Integrator {
             interactions,
         }
     }
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub enum ForceIntegratorVariant {
+    EulerExplicit,
+    EulerImplicit,
+    RungeKutta2,
+    RungeKutta4,
+    RungeKuttaN,
+    VelocityVerlet,
+    Verlet,
+    LeapFrog,
+    BulirschStoer,
 }
