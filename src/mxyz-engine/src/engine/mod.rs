@@ -1,5 +1,6 @@
 #![allow(unreachable_code)]
 use crate::config::preset;
+use crate::config::preset::simulation_variant::SimulationVariant;
 use crate::config::EngineConfig;
 use crate::entity::Entity;
 use crate::integrator::euler;
@@ -8,7 +9,6 @@ use crate::integrator::Integrator;
 use crate::integrator::IntegratorVariant;
 use crate::interaction::force::ForceVariant;
 use crate::interaction::InteractionVariant;
-use crate::preset::SimulationVariant;
 use crate::state::State;
 use crate::system::System;
 

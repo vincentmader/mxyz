@@ -1,9 +1,10 @@
 #![allow(unreachable_patterns)]
+pub mod simulation_variant;
 pub mod three_body_figure_eight;
 pub mod three_body_moon;
 use crate::config::EngineConfig;
-use crate::preset::SimulationVariant;
 use crate::state::State;
+use simulation_variant::SimulationVariant;
 
 /// Initialize State & Config
 pub fn initialize(simulation_variant: Option<SimulationVariant>, cfg: &mut EngineConfig) -> State {

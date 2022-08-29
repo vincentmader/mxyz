@@ -1,5 +1,5 @@
 pub mod preset;
-use crate::preset::SimulationVariant;
+use preset::simulation_variant::SimulationVariant;
 
 pub struct EngineConfig {
     pub step_id: (usize, usize),

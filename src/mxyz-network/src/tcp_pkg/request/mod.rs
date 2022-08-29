@@ -1,4 +1,4 @@
-use mxyz_engine::preset::SimulationVariant;
+use mxyz_engine::config::preset::simulation_variant::SimulationVariant;
 use mxyz_engine::state::StateQuery;
 use serde::{Deserialize, Serialize};
 
