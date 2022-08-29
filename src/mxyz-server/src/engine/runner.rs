@@ -1,9 +1,11 @@
+use mxyz_client_engine::SimulationEngineV1Client;
 use mxyz_engine::config::ExportVariant;
-use mxyz_engine::Engine;
+use mxyz_engine::engine::Engine;
 use mxyz_engine_universe::preset::SimulationVariant;
 use mxyz_engine_universe::system::SystemVariant;
 use mxyz_network::mpsc_msg;
 use mxyz_network::mpsc_msg::MpscMessage;
+use mxyz_server_engine::SimulationEngineV2Server;
 use std::sync::mpsc;
 
 /// Engine Runner
@@ -52,7 +54,7 @@ impl EngineRunner {
         let simulation_variant = simulation_variant.clone();
 
         // Create & initialize new simulation engine.
-        let mut engine = Engine::new(engine_id);
+        let mut engine = SimulationEngineV1Client::new(engine_id);
         engine.init(Some(simulation_variant));
         engine.config.step_id.1 = usize::MAX;
 
@@ -80,29 +82,30 @@ impl EngineRunner {
 }
 
 /// Exports Engine
-pub fn export(engine: &mut Engine) {
+pub fn export<T: Engine>(engine: &mut T) {
     // Get state-ids.
-    let states_to_save = engine.get_unsaved_state_ids();
+    let states_to_save = get_unsaved_state_ids(engine);
     // Choose export method.
-    match engine.config.export_variant {
+    match engine.engine_config().export_variant {
         ExportVariant::ToFile => export_to_file(engine, &states_to_save),
         ExportVariant::ToDatabase => export_to_database(engine, &states_to_save),
     }
-    // Update step-id of last expor.
-    engine.config.last_export_step_id = Some(engine.config.step_id.0);
+    // Update step-id of last export.
+    let state_id = Some(engine.engine_config().step_id.0);
+    engine.engine_config_mut().last_export_step_id = state_id;
 }
 
 /// Exports Engine to Database
-pub fn export_to_database(engine: &mut Engine, states_to_save: &Vec<usize>) {
+pub fn export_to_database<T: Engine>(engine: &mut T, states_to_save: &Vec<usize>) {
     let conn = mxyz_database::establish_connection();
 
     // Loop over unsaved states.
     for state_id in states_to_save.iter() {
-        let state = engine.states.get(*state_id).unwrap();
+        let state = engine.engine_states().get(*state_id).unwrap();
         // Loops over systems.
         for system in state.systems.iter() {
             // Gets ids for engine, system, & system-variant (via conversion: enum -> usize).
-            let engine_id = engine.engine_id;
+            let engine_id = engine.engine_id();
             let system_id = system.system_id;
             let system_variant_id: usize = system.variant.clone().into(); // TODO remove clone
 
@@ -112,7 +115,7 @@ pub fn export_to_database(engine: &mut Engine, states_to_save: &Vec<usize>) {
                     for (ent_id, ent) in system.entities.iter().enumerate() {
                         let db_entity = mxyz_database::models::entity_v1::NewEntityV1 {
                             // ids of engien, state, system & entity
-                            engine_id: &(engine.engine_id as i32),
+                            engine_id: &(*engine.engine_id() as i32),
                             state_id: &(*state_id as i32),
                             system_id: &(system_id as i32),
                             entity_id: &(ent_id as i32),
@@ -134,7 +137,7 @@ pub fn export_to_database(engine: &mut Engine, states_to_save: &Vec<usize>) {
             }
             // Save system to database.
             let db_system = mxyz_database::models::system::NewSystem {
-                engine_id: &(engine_id as i32),
+                engine_id: &(*engine_id as i32),
                 state_id: &(*state_id as i32),
                 system_id: &(system_id as i32),
                 system_variant_id: &(system_variant_id as i32),
@@ -143,7 +146,7 @@ pub fn export_to_database(engine: &mut Engine, states_to_save: &Vec<usize>) {
         }
         // Save state to database.
         let db_state = mxyz_database::models::state::NewState {
-            engine_id: &(engine.engine_id as i32),
+            engine_id: &(*engine.engine_id() as i32),
             state_id: &(*state_id as i32),
         };
         mxyz_database::models::state::create_state(&conn, db_state);
@@ -151,17 +154,35 @@ pub fn export_to_database(engine: &mut Engine, states_to_save: &Vec<usize>) {
 }
 
 /// Exports Engine to File
-pub fn export_to_file(engine: &mut Engine, states_to_save: &Vec<usize>) {
+pub fn export_to_file<T: Engine>(engine: &mut T, states_to_save: &Vec<usize>) {
     // Get simulation variant.
-    let simulation_variant = engine.config.simulation_variant.as_ref().unwrap();
+    let simulation_variant = engine.engine_config().simulation_variant.as_ref().unwrap();
     // Convert simulation variant to integer representation in out-path.
     let simulation_variant: usize = simulation_variant.clone().into();
     let out_dir = format!("./mxyz-engine/output/{:?}", simulation_variant);
     // Loop over unsaved states.
     for state_id in states_to_save.iter() {
-        let state = engine.states.get(*state_id).unwrap();
+        let state = engine.engine_states().get(*state_id).unwrap();
         // Save to file.
         let path = format!("{}/{}.txt", out_dir, state_id);
         std::fs::write(path, format!("{:#?}", state)).unwrap();
     }
+}
+
+/// Gets state-ids of states not yet saved to database.
+pub fn get_unsaved_state_ids<T: Engine>(engine: &T) -> Vec<usize> {
+    engine
+        .engine_states()
+        .iter()
+        .filter(|state| {
+            state.state_id
+                >= match engine.engine_config().last_export_step_id {
+                    // If last-export-id is None, load all states since 0.
+                    None => 0,
+                    // If not None, load states since last-export-id + 1.
+                    Some(e) => e + 1,
+                }
+        })
+        .map(|state| state.state_id)
+        .collect()
 }

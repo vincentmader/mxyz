@@ -1,5 +1,5 @@
 use mxyz_engine::config::EngineConfig;
-use mxyz_engine::engine::Engine_;
+use mxyz_engine::engine::Engine;
 use mxyz_engine_universe::integrator::Integrator;
 use mxyz_engine_universe::state::State;
 use mxyz_engine_universe::system::System;
@@ -24,7 +24,7 @@ impl SimulationEngineV2Server {
         }
     }
 }
-impl Engine_ for SimulationEngineV2Server {
+impl Engine for SimulationEngineV2Server {
     fn forward_state(&self, state: &State) -> State {
         // Forward systems.
         let systems = state
@@ -38,7 +38,7 @@ impl Engine_ for SimulationEngineV2Server {
         State { state_id, systems }
     }
     fn integrate_system(&self, integrator: &Integrator, system: &System) -> System {
-        todo!();
+        system.clone()
     }
     fn engine_config(&self) -> &EngineConfig {
         &self.config
