@@ -1,4 +1,4 @@
-use crate::renderer::components::canvas::Canvas;
+use crate::components::canvas::Canvas;
 use crate::utils::dom;
 use mxyz_engine_universe::preset::SimulationVariant;
 use mxyz_engine_universe::state::SizedState;

@@ -8,8 +8,8 @@ const ENGINE_ID: usize = 0;
 
 fn main() {
     // Create new engine.
-    let mut engine = Engine::new(ENGINE_ID);
-    // Initialize engine's state-vector.
+    let mut engine = Engine::new(ENGINE_ID); // TODO
+                                             // Initialize engine's state-vector.
     engine.init(Some(SimulationVariant::ThreeBodyMoon));
     // Initialize engine-config.
     engine.config.export_variant = EXPORT_VARIANT;

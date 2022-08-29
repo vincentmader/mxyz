@@ -1,6 +1,7 @@
 use mxyz_engine::config::EngineConfig;
 use mxyz_engine::engine::Engine;
 use mxyz_engine_universe::integrator::Integrator;
+use mxyz_engine_universe::integrator::IntegratorVariant;
 use mxyz_engine_universe::state::State;
 use mxyz_engine_universe::system::System;
 
@@ -11,9 +12,7 @@ pub struct SimulationEngineV1Client {
 }
 impl SimulationEngineV1Client {
     pub fn new(engine_id: usize) -> Self {
-        // Create new engine-config.
         let config = EngineConfig::new();
-        // Initialize empty state-vector.
         let states = vec![];
 
         SimulationEngineV1Client {
@@ -25,19 +24,16 @@ impl SimulationEngineV1Client {
 }
 impl Engine for SimulationEngineV1Client {
     fn forward_state(&self, state: &State) -> State {
-        // Forward systems.
         let systems = state
             .systems
             .iter()
             .map(|sys| self.forward_system(sys))
             .collect();
-        // Update state-id.
         let state_id = state.state_id + 1;
-        // Return next state.
         State { state_id, systems }
     }
     fn integrate_system(&self, integrator: &Integrator, system: &System) -> System {
-        todo!();
+        system.clone() // TODO
     }
     fn engine_config(&self) -> &EngineConfig {
         &self.config

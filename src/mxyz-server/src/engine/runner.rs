@@ -54,7 +54,7 @@ impl EngineRunner {
         let simulation_variant = simulation_variant.clone();
 
         // Create & initialize new simulation engine.
-        let mut engine = SimulationEngineV1Client::new(engine_id);
+        let mut engine = SimulationEngineV2Server::new(engine_id);
         engine.init(Some(simulation_variant));
         engine.config.step_id.1 = usize::MAX;
 
@@ -62,7 +62,7 @@ impl EngineRunner {
         std::thread::spawn(move || {
             for _ in 0..engine.config.step_id.1 {
                 // Forward engine to next step-id.
-                engine.forward();
+                engine.forward_engine();
                 // Every so often, export the engine to the database.
                 if engine.config.step_id.0 % engine.config.nr_of_steps_between_exports == 0 {
                     export(&mut engine);

@@ -1,3 +1,4 @@
+use crate::entity::Entity;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -19,6 +20,7 @@ impl Force {
     pub fn new(variant: ForceVariant) -> Self {
         Force { variant }
     }
+    pub fn apply(&self, entity: &Box<dyn Entity>) {}
 }
 
 // fn _force_coulomb(entity: &Box<dyn PhysicalObject>, other: &Box<dyn PhysicalObject>) -> [f64; 3] {

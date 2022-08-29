@@ -12,9 +12,7 @@ pub struct SimulationEngineV2Server {
 }
 impl SimulationEngineV2Server {
     pub fn new(engine_id: usize) -> Self {
-        // Create new engine-config.
         let config = EngineConfig::new();
-        // Initialize empty state-vector.
         let states = vec![];
 
         SimulationEngineV2Server {
@@ -26,19 +24,29 @@ impl SimulationEngineV2Server {
 }
 impl Engine for SimulationEngineV2Server {
     fn forward_state(&self, state: &State) -> State {
-        // Forward systems.
         let systems = state
             .systems
             .par_iter()
             .map(|sys| self.forward_system(sys))
             .collect();
-        // Update state-id.
         let state_id = state.state_id + 1;
-        // Return next state.
         State { state_id, systems }
     }
     fn integrate_system(&self, integrator: &Integrator, system: &System) -> System {
-        system.clone()
+        let system_id = system.system_id;
+        let entities = system
+            .entities
+            .par_iter()
+            .map(|x| self.integrate_entity(integrator, x))
+            .collect();
+        let integrators = system.integrators.clone();
+        let variant = system.variant.clone();
+        System {
+            system_id,
+            entities,
+            integrators,
+            variant,
+        }
     }
     fn engine_config(&self) -> &EngineConfig {
         &self.config
