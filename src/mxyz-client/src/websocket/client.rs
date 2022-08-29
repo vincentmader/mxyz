@@ -18,7 +18,7 @@ use web_sys::WebSocket;
 use web_sys::{ErrorEvent, MessageEvent};
 
 const STATE_BATCH_SIZE: i32 = 500;
-const r: f64 = 10.;
+const PARTICLE_RADIUS: f64 = 10.;
 
 /// Web-Socket TCP Client
 pub struct WebSocketClient {
@@ -228,7 +228,7 @@ pub fn draw_states(
                         let _vel = entity.velocity;
 
                         let _cnv_dim = canvas.dimensions;
-                        canvas.draw_circle([pos[0], pos[1]], r, true);
+                        canvas.draw_circle([pos[0], pos[1]], PARTICLE_RADIUS, true);
                     }
                 }
                 _ => {}

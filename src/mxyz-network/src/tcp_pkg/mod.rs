@@ -1,15 +1,11 @@
-use mxyz_engine::state::SizedState;
-use serde::{Deserialize, Serialize};
-
 pub mod request;
 pub mod response;
-
+use serde::{Deserialize, Serialize};
+// -----------------------------------------------------------------------------
 #[derive(Debug, Serialize, Deserialize)]
 pub enum TcpPackage {
     Request(request::Request),
     Response(response::Response),
-    // Command(command::Command),
-    // StateVec(Vec<SizedState>),
 }
 impl TcpPackage {
     pub fn to_bytes(self) -> Vec<u8> {

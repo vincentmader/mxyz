@@ -1,4 +1,5 @@
 #![allow(unused_variables)]
+#![allow(non_snake_case)]
 use crate::config::EngineConfig;
 use crate::entity::EntityV1;
 use crate::integrator::Integrator;

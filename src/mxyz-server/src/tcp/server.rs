@@ -97,8 +97,6 @@ pub fn handle_binary_message(bytes: Vec<u8>, tx: &mpsc::Sender<MpscMessage>) -> 
     let response = match package {
         TcpPackage::Request(request) => handle_request(request, &tx),
         TcpPackage::Response(response) => handle_response(response),
-        // TcpPackage::Command(command) => handle_command(command),
-        _ => todo!(),
     };
     // Convert package to bytes and return.
     let bytes = response.to_bytes();

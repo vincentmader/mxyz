@@ -35,9 +35,7 @@ impl EngineRunner {
                 mpsc_msg::command::Command::AddEngine(engine_id, client_id, simulation_variant) => {
                     self.add_engine(*engine_id, *client_id, simulation_variant)
                 }
-                _ => todo!(),
             },
-            _ => todo!(),
         };
         println!("Engine-Runner received MPSC msg: {:#?}", msg);
     }

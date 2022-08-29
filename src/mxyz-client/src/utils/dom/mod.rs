@@ -51,11 +51,16 @@ pub fn set_panic_hook() {
 #[wasm_bindgen]
 extern "C" {
     // #[wasm_bindgen(js_namespace = console)]
-
     fn alert(s: &str);
     fn warn(s: &str);
     // fn log(s: &str);  // not working
 }
+
+// /// Manually Logs String as Warning to Browser Console
+// macro_rules! console_warn {
+//     ($($t:tt)*) => (warn(&format_args!($($t)*).to_string()))
+// }
+// pub(crate) use console_warn;
 
 /// Manually Logs String to Browser Console
 macro_rules! console_log {
@@ -68,54 +73,7 @@ macro_rules! console_log {
 }
 pub(crate) use console_log;
 
-/// Manually Logs String as Warning to Browser Console
-macro_rules! console_warn {
-    ($($t:tt)*) => (warn(&format_args!($($t)*).to_string()))
-}
-pub(crate) use console_warn;
-
 // ============================================================================
-
-// /// Document Object Model (DOM)
-// pub struct DocumentObjectModel {}
-// impl DocumentObjectModel {
-//     /// Create new DOM Object
-//     pub fn new() -> Self {
-//         DocumentObjectModel {}
-//     }
-
-//     /// get Window from DOM
-//     pub fn window(&self) -> web_sys::Window {
-//         web_sys::window().expect("ERROR: no global `window` exists")
-//     }
-
-//     /// get Document from DOM
-//     pub fn document(&self) -> web_sys::Document {
-//         self.window()
-//             .document()
-//             .expect("ERROR: there's no document on window")
-//     }
-
-//     /// get Page Body from Document
-//     pub fn body(&self) -> web_sys::HtmlElement {
-//         self.document()
-//             .body()
-//             .expect("ERROR: document does not have a body")
-//     }
-// }
-
-// /// HTML-Object Trait
-// pub trait HTMLObject {
-//     fn update(&mut self);
-// }
-
-// ============================================================================
-
-//use gloo::events::EventListener;
-
-//pub fn window() -> web_sys::Window {
-//    web_sys::window().expect("no global `window` exists")
-//}
 
 //pub fn eventlistener_new_p_mousedown() {
 //    let window = web_sys::window().expect("global window does not exists");

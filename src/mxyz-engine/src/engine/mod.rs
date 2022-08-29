@@ -3,11 +3,8 @@ use crate::config::preset;
 use crate::config::simulation_variant::SimulationVariant;
 use crate::config::EngineConfig;
 use crate::entity::Entity;
-use crate::integrator::euler;
-use crate::integrator::runge_kutta;
 use crate::integrator::Integrator;
 use crate::integrator::IntegratorVariant;
-use crate::interaction::force::ForceVariant;
 use crate::interaction::InteractionVariant;
 use crate::state::State;
 use crate::system::System;
@@ -81,7 +78,6 @@ pub trait Engine {
         let state_id = self.engine_states().len() - 1;
         let state = self.engine_states().get(state_id).unwrap();
         let interactions = &integrator.interactions;
-        const DT: f64 = 0.01;
         match integrator.variant {
             IntegratorVariant::EulerExplicit => {
                 for system in state.systems.iter() {
@@ -94,9 +90,9 @@ pub trait Engine {
                         }
                     }
                 }
-                let mut m = entity.get_mass();
-                let mut p = *entity.get_position();
-                let mut v = *entity.get_velocity();
+                let m = entity.get_mass(); // TODO
+                let p = *entity.get_position();
+                let v = *entity.get_velocity();
                 let entity = crate::entity::EntityV1::new(m, p, v);
                 Box::new(entity)
             }
