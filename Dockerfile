@@ -20,17 +20,18 @@ RUN curl --proto '=https' \
 # Add Rust toolchain to $PATH.
 ENV PATH=$PATH:/root/.cargo/bin
 
-RUN apk add --no-cache musl-dev
-RUN apk add --no-cache libc-dev
 
 # =============================================================================
 
 # Install `make` tool
 RUN apk add make
-RUN apk add libc-dev
 
 # RUN cargo install cargo-bundle
+RUN apk add musl-dev
+RUN apk add postgresql
+RUN apk add postgresql-dev
 RUN apk add mysql
+RUN apk add libc-dev
 RUN apk add libpq
 RUN apk add libtool
 RUN cargo install diesel_cli --no-default-features --features postgres
