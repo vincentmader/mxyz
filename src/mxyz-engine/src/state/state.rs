@@ -1,3 +1,4 @@
+use crate::state::SizedState;
 use crate::system::System;
 use serde::{Deserialize, Serialize};
 
@@ -11,6 +12,13 @@ impl State {
     /// Creates new instance of State Structure
     pub fn new(state_id: usize) -> Self {
         let systems = vec![];
+        State { state_id, systems }
+    }
+}
+impl From<&SizedState> for State {
+    fn from(state: &SizedState) -> Self {
+        let state_id = state.state_id;
+        let systems = state.systems.iter().map(|sys| sys.into()).collect();
         State { state_id, systems }
     }
 }

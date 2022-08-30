@@ -14,15 +14,15 @@ const NR_OF_FORWARDS_BTW_RENDER: usize = 1;
 /// Simulation-Client v2
 /// - Compute States
 /// - Render to Canvas (Animation Loop).
-pub struct ClientV1EngineRunner {}
+pub struct EngineRunnerClientV1 {}
 
-impl ClientV1EngineRunner {
+impl EngineRunnerClientV1 {
     /// Create new Simulation-Compute-Client.
     pub fn new() -> Self {
-        ClientV1EngineRunner {}
+        EngineRunnerClientV1 {}
     }
 }
-impl EngineRunner for ClientV1EngineRunner {
+impl EngineRunner for EngineRunnerClientV1 {
     /// Initialize Compute-Client.
     /// - ... page-id
     /// - ... panic hook

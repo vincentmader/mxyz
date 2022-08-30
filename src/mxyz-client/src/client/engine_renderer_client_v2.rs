@@ -7,12 +7,12 @@ use std::future::Future;
 /// Simulation-Client v2
 /// - Receive states via WebSocket.
 /// - Render to Canvas (Animation Loop).
-pub struct ClientV2EngineRenderer {
+pub struct EngineRendererClientV2 {
     config: ClientConfig,
     websocket: WebSocketClient,
 }
 
-impl ClientV2EngineRenderer {
+impl EngineRendererClientV2 {
     /// Create new Simulation-Renderer-Client.
     /// - Create Client Config.
     /// - Create WebSocket Client.
@@ -22,10 +22,10 @@ impl ClientV2EngineRenderer {
         // Create WebSocket Client using host & port from Client Config.
         let websocket = WebSocketClient::new(&config.websocket_host, config.websocket_port);
 
-        ClientV2EngineRenderer { config, websocket }
+        EngineRendererClientV2 { config, websocket }
     }
 }
-impl EngineRunner for ClientV2EngineRenderer {
+impl EngineRunner for EngineRendererClientV2 {
     /// Initialize Renderer-Client.
     /// - ... page-id
     /// - ... panic hook

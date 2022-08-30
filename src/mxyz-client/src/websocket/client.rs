@@ -1,4 +1,5 @@
 use crate::renderer::components::canvas::Canvas;
+use crate::renderer::Renderer;
 use crate::utils::dom;
 use mxyz_engine::config::simulation_variant::SimulationVariant;
 use mxyz_engine::state::SizedState;
@@ -18,7 +19,7 @@ use web_sys::WebSocket;
 use web_sys::{ErrorEvent, MessageEvent};
 
 const STATE_BATCH_SIZE: i32 = 500;
-const PARTICLE_RADIUS: f64 = 10.;
+const PARTICLE_RADIUS: f64 = 3.;
 
 /// Web-Socket TCP Client
 pub struct WebSocketClient {
@@ -192,10 +193,12 @@ pub fn draw_states(
 ) -> Result<(), JsValue> {
     let states = Arc::new(Mutex::new(states));
 
+    let mut renderer = Renderer::new();
+
     let mut canvas = Canvas::new(0);
     canvas.init();
-    canvas.set_fill_style("purple");
-    canvas.set_stroke_style("purple");
+    canvas.set_fill_style("green");
+    canvas.set_stroke_style("green");
 
     let f = Rc::new(RefCell::new(None));
     let g = f.clone();
@@ -218,7 +221,11 @@ pub fn draw_states(
         // dom::console_log!("{} < {}", i, STATE_BATCH_SIZE);
 
         // dom::console_log!("{}", i);
-        let state = states.get(i as usize).unwrap(); // TODO
+
+        let state = states.get(i as usize).unwrap(); // TODO (?)
+
+        // renderer.draw_state(&state.into()); // TODO
+
         for system in state.systems.iter() {
             match &system.variant {
                 SizedSystemVariant::EntitiesV1(sys) => {

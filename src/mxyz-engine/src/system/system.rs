@@ -1,5 +1,6 @@
 use crate::entity::Entity;
 use crate::integrator::Integrator;
+use crate::system::SizedSystem;
 
 // ============================================================================
 
@@ -21,6 +22,20 @@ impl System {
             system_id,
             variant,
             entities,
+            integrators,
+        }
+    }
+}
+impl From<&SizedSystem> for System {
+    fn from(system: &SizedSystem) -> System {
+        let system_id = system.system_id;
+        let variant = todo!();
+        let entities = todo!();
+        let integrators = todo!();
+        System {
+            system_id,
+            entities,
+            variant,
             integrators,
         }
     }
