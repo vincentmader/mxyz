@@ -32,7 +32,7 @@ def check_dir(path, code):
 
 code = check_dir(proj_root, "")
 # print(f"\nnr. of lines: {code}")
-path_to_fuse = os.path.join(proj_root, 'scripts/stats/fuse.txt')
+path_to_fuse = os.path.join(pwd, 'fuse.txt')
 with open(path_to_fuse, 'w') as fp:
     fp.write(code)
 
