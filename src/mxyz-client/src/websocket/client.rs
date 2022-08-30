@@ -214,7 +214,7 @@ pub fn draw_states(
         } else {
             nr_of_states = states.len();
         }
-        dom::console_log!("{} / {}", i, nr_of_states);
+        // dom::console_log!("{} / {}", i, nr_of_states);
         // dom::console_log!("{} < {}", i, STATE_BATCH_SIZE);
 
         // dom::console_log!("{}", i);

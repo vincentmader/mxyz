@@ -1,7 +1,7 @@
 pub mod simulation;
 use mxyz_engine::config::EngineRunnerVariant;
-use simulation::client_v1_compute::SimulationClientV1Compute;
-use simulation::client_v2_render::SimulationClientV2Render;
+use simulation::client_v1_engine_runner::ClientV1EngineRunner;
+use simulation::client_v2_engine_renderer::ClientV2EngineRenderer;
 use simulation::EngineRunner;
 
 pub struct Client {
@@ -19,11 +19,11 @@ impl Client {
         let engine_runner: Box<dyn EngineRunner>;
         match runner_variant {
             EngineRunnerVariant::ClientWASM => {
-                let res = SimulationClientV1Compute::new();
+                let res = ClientV1EngineRunner::new();
                 engine_runner = Box::new(res);
             }
             EngineRunnerVariant::ServerRust => {
-                let res = SimulationClientV2Render::new();
+                let res = ClientV2EngineRenderer::new();
                 engine_runner = Box::new(res);
             }
             _ => todo!(),

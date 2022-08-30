@@ -12,15 +12,15 @@ use wasm_bindgen::JsCast;
 /// Simulation-Client v2
 /// - Compute States
 /// - Render to Canvas (Animation Loop).
-pub struct SimulationClientV1Compute {}
+pub struct ClientV1EngineRunner {}
 
-impl SimulationClientV1Compute {
+impl ClientV1EngineRunner {
     /// Create new Simulation-Compute-Client.
     pub fn new() -> Self {
-        SimulationClientV1Compute {}
+        ClientV1EngineRunner {}
     }
 }
-impl EngineRunner for SimulationClientV1Compute {
+impl EngineRunner for ClientV1EngineRunner {
     /// Initialize Compute-Client.
     /// - ... page-id
     /// - ... panic hook

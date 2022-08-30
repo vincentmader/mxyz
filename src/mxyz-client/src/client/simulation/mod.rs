@@ -1,5 +1,5 @@
-pub mod client_v1_compute;
-pub mod client_v2_render;
+pub mod client_v1_engine_runner;
+pub mod client_v2_engine_renderer;
 use async_trait::async_trait;
 
 #[async_trait]

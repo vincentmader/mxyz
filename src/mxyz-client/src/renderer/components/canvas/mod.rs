@@ -130,10 +130,17 @@ impl Canvas {
         let center = fix_coords(center, self.dimensions);
         // let radius = self.rescale_dist(radius);
         // let center = [center[0] * self.dimensions.0, center[1] * self.dimensions.1];
+
         self.context.begin_path();
-        self.context
-            .arc(center[0], center[1], radius, 0.0, TAU)
-            .unwrap();
+        match self.context.arc(center[0], center[1], radius, 0.0, TAU) {
+            Ok(_) => {
+                // dom::console_log!(" + {:?}", center);
+            }
+            Err(_) => {
+                // dom::console_log!(" - {:?}", center);
+            }
+        }
+
         self.context.stroke();
         if fill {
             self.context.fill();
@@ -151,6 +158,7 @@ impl Canvas {
 
 fn fix_coords(pos: [f64; 2], cnv_dim: (f64, f64)) -> [f64; 2] {
     // let res = [pos[0] * cnv_dim.0, pos[1] * cnv_dim.1];
+    // convert from x-range [-1, 1] to x-range [0, 1] * canvas_width
     let res = [
         0.5 * (pos[0] + 1.) * cnv_dim.0,
         0.5 * (pos[1] + 1.) * cnv_dim.1,
