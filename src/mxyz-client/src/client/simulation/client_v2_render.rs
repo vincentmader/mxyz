@@ -1,10 +1,12 @@
+use super::EngineRunner;
 use crate::config::ClientConfig;
 use crate::utils::dom;
 use crate::websocket::client::WebSocketClient;
+use std::future::Future;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
-/// Simulation-Client v1
+/// Simulation-Client v2
 /// - Receive states via WebSocket.
 /// - Render to Canvas (Animation Loop).
 pub struct SimulationClientV2Render {
@@ -25,16 +27,18 @@ impl SimulationClientV2Render {
 
         SimulationClientV2Render { config, websocket }
     }
-
+}
+impl EngineRunner for SimulationClientV2Render {
     /// Initialize Renderer-Client.
     /// - ... page-id
     /// - ... panic hook
     /// - Initialize WebSocket Client.
-    pub fn init(&mut self, category: &str, simulation_variant: &str) {
+    fn init(&mut self, category: &str, simulation_variant: &str) {
         let page_id = (category, simulation_variant);
-        dom::console_log!("page-id: {:?}", page_id);
+
         // ...
         dom::set_panic_hook();
+
         // Initialize WebSocket Client.
         self.websocket.init().unwrap();
     }

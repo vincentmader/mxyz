@@ -1,4 +1,8 @@
-mod client_v1_compute;
-mod client_v2_render;
-pub use client_v1_compute::SimulationClientV1Compute;
-pub use client_v2_render::SimulationClientV2Render;
+pub mod client_v1_compute;
+pub mod client_v2_render;
+use async_trait::async_trait;
+
+#[async_trait]
+pub trait EngineRunner {
+    fn init(&mut self, category: &str, simulation_variant: &str);
+}

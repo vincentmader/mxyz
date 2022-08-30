@@ -33,3 +33,11 @@ pub enum ExportVariant {
     ToDatabase,
     ToFile,
 }
+
+pub enum EngineRunnerVariant {
+    ClientWASM,
+    ServerWASM,
+    ServerRust,
+    LocalRust,
+    LocalWASM,
+}

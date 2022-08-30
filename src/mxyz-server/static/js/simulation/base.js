@@ -1,7 +1,6 @@
 import init, {
   // initThreadPool,
-  SimulationClientV2Render,
-  SimulationClientV1Compute,
+  init_client,
 } from "../../../static/pkg/mxyz_client.js";
 
 let script = document.getElementById("simulation.js");
@@ -12,7 +11,5 @@ let simulation_variant = script.getAttribute("simulation_variant");
 (async () => {
   await init();
   // await initThreadPool(navigator.hardwareConcurrency);
-
-  let simulation = SimulationClientV2Render.new();
-  simulation.init(category, simulation_variant);
+  init_client(1, category, simulation_variant);
 })();

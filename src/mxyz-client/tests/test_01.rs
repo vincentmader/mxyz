@@ -47,3 +47,8 @@ fn set_timeout(window: &web_sys::Window, f: &Closure<dyn FnMut()>, timeout_ms: i
         )
         .expect("should register `setTimeout` OK")
 }
+
+#[test]
+fn animation_loop() {
+    // todo
+}

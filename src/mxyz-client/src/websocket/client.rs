@@ -1,4 +1,4 @@
-use crate::components::canvas::Canvas;
+use crate::renderer::components::canvas::Canvas;
 use crate::utils::dom;
 use mxyz_engine::config::simulation_variant::SimulationVariant;
 use mxyz_engine::state::SizedState;
@@ -214,7 +214,8 @@ pub fn draw_states(
         } else {
             nr_of_states = states.len();
         }
-        dom::console_log!("{} < {}", i, STATE_BATCH_SIZE);
+        dom::console_log!("{} / {}", i, nr_of_states);
+        // dom::console_log!("{} < {}", i, STATE_BATCH_SIZE);
 
         // dom::console_log!("{}", i);
         let state = states.get(i as usize).unwrap(); // TODO
