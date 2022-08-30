@@ -1,26 +1,26 @@
 use crate::entity::Entity;
 use crate::entity::EntityV1;
 use crate::integrator::Integrator;
-use crate::system::SizedSystem;
-use crate::system::SizedSystemVariant;
+use crate::system::sized_system::SizedSystem;
+use crate::system::sized_system::SizedSystemVariant;
 
 // ============================================================================
 
 /// System Structure
 #[derive(Debug, Clone)]
-pub struct System {
+pub struct UnsizedSystem {
     pub system_id: usize,
     pub entities: Vec<Box<dyn Entity>>,
     pub variant: SystemVariant,
     pub integrators: Vec<Integrator>,
 }
 
-impl System {
+impl UnsizedSystem {
     /// Creates a new System
     pub fn new(system_id: usize, variant: SystemVariant) -> Self {
         let entities = vec![];
         let integrators = vec![];
-        System {
+        UnsizedSystem {
             system_id,
             variant,
             entities,
@@ -28,8 +28,8 @@ impl System {
         }
     }
 }
-impl From<&SizedSystem> for System {
-    fn from(system: &SizedSystem) -> System {
+impl From<&SizedSystem> for UnsizedSystem {
+    fn from(system: &SizedSystem) -> UnsizedSystem {
         let system_id = system.system_id;
         let variant = (&system.variant).into();
         let integrators = system.integrators.clone(); //TODO
@@ -51,7 +51,7 @@ impl From<&SizedSystem> for System {
             }
             _ => todo!(),
         };
-        System {
+        UnsizedSystem {
             system_id,
             entities,
             variant,

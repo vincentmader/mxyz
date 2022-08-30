@@ -1,7 +1,7 @@
 use mxyz_engine::config::export_variant::ExportVariant;
 use mxyz_engine::config::simulation_variant::SimulationVariant;
-use mxyz_engine::engine::Engine;
 use mxyz_engine::system::SystemVariant;
+use mxyz_engine::Engine;
 use mxyz_network::mpsc_msg;
 use mxyz_network::mpsc_msg::MpscMessage;
 use std::sync::mpsc;

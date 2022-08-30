@@ -9,13 +9,13 @@ use crate::interaction::force::Force;
 use crate::interaction::force::ForceVariant;
 use crate::interaction::Interaction;
 use crate::interaction::InteractionVariant;
-use crate::system::System;
-use crate::system::SystemVariant;
+use crate::system::unsized_system::SystemVariant;
+use crate::system::unsized_system::UnsizedSystem;
 
 const NR_OF_STEPS: usize = 10;
 const G: f64 = 1.;
 
-pub fn preset(systems: &mut Vec<System>, config: &mut EngineConfig) {
+pub fn preset(systems: &mut Vec<UnsizedSystem>, config: &mut EngineConfig) {
     config.step_id.1 = NR_OF_STEPS;
 
     let m0 = 1.;
@@ -31,7 +31,7 @@ pub fn preset(systems: &mut Vec<System>, config: &mut EngineConfig) {
     // SYSTEM
     let system_id = 0;
     let variant = SystemVariant::EntitiesV1;
-    let mut system = System::new(system_id, variant);
+    let mut system = UnsizedSystem::new(system_id, variant);
     let entity = EntityV1::new(m0, [0., 0., 0.], [0., 0., 0.]);
     system.entities.push(Box::new(entity));
     systems.push(system);
@@ -41,7 +41,7 @@ pub fn preset(systems: &mut Vec<System>, config: &mut EngineConfig) {
     // SYSTEM
     let system_id = 1;
     let variant = SystemVariant::EntitiesV1;
-    let mut system = System::new(system_id, variant);
+    let mut system = UnsizedSystem::new(system_id, variant);
     for entity_id in 0..N {
         let phi = 2. * 3.14159 * entity_id as f64 / N as f64;
         let x = [r0 * phi.cos(), r0 * phi.sin(), 0.];
@@ -74,7 +74,7 @@ pub fn preset(systems: &mut Vec<System>, config: &mut EngineConfig) {
     // SYSTEM
     let system_id = 2;
     let variant = SystemVariant::EntitiesV1;
-    let mut system = System::new(system_id, variant);
+    let mut system = UnsizedSystem::new(system_id, variant);
     for entity_id in 0..N {
         let phi = 2. * 3.14159 * entity_id as f64 / N as f64;
         // let phi = phi + 3.14159;

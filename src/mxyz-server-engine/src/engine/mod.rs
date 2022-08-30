@@ -1,8 +1,8 @@
 use mxyz_engine::config::EngineConfig;
-use mxyz_engine::engine::Engine;
 use mxyz_engine::integrator::Integrator;
 use mxyz_engine::state::UnsizedState;
-use mxyz_engine::system::System;
+use mxyz_engine::system::unsized_system::UnsizedSystem;
+use mxyz_engine::Engine;
 use rayon::prelude::*;
 
 pub struct SimulationEngineV2 {
@@ -33,7 +33,11 @@ impl Engine for SimulationEngineV2 {
         let state_id = state.state_id + 1;
         UnsizedState { state_id, systems }
     }
-    fn integrate_system(&self, integrator: &Integrator, system: (usize, &System)) -> System {
+    fn integrate_system(
+        &self,
+        integrator: &Integrator,
+        system: (usize, &UnsizedSystem),
+    ) -> UnsizedSystem {
         let (sys_id, system) = system;
         let entities = system
             .entities
@@ -41,7 +45,7 @@ impl Engine for SimulationEngineV2 {
             .enumerate()
             .map(|(ent_id, ent)| self.integrate_entity(integrator, ((sys_id, ent_id), ent)))
             .collect();
-        System {
+        UnsizedSystem {
             entities,
             integrators: system.integrators.clone(), // todo: move to config
             variant: system.variant.clone(),         // todo: move to config

@@ -2,7 +2,7 @@ use super::EngineRunner;
 use crate::renderer::engine_renderer::EngineRenderer;
 use crate::utils::dom;
 use mxyz_client_engine::SimulationEngineV1;
-use mxyz_engine::engine::Engine;
+use mxyz_engine::Engine;
 use std::cell::RefCell;
 use std::future::Future;
 use std::rc::Rc;

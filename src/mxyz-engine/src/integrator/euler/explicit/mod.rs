@@ -4,17 +4,17 @@ use crate::interaction::force::ForceVariant;
 use crate::interaction::Interaction;
 use crate::interaction::InteractionVariant;
 use crate::state::UnsizedState;
-use crate::system::{System, SystemVariant};
+use crate::system::unsized_system::{SystemVariant, UnsizedSystem};
 use rayon::prelude::*;
 use std::sync::{Arc, Mutex};
 
 const DT: f64 = 0.01;
 
 pub fn apply(
-    system: &System,
+    system: &UnsizedSystem,
     states: &Vec<UnsizedState>,
     interactions: &Vec<Interaction>,
-) -> System {
+) -> UnsizedSystem {
     // Load current state.
     let current_state = &states[states.len() - 1]; // TODO: fix, this might fail
 
@@ -98,7 +98,7 @@ pub fn apply(
         })
         .collect();
 
-    System {
+    UnsizedSystem {
         system_id,
         variant,
         integrators,

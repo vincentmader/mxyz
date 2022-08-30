@@ -1,7 +1,7 @@
 use crate::entity::EntityV1;
 use crate::integrator::Integrator;
-use crate::system::system::System;
-use crate::system::system::SystemVariant;
+use crate::system::unsized_system::SystemVariant;
+use crate::system::unsized_system::UnsizedSystem;
 use crate::system::EntitiesV1;
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
@@ -24,8 +24,8 @@ impl SizedSystem {
     }
 }
 /// Conversion: System -> SizedSystem
-impl From<System> for SizedSystem {
-    fn from(system: System) -> SizedSystem {
+impl From<UnsizedSystem> for SizedSystem {
+    fn from(system: UnsizedSystem) -> SizedSystem {
         let system_id = system.system_id;
         let integrators = system.integrators;
         let variant = match system.variant {

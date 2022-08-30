@@ -1,8 +1,8 @@
 use crate::renderer::components::canvas::Canvas;
 use crate::utils::dom;
 use mxyz_engine::state::UnsizedState;
-use mxyz_engine::system::System;
-use mxyz_engine::system::SystemVariant;
+use mxyz_engine::system::unsized_system::SystemVariant;
+use mxyz_engine::system::unsized_system::UnsizedSystem;
 
 const CANVAS_ID: u8 = 0; // TODO move?
 const DRAWING_RADIUS: f64 = 3.;
@@ -32,7 +32,7 @@ impl EngineRenderer {
         }
     }
     /// Draw System.
-    pub fn draw_system(&mut self, system: (usize, &System)) {
+    pub fn draw_system(&mut self, system: (usize, &UnsizedSystem)) {
         let (system_id, system) = system;
         for (entity_id, entity) in system.entities.iter().enumerate() {
             match system.variant {

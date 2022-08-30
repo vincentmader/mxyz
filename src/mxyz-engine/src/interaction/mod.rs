@@ -4,7 +4,7 @@ pub mod diffusion_v1;
 pub mod force;
 pub mod game_of_life;
 pub mod ising_v1;
-use crate::system::System;
+use crate::system::unsized_system::UnsizedSystem;
 use serde::{Deserialize, Serialize};
 
 // ============================================================================
@@ -54,7 +54,7 @@ impl InteractionVector {
         InteractionVector { entries }
     }
     /// Initialize Interaction Matrix Row
-    pub fn init(&mut self, systems: &Vec<System>) {
+    pub fn init(&mut self, systems: &Vec<UnsizedSystem>) {
         for _ in 0..systems.len() + 1 {
             self.entries.push(None);
         }

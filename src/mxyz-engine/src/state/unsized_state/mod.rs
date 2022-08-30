@@ -1,11 +1,11 @@
 use crate::state::SizedState;
-use crate::system::System;
+use crate::system::unsized_system::UnsizedSystem;
 
 /// State
 #[derive(Debug)]
 pub struct UnsizedState {
     pub state_id: usize,
-    pub systems: Vec<System>, // todo include into db ?
+    pub systems: Vec<UnsizedSystem>, // todo include into db ?
 }
 impl UnsizedState {
     /// Creates new instance of State Structure
