@@ -7,7 +7,7 @@
 [dependencies]
     dotenv = "0.15.0"
     # mxyz-config = { path = "../mxyz-config" }
-    utils = { path="../utils" }
+    mxyz-utils = { path="../mxyz-utils" }
     mxyz-engine = { path="../mxyz-engine" }
 
 [dependencies.diesel]

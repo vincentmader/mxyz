@@ -5,7 +5,7 @@
     version = "0.1.0"
 
 [dependencies]
-    utils = { path="../utils" }
+    mxyz-utils = { path="../mxyz-utils" }
     rand = "0.8.5"
     rayon = "1.5"
 

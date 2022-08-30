@@ -1,5 +1,6 @@
 pub mod components;
 use crate::renderer::components::canvas::Canvas;
+use crate::utils::dom;
 use mxyz_engine::state::State;
 use mxyz_engine::system::System;
 
@@ -19,19 +20,21 @@ impl Renderer {
     }
     /// Initialize Renderer.
     pub fn init(&mut self) {
-        self.canvas.set_fill_style("purple");
-        self.canvas.set_stroke_style("purple");
+        self.canvas.set_fill_style("white");
+        self.canvas.set_stroke_style("white");
     }
     /// Draw State.
     pub fn draw_state(&mut self, state: &State) {
-        for system in state.systems.iter() {
+        for system in state.systems.iter().enumerate() {
             self.draw_system(system);
         }
     }
     /// Draw System.
-    pub fn draw_system(&mut self, system: &System) {
+    pub fn draw_system(&mut self, system: (usize, &System)) {
+        let (system_id, system) = system;
         self.canvas.clear();
-        for entity in system.entities.iter() {
+        for (entity_id, entity) in system.entities.iter().enumerate() {
+            dom::console_log!("{}, {}", system_id, entity_id);
             // match system.variant {} // TODO
 
             let pos = entity.get_position();

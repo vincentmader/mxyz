@@ -19,7 +19,7 @@
     serde_json = "1.0"
     tokio-tungstenite = "0.17.1"
     tokio-util = "0.7.3"
-    utils = { path="../utils" }
+    mxyz-utils = { path="../mxyz-utils" }
     websocket = "0.26.4"
 
 [dependencies.futures]
