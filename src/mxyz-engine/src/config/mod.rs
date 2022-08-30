@@ -1,13 +1,19 @@
+pub mod constants;
+pub mod engine_runner_variant;
+pub mod export_variant;
 pub mod preset;
 pub mod simulation_variant;
+use export_variant::ExportVariant;
 use simulation_variant::SimulationVariant;
 
 pub struct EngineConfig {
     pub step_id: (usize, usize),
-    pub simulation_variant: Option<SimulationVariant>,
+    // Database
     pub export_variant: ExportVariant,
-    pub last_export_step_id: Option<usize>,
     pub nr_of_steps_between_exports: usize,
+    pub last_export_step_id: Option<usize>,
+    // Preset
+    pub simulation_variant: Option<SimulationVariant>,
     // pub constants: Constants,
 }
 impl EngineConfig {
@@ -27,17 +33,4 @@ impl EngineConfig {
             // constants,
         }
     }
-}
-
-pub enum ExportVariant {
-    ToDatabase,
-    ToFile,
-}
-
-pub enum EngineRunnerVariant {
-    ClientWASM,
-    ServerWASM,
-    ServerRust,
-    LocalRust,
-    LocalWASM,
 }

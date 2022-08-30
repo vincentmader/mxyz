@@ -1,5 +1,5 @@
+use mxyz_engine::config::export_variant::ExportVariant;
 use mxyz_engine::config::simulation_variant::SimulationVariant;
-use mxyz_engine::config::ExportVariant;
 use mxyz_engine::engine::Engine;
 use mxyz_engine::system::SystemVariant;
 use mxyz_network::mpsc_msg;
@@ -61,7 +61,7 @@ impl EngineRunner {
                 engine.forward_engine();
                 // Every so often, export the engine to the database.
                 if engine.config.step_id.0 % engine.config.nr_of_steps_between_exports == 0 {
-                    export(&mut engine);
+                    export_engine(&mut engine);
                 }
             }
         });
@@ -78,7 +78,7 @@ impl EngineRunner {
 }
 
 /// Exports Engine
-pub fn export<T: Engine>(engine: &mut T) {
+pub fn export_engine<T: Engine>(engine: &mut T) {
     // Get state-ids.
     let states_to_save = get_unsaved_state_ids(engine);
     // Choose export method.
@@ -151,14 +151,15 @@ pub fn export_to_database<T: Engine>(engine: &mut T, states_to_save: &Vec<usize>
 
 /// Exports Engine to File
 pub fn export_to_file<T: Engine>(engine: &mut T, states_to_save: &Vec<usize>) {
-    // Get simulation variant.
+    // Get simulation variant & state vector.
     let simulation_variant = engine.engine_config().simulation_variant.as_ref().unwrap();
+    let states = engine.engine_states();
     // Convert simulation variant to integer representation in out-path.
     let simulation_variant: usize = simulation_variant.clone().into();
     let out_dir = format!("./mxyz-engine/output/{:?}", simulation_variant);
     // Loop over unsaved states.
     for state_id in states_to_save.iter() {
-        let state = engine.engine_states().get(*state_id).unwrap();
+        let state = states.get(*state_id).unwrap();
         // Save to file.
         let path = format!("{}/{}.txt", out_dir, state_id);
         std::fs::write(path, format!("{:#?}", state)).unwrap();

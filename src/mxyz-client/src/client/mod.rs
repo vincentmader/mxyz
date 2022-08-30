@@ -2,7 +2,7 @@ pub mod engine_renderer_client_v2;
 pub mod engine_runner_client_v1;
 use engine_renderer_client_v2::EngineRendererClientV2;
 use engine_runner_client_v1::EngineRunnerClientV1;
-use mxyz_engine::config::EngineRunnerVariant;
+use mxyz_engine::config::engine_runner_variant::EngineRunnerVariant;
 
 pub struct Client {
     runner_variant: EngineRunnerVariant,
