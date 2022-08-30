@@ -1,5 +1,5 @@
 use super::EngineRunner;
-use crate::renderer::Renderer;
+use crate::renderer::engine_renderer::EngineRenderer;
 use crate::utils::dom;
 use mxyz_client_engine::SimulationEngineV1;
 use mxyz_engine::engine::Engine;
@@ -36,7 +36,7 @@ impl EngineRunner for EngineRunnerClientV1 {
         let mut engine = mxyz_client_engine::SimulationEngineV1::new(0);
         engine.init(simulation_variant);
 
-        let mut renderer = Renderer::new();
+        let mut renderer = EngineRenderer::new();
         renderer.init();
 
         let n = usize::MAX;

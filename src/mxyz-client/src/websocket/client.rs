@@ -1,5 +1,5 @@
 use crate::renderer::components::canvas::Canvas;
-use crate::renderer::Renderer;
+use crate::renderer::engine_renderer::EngineRenderer;
 use crate::utils::dom;
 use mxyz_engine::config::simulation_variant::SimulationVariant;
 use mxyz_engine::state::SizedState;
@@ -193,12 +193,12 @@ pub fn draw_states(
 ) -> Result<(), JsValue> {
     let states = Arc::new(Mutex::new(states));
 
-    let mut renderer = Renderer::new();
+    let mut renderer = EngineRenderer::new();
 
     let mut canvas = Canvas::new(0);
     canvas.init();
-    canvas.set_fill_style("green");
-    canvas.set_stroke_style("green");
+    // canvas.set_fill_style("green");
+    // canvas.set_stroke_style("green");
 
     let f = Rc::new(RefCell::new(None));
     let g = f.clone();
@@ -213,7 +213,7 @@ pub fn draw_states(
         let states = states.clone();
         let states = states.lock().unwrap();
         if nr_of_states == states.len() {
-            canvas.clear();
+            // canvas.clear();
         } else {
             nr_of_states = states.len();
         }
@@ -224,24 +224,24 @@ pub fn draw_states(
 
         let state = states.get(i as usize).unwrap(); // TODO (?)
 
-        // renderer.draw_state(&state.into()); // TODO
+        renderer.draw_state(&state.into()); // TODO
 
-        for system in state.systems.iter() {
-            match &system.variant {
-                SizedSystemVariant::EntitiesV1(sys) => {
-                    //
-                    for entity in sys.entities.iter() {
-                        let _mass = entity.mass;
-                        let pos = entity.position;
-                        let _vel = entity.velocity;
+        //for system in state.systems.iter() {
+        //    match &system.variant {
+        //        SizedSystemVariant::EntitiesV1(sys) => {
+        //            //
+        //            for entity in sys.entities.iter() {
+        //                let _mass = entity.mass;
+        //                let pos = entity.position;
+        //                let _vel = entity.velocity;
 
-                        let _cnv_dim = canvas.dimensions;
-                        canvas.draw_circle([pos[0], pos[1]], PARTICLE_RADIUS, true);
-                    }
-                }
-                _ => {}
-            }
-        }
+        //                let _cnv_dim = canvas.dimensions;
+        //                canvas.draw_circle([pos[0], pos[1]], PARTICLE_RADIUS, true);
+        //            }
+        //        }
+        //        _ => {}
+        //    }
+        //}
 
         i += 1;
         // Schedule ourself for another requestAnimationFrame callback.
