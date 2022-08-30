@@ -9,6 +9,8 @@ use std::rc::Rc;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 
+const NR_OF_FORWARDS_BTW_RENDER: usize = 1;
+
 /// Simulation-Client v2
 /// - Compute States
 /// - Render to Canvas (Animation Loop).
@@ -56,8 +58,10 @@ impl EngineRunner for ClientV1EngineRunner {
             }
 
             engine.forward_engine();
-            let state = engine.states.get(state_id).unwrap();
-            renderer.draw_state(state);
+            if state_id % NR_OF_FORWARDS_BTW_RENDER == 0 {
+                let state = engine.states.get(state_id).unwrap();
+                renderer.draw_state(state);
+            }
 
             state_id += 1;
             // Schedule ourself for another requestAnimationFrame callback.

@@ -6,7 +6,7 @@ use mxyz_engine::system::System;
 use mxyz_engine::system::SystemVariant;
 
 const CANVAS_ID: u8 = 0; // TODO move?
-const DRAWING_RADIUS: f64 = 1.;
+const DRAWING_RADIUS: f64 = 3.;
 
 /// Renderer
 pub struct Renderer {
@@ -26,7 +26,7 @@ impl Renderer {
     }
     /// Draw State.
     pub fn draw_state(&mut self, state: &State) {
-        // self.canvas.clear();
+        self.canvas.clear();
         // dom::console_log!("\nstate {}", state.state_id);
         for system in state.systems.iter().enumerate() {
             self.draw_system(system);

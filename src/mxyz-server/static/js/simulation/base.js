@@ -11,5 +11,5 @@ let simulation_variant = script.getAttribute("simulation_variant");
 (async () => {
   await init();
   // await initThreadPool(navigator.hardwareConcurrency);
-  init_client(1, category, simulation_variant);
+  init_client(0, category, simulation_variant);
 })();

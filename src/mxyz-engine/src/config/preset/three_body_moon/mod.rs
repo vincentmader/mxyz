@@ -18,11 +18,13 @@ const G: f64 = 1.;
 pub fn preset(systems: &mut Vec<System>, config: &mut EngineConfig) {
     config.step_id.1 = NR_OF_STEPS;
 
-    let m = 1.;
-    let M = 1.;
+    let m0 = 1.;
+    let m1 = 0.1;
+    let m2 = 0.00001;
     let r0 = 0.7;
-    let v0 = (G * M / r0).powf(0.5);
-    let N = 2;
+    let dr = 0.05;
+    let v0 = (G * m0 / r0).powf(0.5);
+    let N = 5;
 
     // System 0: STAR
     // ------------------------------------------------------------------------
@@ -30,7 +32,7 @@ pub fn preset(systems: &mut Vec<System>, config: &mut EngineConfig) {
     let system_id = 0;
     let variant = SystemVariant::EntitiesV1;
     let mut system = System::new(system_id, variant);
-    let entity = EntityV1::new(M, [0., 0., 0.], [0., 0., 0.]);
+    let entity = EntityV1::new(m0, [0., 0., 0.], [0., 0., 0.]);
     system.entities.push(Box::new(entity));
     systems.push(system);
 
@@ -44,7 +46,7 @@ pub fn preset(systems: &mut Vec<System>, config: &mut EngineConfig) {
         let phi = 2. * 3.14159 * entity_id as f64 / N as f64;
         let x = [r0 * phi.cos(), r0 * phi.sin(), 0.];
         let v = [-v0 * phi.sin(), v0 * phi.cos(), 0.];
-        let entity = EntityV1::new(m, x, v);
+        let entity = EntityV1::new(m1, x, v);
         system.entities.push(Box::new(entity));
     }
     // INTEGRATORS
@@ -66,12 +68,9 @@ pub fn preset(systems: &mut Vec<System>, config: &mut EngineConfig) {
     system.integrators.push(integrator); // TODO needs to be run for each system!
     systems.push(system);
 
-    // System 1: PLANETS
+    // System 2: Moons
     // ------------------------------------------------------------------------
-    let dr = 0.1;
-    let r = r0 + dr;
-    let v0 = v0 + (G * m / dr).powf(0.5);
-    let mu = 0.001;
+    let r = r0;
     // SYSTEM
     let system_id = 2;
     let variant = SystemVariant::EntitiesV1;
@@ -80,9 +79,15 @@ pub fn preset(systems: &mut Vec<System>, config: &mut EngineConfig) {
         let phi = 2. * 3.14159 * entity_id as f64 / N as f64;
         // let phi = phi + 3.14159;
         let x = [r * phi.cos(), r * phi.sin(), 0.];
+        let v_K = (G * m1 / dr).powf(0.5);
         let v = [-v0 * phi.sin(), v0 * phi.cos(), 0.];
-        let entity = EntityV1::new(mu, x, v);
-        system.entities.push(Box::new(entity));
+        for moon_id in 0..N {
+            let theta = 2. * 3.14159 * moon_id as f64 / N as f64;
+            let x = [x[0] + dr * theta.cos(), x[1] + dr * theta.sin(), 0.];
+            let v = [v[0] - v_K * theta.sin(), v[1] + v_K * theta.cos(), 0.];
+            let entity = EntityV1::new(m2, x, v);
+            system.entities.push(Box::new(entity));
+        }
     }
     // INTEGRATORS
     let integrator_variant = ForceIntegratorVariant::EulerExplicit;
