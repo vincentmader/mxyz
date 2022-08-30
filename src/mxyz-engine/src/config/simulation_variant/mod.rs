@@ -29,8 +29,8 @@ impl From<usize> for SimulationVariant {
 impl From<&str> for SimulationVariant {
     fn from(simulation_variant: &str) -> Self {
         match simulation_variant {
-            "3body-fig8" => SimulationVariant::ThreeBodyMoon,
-            "3body-moon" => SimulationVariant::ThreeBodyFigureEight,
+            "3body-moon" => SimulationVariant::ThreeBodyMoon,
+            "3body-fig8" => SimulationVariant::ThreeBodyFigureEight,
             _ => todo!(),
         }
     }

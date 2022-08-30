@@ -16,7 +16,7 @@ pub fn initialize(simulation_variant: Option<SimulationVariant>, cfg: &mut Engin
                 state.systems = systems;
                 state
             }
-            _ => todo!(),
+            _ => todo!("{:?}", simulation_variant),
         },
         None => todo!("handle this earlier? (in str->enum sim-var conversion)"),
     }

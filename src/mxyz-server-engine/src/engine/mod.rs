@@ -8,7 +8,7 @@ use rayon::prelude::*;
 pub struct SimulationEngineV2 {
     pub config: EngineConfig,
     engine_id: usize,
-    states: Vec<State>,
+    pub states: Vec<State>,
 }
 impl SimulationEngineV2 {
     pub fn new(engine_id: usize) -> Self {

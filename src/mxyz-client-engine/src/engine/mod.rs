@@ -7,7 +7,7 @@ use mxyz_engine::system::System;
 pub struct SimulationEngineV1 {
     pub config: EngineConfig,
     engine_id: usize,
-    states: Vec<State>,
+    pub states: Vec<State>,
 }
 impl SimulationEngineV1 {
     pub fn new(engine_id: usize) -> Self {

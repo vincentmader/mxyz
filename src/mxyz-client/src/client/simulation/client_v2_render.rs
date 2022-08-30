@@ -3,9 +3,7 @@ use crate::config::ClientConfig;
 use crate::utils::dom;
 use crate::websocket::client::WebSocketClient;
 use std::future::Future;
-use wasm_bindgen::prelude::*;
 
-#[wasm_bindgen]
 /// Simulation-Client v2
 /// - Receive states via WebSocket.
 /// - Render to Canvas (Animation Loop).
@@ -14,7 +12,6 @@ pub struct SimulationClientV2Render {
     websocket: WebSocketClient,
 }
 
-#[wasm_bindgen]
 impl SimulationClientV2Render {
     /// Create new Simulation-Renderer-Client.
     /// - Create Client Config.
