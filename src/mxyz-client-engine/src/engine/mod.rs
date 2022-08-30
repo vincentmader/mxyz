@@ -1,13 +1,13 @@
 use mxyz_engine::config::EngineConfig;
 use mxyz_engine::engine::Engine;
 use mxyz_engine::integrator::Integrator;
-use mxyz_engine::state::State;
+use mxyz_engine::state::UnsizedState;
 use mxyz_engine::system::System;
 
 pub struct SimulationEngineV1 {
     pub config: EngineConfig,
     engine_id: usize,
-    pub states: Vec<State>,
+    pub states: Vec<UnsizedState>,
 }
 impl SimulationEngineV1 {
     pub fn new(engine_id: usize) -> Self {
@@ -22,7 +22,7 @@ impl SimulationEngineV1 {
     }
 }
 impl Engine for SimulationEngineV1 {
-    fn forward_state(&self, state: &State) -> State {
+    fn forward_state(&self, state: &UnsizedState) -> UnsizedState {
         let systems = state
             .systems
             .iter()
@@ -30,7 +30,7 @@ impl Engine for SimulationEngineV1 {
             .map(|(sys_id, sys)| self.forward_system((sys_id, sys)))
             .collect();
         let state_id = state.state_id + 1;
-        State { state_id, systems }
+        UnsizedState { state_id, systems }
     }
     fn integrate_system(&self, integrator: &Integrator, system: (usize, &System)) -> System {
         let (system_id, system) = system;
@@ -56,10 +56,10 @@ impl Engine for SimulationEngineV1 {
     fn engine_id(&self) -> &usize {
         &self.engine_id
     }
-    fn engine_states(&self) -> &Vec<State> {
+    fn engine_states(&self) -> &Vec<UnsizedState> {
         &self.states
     }
-    fn engine_states_mut(&mut self) -> &mut Vec<State> {
+    fn engine_states_mut(&mut self) -> &mut Vec<UnsizedState> {
         &mut self.states
     }
 }

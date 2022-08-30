@@ -1,6 +1,6 @@
 use crate::renderer::components::canvas::Canvas;
 use crate::utils::dom;
-use mxyz_engine::state::State;
+use mxyz_engine::state::UnsizedState;
 use mxyz_engine::system::System;
 use mxyz_engine::system::SystemVariant;
 
@@ -24,7 +24,7 @@ impl EngineRenderer {
         self.canvas.set_stroke_style("white");
     }
     /// Draw State.
-    pub fn draw_state(&mut self, state: &State) {
+    pub fn draw_state(&mut self, state: &UnsizedState) {
         self.canvas.clear();
         // dom::console_log!("\nstate {}", state.state_id);
         for system in state.systems.iter().enumerate() {

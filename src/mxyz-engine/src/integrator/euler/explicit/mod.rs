@@ -3,14 +3,18 @@ use crate::entity::EntityV1;
 use crate::interaction::force::ForceVariant;
 use crate::interaction::Interaction;
 use crate::interaction::InteractionVariant;
-use crate::state::State;
+use crate::state::UnsizedState;
 use crate::system::{System, SystemVariant};
 use rayon::prelude::*;
 use std::sync::{Arc, Mutex};
 
 const DT: f64 = 0.01;
 
-pub fn apply(system: &System, states: &Vec<State>, interactions: &Vec<Interaction>) -> System {
+pub fn apply(
+    system: &System,
+    states: &Vec<UnsizedState>,
+    interactions: &Vec<Interaction>,
+) -> System {
     // Load current state.
     let current_state = &states[states.len() - 1]; // TODO: fix, this might fail
 
