@@ -1,7 +1,7 @@
 #![allow(unused_variables)]
 #![allow(non_snake_case)]
 use crate::config::EngineConfig;
-use crate::entity::EntityV1;
+use crate::entity::entity_v1::EntityV1;
 use crate::integrator::ForceIntegratorVariant;
 use crate::integrator::Integrator;
 use crate::integrator::IntegratorVariant;
@@ -14,6 +14,7 @@ use crate::system::unsized_system::UnsizedSystem;
 
 const NR_OF_STEPS: usize = 10;
 const G: f64 = 1.;
+const Q: f64 = 0.;
 
 pub fn preset(systems: &mut Vec<UnsizedSystem>, config: &mut EngineConfig) {
     config.step_id.1 = NR_OF_STEPS;
@@ -32,7 +33,7 @@ pub fn preset(systems: &mut Vec<UnsizedSystem>, config: &mut EngineConfig) {
     let system_id = 0;
     let variant = UnsizedSystemVariant::EntitiesV1;
     let mut system = UnsizedSystem::new(system_id, variant);
-    let entity = EntityV1::new(m0, [0., 0., 0.], [0., 0., 0.]);
+    let entity = EntityV1::new(m0, [0., 0., 0.], [0., 0., 0.], Q);
     system.entities.push(Box::new(entity));
     systems.push(system);
 
@@ -46,7 +47,7 @@ pub fn preset(systems: &mut Vec<UnsizedSystem>, config: &mut EngineConfig) {
         let phi = 2. * 3.14159 * entity_id as f64 / N as f64;
         let x = [r0 * phi.cos(), r0 * phi.sin(), 0.];
         let v = [-v0 * phi.sin(), v0 * phi.cos(), 0.];
-        let entity = EntityV1::new(m1, x, v);
+        let entity = EntityV1::new(m1, x, v, Q);
         system.entities.push(Box::new(entity));
     }
     // INTEGRATORS
@@ -85,7 +86,7 @@ pub fn preset(systems: &mut Vec<UnsizedSystem>, config: &mut EngineConfig) {
             let theta = 2. * 3.14159 * moon_id as f64 / N as f64;
             let x = [x[0] + dr * theta.cos(), x[1] + dr * theta.sin(), 0.];
             let v = [v[0] - v_K * theta.sin(), v[1] + v_K * theta.cos(), 0.];
-            let entity = EntityV1::new(m2, x, v);
+            let entity = EntityV1::new(m2, x, v, Q);
             system.entities.push(Box::new(entity));
         }
     }

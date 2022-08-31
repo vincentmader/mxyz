@@ -95,10 +95,11 @@ pub trait Engine {
         let state = self.engine_states().get(state_id).unwrap();
         let interactions = &integrator.interactions;
         // ...
-        let (m, pos, vel) = (
+        let (m, pos, vel, q) = (
             entity.get_mass(),
             entity.get_position(),
             entity.get_velocity(),
+            entity.get_charge(),
         );
         match &integrator.variant {
             IntegratorVariant::ForceIntegratorV1(integrator) => match integrator {
@@ -139,7 +140,7 @@ pub trait Engine {
                     let pos: Vec<f64> = (0..3).map(|i| pos[i] + vel[i] * DT).collect();
                     let pos = [pos[0], pos[1], pos[2]];
                     let vel = [vel[0], vel[1], vel[2]];
-                    let entity = crate::entity::EntityV1::new(m, pos, vel);
+                    let entity = crate::entity::entity_v1::EntityV1::new(m, pos, vel, q);
                     Box::new(entity)
                 }
                 _ => todo!("Force Integrator Variant"),

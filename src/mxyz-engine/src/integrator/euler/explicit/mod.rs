@@ -1,5 +1,5 @@
+use crate::entity::entity_v1::EntityV1;
 use crate::entity::Entity;
-use crate::entity::EntityV1;
 use crate::interaction::force::ForceVariant;
 use crate::interaction::Interaction;
 use crate::interaction::InteractionVariant;
@@ -90,6 +90,7 @@ pub fn apply(
                     mass: next_ent.get_mass(),
                     position,
                     velocity,
+                    charge: next_ent.get_charge(),
                 },
                 _ => todo!(),
             };

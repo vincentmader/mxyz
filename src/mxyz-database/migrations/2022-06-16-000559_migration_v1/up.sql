@@ -43,7 +43,8 @@ CREATE TABLE entities_v1 (
   pos_z   FLOAT NOT NULL,
   vel_x   FLOAT NOT NULL,
   vel_y   FLOAT NOT NULL,
-  vel_z   FLOAT NOT NULL
+  vel_z   FLOAT NOT NULL,
+  charge  FLOAT NOT NULL
 );
 
 -- PLANETS

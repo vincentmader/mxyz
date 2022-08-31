@@ -125,6 +125,8 @@ pub fn export_to_database<T: Engine>(engine: &mut T, states_to_save: &Vec<usize>
                             vel_x: &ent.get_velocity()[0],
                             vel_y: &ent.get_velocity()[1],
                             vel_z: &ent.get_velocity()[2],
+                            // charge
+                            charge: &ent.get_charge(),
                         };
                         mxyz_database::models::entity_v1::create_entity_v1(&conn, db_entity);
                     }

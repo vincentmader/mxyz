@@ -18,6 +18,7 @@ pub struct NewEntityV1<'a> {
     pub vel_x: &'a f64,
     pub vel_y: &'a f64,
     pub vel_z: &'a f64,
+    pub charge: &'a f64,
 }
 
 #[derive(Queryable, Debug)]
@@ -34,13 +35,15 @@ pub struct EntityV1 {
     pub vel_x: f64,
     pub vel_y: f64,
     pub vel_z: f64,
+    pub charge: f64,
 }
-impl std::convert::Into<mxyz_engine::entity::EntityV1> for EntityV1 {
-    fn into(self) -> mxyz_engine::entity::EntityV1 {
-        mxyz_engine::entity::EntityV1 {
+impl std::convert::Into<mxyz_engine::entity::entity_v1::EntityV1> for EntityV1 {
+    fn into(self) -> mxyz_engine::entity::entity_v1::EntityV1 {
+        mxyz_engine::entity::entity_v1::EntityV1 {
             mass: self.mass,
             position: [self.pos_x, self.pos_y, self.pos_z],
             velocity: [self.vel_x, self.vel_y, self.vel_z],
+            charge: self.charge,
         }
     }
 }
@@ -74,7 +77,7 @@ pub fn get_entities(
     engine_query: i32,
     state_query: i32,
     system_query: i32,
-) -> Vec<mxyz_engine::entity::EntityV1> {
+) -> Vec<mxyz_engine::entity::entity_v1::EntityV1> {
     let db_entities = get_db_entities(conn, engine_query, state_query, system_query);
     db_entities
         .into_iter()
