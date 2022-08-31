@@ -1,10 +1,12 @@
 use crate::models::entity_v1;
 use crate::schema::systems;
 use diesel::pg::PgConnection;
+use mxyz_engine::system::entities_v1::EntitiesV1;
 use mxyz_engine::system::objects::planets::Planets;
 use mxyz_engine::system::objects::ObjectsVariant;
-use mxyz_engine::system::EntitiesV1;
-use mxyz_engine::system::{SizedSystem, SizedSystemVariant, UnsizedSystemVariant};
+use mxyz_engine::system::sized_system::sized_system_variant::SizedSystemVariant;
+use mxyz_engine::system::sized_system::SizedSystem;
+use mxyz_engine::system::unsized_system::unsized_system_variant::UnsizedSystemVariant;
 // -----------------------------------------------------------------------------
 #[derive(Insertable, Debug)]
 #[table_name = "systems"]

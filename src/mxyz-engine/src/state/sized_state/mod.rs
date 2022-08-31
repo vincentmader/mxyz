@@ -1,4 +1,4 @@
-use crate::system::SizedSystem;
+use crate::system::sized_system::SizedSystem;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Deserialize, Serialize)] // TODO remove clone again

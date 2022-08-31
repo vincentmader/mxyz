@@ -1,4 +1,4 @@
-use crate::system::EntitiesV1;
+use crate::system::entities_v1::EntitiesV1;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)] // TODO remove clone again

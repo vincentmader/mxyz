@@ -1,8 +1,8 @@
 use crate::entity::EntityV1;
 use crate::integrator::Integrator;
+use crate::system::entities_v1::EntitiesV1;
 use crate::system::unsized_system::unsized_system_variant::UnsizedSystemVariant;
 use crate::system::unsized_system::UnsizedSystem;
-use crate::system::EntitiesV1;
 use serde::{Deserialize, Serialize};
 use sized_system_variant::SizedSystemVariant;
 use std::fmt::Debug;
