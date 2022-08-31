@@ -1,6 +1,6 @@
 use mxyz_engine::config::export_variant::ExportVariant;
 use mxyz_engine::config::simulation_variant::SimulationVariant;
-use mxyz_engine::system::SystemVariant;
+use mxyz_engine::system::unsized_system::unsized_system_variant::UnsizedSystemVariant;
 use mxyz_engine::Engine;
 use mxyz_network::mpsc_msg;
 use mxyz_network::mpsc_msg::MpscMessage;
@@ -107,7 +107,7 @@ pub fn export_to_database<T: Engine>(engine: &mut T, states_to_save: &Vec<usize>
 
             // Choose export format. (depends on system variant)
             match &system.variant {
-                SystemVariant::EntitiesV1 => {
+                UnsizedSystemVariant::EntitiesV1 => {
                     for (ent_id, ent) in system.entities.iter().enumerate() {
                         let db_entity = mxyz_database::models::entity_v1::NewEntityV1 {
                             // ids of engien, state, system & entity

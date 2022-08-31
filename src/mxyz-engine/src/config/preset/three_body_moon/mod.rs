@@ -9,7 +9,7 @@ use crate::interaction::force::Force;
 use crate::interaction::force::ForceVariant;
 use crate::interaction::Interaction;
 use crate::interaction::InteractionVariant;
-use crate::system::unsized_system::SystemVariant;
+use crate::system::unsized_system::unsized_system_variant::UnsizedSystemVariant;
 use crate::system::unsized_system::UnsizedSystem;
 
 const NR_OF_STEPS: usize = 10;
@@ -30,7 +30,7 @@ pub fn preset(systems: &mut Vec<UnsizedSystem>, config: &mut EngineConfig) {
     // ------------------------------------------------------------------------
     // SYSTEM
     let system_id = 0;
-    let variant = SystemVariant::EntitiesV1;
+    let variant = UnsizedSystemVariant::EntitiesV1;
     let mut system = UnsizedSystem::new(system_id, variant);
     let entity = EntityV1::new(m0, [0., 0., 0.], [0., 0., 0.]);
     system.entities.push(Box::new(entity));
@@ -40,7 +40,7 @@ pub fn preset(systems: &mut Vec<UnsizedSystem>, config: &mut EngineConfig) {
     // ------------------------------------------------------------------------
     // SYSTEM
     let system_id = 1;
-    let variant = SystemVariant::EntitiesV1;
+    let variant = UnsizedSystemVariant::EntitiesV1;
     let mut system = UnsizedSystem::new(system_id, variant);
     for entity_id in 0..N {
         let phi = 2. * 3.14159 * entity_id as f64 / N as f64;
@@ -73,7 +73,7 @@ pub fn preset(systems: &mut Vec<UnsizedSystem>, config: &mut EngineConfig) {
     let r = r0;
     // SYSTEM
     let system_id = 2;
-    let variant = SystemVariant::EntitiesV1;
+    let variant = UnsizedSystemVariant::EntitiesV1;
     let mut system = UnsizedSystem::new(system_id, variant);
     for entity_id in 0..N {
         let phi = 2. * 3.14159 * entity_id as f64 / N as f64;

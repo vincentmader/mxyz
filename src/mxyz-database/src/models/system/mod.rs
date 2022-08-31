@@ -4,7 +4,7 @@ use diesel::pg::PgConnection;
 use mxyz_engine::system::objects::planets::Planets;
 use mxyz_engine::system::objects::ObjectsVariant;
 use mxyz_engine::system::EntitiesV1;
-use mxyz_engine::system::{SizedSystem, SizedSystemVariant, SystemVariant};
+use mxyz_engine::system::{SizedSystem, SizedSystemVariant, UnsizedSystemVariant};
 // -----------------------------------------------------------------------------
 #[derive(Insertable, Debug)]
 #[table_name = "systems"]
@@ -25,9 +25,9 @@ pub struct System {
 impl System {
     fn into(self, conn: &PgConnection) -> SizedSystem {
         let other_system_id = self.system_id as usize;
-        let other_system_variant = SystemVariant::from(self.system_variant_id as usize);
+        let other_system_variant = UnsizedSystemVariant::from(self.system_variant_id as usize);
         let other_system_variant = match other_system_variant {
-            SystemVariant::EntitiesV1 => {
+            UnsizedSystemVariant::EntitiesV1 => {
                 let entities =
                     entity_v1::get_entities(&conn, self.engine_id, self.state_id, self.system_id);
                 //

@@ -1,10 +1,12 @@
 use crate::entity::EntityV1;
 use crate::integrator::Integrator;
-use crate::system::unsized_system::SystemVariant;
+use crate::system::unsized_system::unsized_system_variant::UnsizedSystemVariant;
 use crate::system::unsized_system::UnsizedSystem;
 use crate::system::EntitiesV1;
 use serde::{Deserialize, Serialize};
+use sized_system_variant::SizedSystemVariant;
 use std::fmt::Debug;
+pub mod sized_system_variant;
 
 #[derive(Debug, Clone, Serialize, Deserialize)] // TODO remove clone again
 pub struct SizedSystem {
@@ -29,7 +31,7 @@ impl From<UnsizedSystem> for SizedSystem {
         let system_id = system.system_id;
         let integrators = system.integrators;
         let variant = match system.variant {
-            SystemVariant::EntitiesV1 => {
+            UnsizedSystemVariant::EntitiesV1 => {
                 let mut e = EntitiesV1::new();
                 e.entities = system
                     .entities
@@ -56,20 +58,3 @@ impl From<UnsizedSystem> for SizedSystem {
         }
     }
 }
-
-#[derive(Debug, Clone, Serialize, Deserialize)] // TODO remove clone again
-pub enum SizedSystemVariant {
-    EntitiesV1(EntitiesV1),
-    Field(SizedFieldVariant),
-    Objects(SizedObjectsVariant),
-    Network(SizedNetworkVariant),
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)] // TODO remove clone again
-pub enum SizedFieldVariant {}
-
-#[derive(Debug, Clone, Serialize, Deserialize)] // TODO remove clone again
-pub enum SizedObjectsVariant {}
-
-#[derive(Debug, Clone, Serialize, Deserialize)] // TODO remove clone again
-pub enum SizedNetworkVariant {}

@@ -1,7 +1,7 @@
 use crate::renderer::components::canvas::Canvas;
 use crate::utils::dom;
 use mxyz_engine::state::UnsizedState;
-use mxyz_engine::system::unsized_system::SystemVariant;
+use mxyz_engine::system::unsized_system::unsized_system_variant::UnsizedSystemVariant;
 use mxyz_engine::system::unsized_system::UnsizedSystem;
 
 const CANVAS_ID: u8 = 0; // TODO move?

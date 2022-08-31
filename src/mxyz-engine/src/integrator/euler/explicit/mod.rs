@@ -4,7 +4,7 @@ use crate::interaction::force::ForceVariant;
 use crate::interaction::Interaction;
 use crate::interaction::InteractionVariant;
 use crate::state::UnsizedState;
-use crate::system::unsized_system::{SystemVariant, UnsizedSystem};
+use crate::system::unsized_system::{unsized_system_variant::UnsizedSystemVariant, UnsizedSystem};
 use rayon::prelude::*;
 use std::sync::{Arc, Mutex};
 
@@ -86,7 +86,7 @@ pub fn apply(
 
             // Choose specific entity struct for this system's variant.
             let next_ent = match system.variant {
-                SystemVariant::EntitiesV1 => EntityV1 {
+                UnsizedSystemVariant::EntitiesV1 => EntityV1 {
                     mass: next_ent.get_mass(),
                     position,
                     velocity,

@@ -1,8 +1,10 @@
 use crate::entity::Entity;
 use crate::entity::EntityV1;
 use crate::integrator::Integrator;
+use crate::system::sized_system::sized_system_variant::SizedSystemVariant;
 use crate::system::sized_system::SizedSystem;
-use crate::system::sized_system::SizedSystemVariant;
+use crate::system::unsized_system::unsized_system_variant::UnsizedSystemVariant;
+pub mod unsized_system_variant;
 
 // ============================================================================
 
@@ -11,13 +13,13 @@ use crate::system::sized_system::SizedSystemVariant;
 pub struct UnsizedSystem {
     pub system_id: usize,
     pub entities: Vec<Box<dyn Entity>>,
-    pub variant: SystemVariant,
+    pub variant: UnsizedSystemVariant,
     pub integrators: Vec<Integrator>,
 }
 
 impl UnsizedSystem {
     /// Creates a new System
-    pub fn new(system_id: usize, variant: SystemVariant) -> Self {
+    pub fn new(system_id: usize, variant: UnsizedSystemVariant) -> Self {
         let entities = vec![];
         let integrators = vec![];
         UnsizedSystem {
@@ -59,49 +61,3 @@ impl From<&SizedSystem> for UnsizedSystem {
         }
     }
 }
-
-// ============================================================================
-
-/// System Variant Enumeration
-#[derive(Debug, Clone)]
-pub enum SystemVariant {
-    EntitiesV1,
-    Field(FieldVariant),
-    Objects(ObjectsVariant),
-    Network(NetworkVariant),
-}
-impl Into<usize> for SystemVariant {
-    fn into(self) -> usize {
-        match self {
-            SystemVariant::EntitiesV1 => 0,
-            _ => todo!("Conversion: SystemVariant -> usize"),
-        }
-    }
-}
-impl From<usize> for SystemVariant {
-    fn from(system_variant: usize) -> SystemVariant {
-        match system_variant {
-            0 => SystemVariant::EntitiesV1,
-            _ => todo!("Conversion: usize -> SystemVariant"),
-        }
-    }
-}
-impl From<&SizedSystemVariant> for SystemVariant {
-    fn from(system_variant: &SizedSystemVariant) -> SystemVariant {
-        match system_variant {
-            SizedSystemVariant::EntitiesV1(_) => SystemVariant::EntitiesV1,
-            _ => todo!(),
-        }
-    }
-}
-
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub enum FieldVariant {}
-
-#[derive(Debug, Clone)]
-pub enum ObjectsVariant {}
-
-#[derive(Debug, Clone)]
-pub enum NetworkVariant {}
