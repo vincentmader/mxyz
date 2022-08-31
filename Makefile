@@ -40,6 +40,7 @@ dc:
 db:
 	# ln -s /opt/homebrew/opt/postgresql@14/lib/postgresql@14/libpq.5.dylib /usr/local/lib/libpq.5.dylib
 	./bin/rebuild_db
+	cd ./src/mxyz-database && diesel migration redo
 clean:
 	rm -r ./src/target/* 2> /dev/null
 	rm ./src/Cargo.lock 2> /dev/null
