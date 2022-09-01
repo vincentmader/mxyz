@@ -16,7 +16,7 @@ use rand::prelude::*;
 const NR_OF_STEPS: usize = 10;
 const G: f64 = 1.;
 const Q: f64 = 1.;
-const N: usize = 5;
+const N: usize = 50;
 const M_P: f64 = 1.;
 const M_E: f64 = 0.1;
 
@@ -32,7 +32,8 @@ pub fn preset(systems: &mut Vec<UnsizedSystem>, config: &mut EngineConfig) {
     let variant = UnsizedSystemVariant::EntitiesV1;
     let mut system = UnsizedSystem::new(system_id, variant);
     for entity_id in 0..N {
-        let x = [rng.gen(), rng.gen(), rng.gen()];
+        let x: [f64; 3] = [rng.gen(), rng.gen(), rng.gen()];
+        let x = [x[0] * 2. - 1., x[1] * 2. - 1., x[2] * 2. - 1.];
         let v = [0., 0., 0.];
         let entity = EntityV1::new(M_P, x, v, Q);
         system.entities.push(Box::new(entity));
@@ -49,8 +50,8 @@ pub fn preset(systems: &mut Vec<UnsizedSystem>, config: &mut EngineConfig) {
     let interaction_variant = InteractionVariant::Force(force);
     let mut interaction = Interaction::new(interaction_variant);
     interaction.matrix.init(&systems);
-    interaction.matrix.entries[0] = Some(true);
-    interaction.matrix.entries[1] = Some(true);
+    interaction.matrix.entries.push(Some(true));
+    interaction.matrix.entries.push(Some(true));
     interactions.push(interaction);
     integrator.interactions = interactions;
     system.integrators.push(integrator); // TODO needs to be run for each system!
@@ -80,8 +81,8 @@ pub fn preset(systems: &mut Vec<UnsizedSystem>, config: &mut EngineConfig) {
     let interaction_variant = InteractionVariant::Force(force);
     let mut interaction = Interaction::new(interaction_variant);
     interaction.matrix.init(&systems);
-    interaction.matrix.entries[0] = Some(true);
-    interaction.matrix.entries[1] = Some(true);
+    interaction.matrix.entries.push(Some(true));
+    interaction.matrix.entries.push(Some(true));
     interactions.push(interaction);
     integrator.interactions = interactions;
     system.integrators.push(integrator); // TODO needs to be run for each system!

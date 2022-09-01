@@ -121,6 +121,9 @@ pub trait Engine {
                                         ForceVariant::NewtonianGravity => {
                                             crate::interaction::force::newtonian_gravity::from
                                         }
+                                        ForceVariant::Coulomb => {
+                                            crate::interaction::force::coulomb_interaction::from
+                                        }
                                         _ => todo!("Force Interaction Variant"),
                                     },
                                     _ => todo!("Interaction Variant"),
