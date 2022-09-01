@@ -104,7 +104,7 @@ pub fn preset(systems: &mut Vec<UnsizedSystem>, config: &mut EngineConfig) {
     interaction.matrix.init(&systems);
     interaction.matrix.entries[0] = Some(true);
     interaction.matrix.entries[1] = Some(true);
-    interaction.matrix.entries[2] = Some(true);
+    interaction.matrix.entries[2] = Some(false);
     interactions.push(interaction);
     integrator.interactions = interactions;
     system.integrators.push(integrator); // TODO needs to be run for each system!
