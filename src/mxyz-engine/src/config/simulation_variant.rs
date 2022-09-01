@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 pub enum SimulationVariant {
     ThreeBodyFigureEight,
     ThreeBodyMoon,
+    ChargeInteraction,
 }
 impl std::convert::Into<usize> for SimulationVariant {
     fn into(self) -> usize {
@@ -31,6 +32,7 @@ impl From<&str> for SimulationVariant {
         match simulation_variant {
             "3body-moon" => SimulationVariant::ThreeBodyMoon,
             "3body-fig8" => SimulationVariant::ThreeBodyFigureEight,
+            "nbody-charge-interaction" => SimulationVariant::ChargeInteraction,
             _ => todo!(),
         }
     }

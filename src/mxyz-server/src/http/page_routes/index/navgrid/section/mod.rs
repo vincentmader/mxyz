@@ -65,7 +65,7 @@ impl NavGridSection {
             "electro-magnetism" => Vec::from([
                 NavGridItem::new(
                     "electro-magnetism",
-                    "nbody-charges",
+                    "nbody-charge-interaction",
                     "charge interaction",
                     0,
                 ),

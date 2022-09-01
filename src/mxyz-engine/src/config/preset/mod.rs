@@ -1,4 +1,5 @@
 #![allow(unreachable_patterns)]
+pub mod charge_interaction;
 pub mod three_body_figure_eight;
 pub mod three_body_moon;
 use crate::config::simulation_variant::SimulationVariant;
@@ -16,6 +17,11 @@ pub fn initialize(
         Some(simulation_variant) => match simulation_variant {
             SimulationVariant::ThreeBodyMoon => {
                 three_body_moon::preset(&mut systems, cfg);
+                state.systems = systems;
+                state
+            }
+            SimulationVariant::ChargeInteraction => {
+                charge_interaction::preset(&mut systems, cfg);
                 state.systems = systems;
                 state
             }

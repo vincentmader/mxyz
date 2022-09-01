@@ -26,6 +26,13 @@ pub fn get_title_from_simulation_variant(category: &str, simulation_variant: &st
                 simulation_variant
             ),
         },
+        "electro-magnetism" => match simulation_variant {
+            "nbody-charge-interaction" => "charge interaction",
+            _ => todo!(
+                "TODO: define title for simulation-id \"{}\"",
+                simulation_variant
+            ),
+        },
         _ => todo!("TODO: define title for category \"{}\"", category),
     }
     .to_string()
