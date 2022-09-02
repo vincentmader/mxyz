@@ -53,7 +53,7 @@ pub trait Engine {
     /// Forward state to next time-step.
     fn forward_state(&self, state: &UnsizedState) -> UnsizedState;
     /// Forward system to next time-step.
-    fn forward_system(&self, system: (usize, &UnsizedSystem)) -> UnsizedSystem {
+    fn forward_or_clone_system(&self, system: (usize, &UnsizedSystem)) -> UnsizedSystem {
         let (system_id, system) = system;
         // Load list of integrators for system.
         let integrators = &system.integrators;
@@ -61,10 +61,10 @@ pub trait Engine {
         let next_system = match integrators.len() {
             0 => system.clone(),
             _ => {
-                let mut next_system = self.integrate_system(&integrators[0], (system_id, &system));
+                let mut next_system = self.forward_system(&integrators[0], (system_id, &system));
                 // Apply possible other integrators to system.
                 for integrator in integrators[1..].iter() {
-                    next_system = self.integrate_system(integrator, (system_id, &system));
+                    next_system = self.forward_system(integrator, (system_id, &system));
                 }
                 next_system
             }
@@ -72,13 +72,13 @@ pub trait Engine {
         next_system
     }
     /// Apply integration scheme to system.
-    fn integrate_system(
+    fn forward_system(
         &self,
         integrator: &Integrator,
         system: (usize, &UnsizedSystem),
     ) -> UnsizedSystem;
     /// Apply integration scheme to entity.
-    fn integrate_entity(
+    fn forward_entity(
         &self,
         integrator: &Integrator,
         entity: ((usize, usize), &Box<dyn Entity>),

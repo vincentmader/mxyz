@@ -28,12 +28,12 @@ impl Engine for SimulationEngineV2 {
             .systems
             .par_iter()
             .enumerate()
-            .map(|(id, sys)| self.forward_system((id, sys)))
+            .map(|(id, sys)| self.forward_or_clone_system((id, sys)))
             .collect();
         let state_id = state.state_id + 1;
         UnsizedState { state_id, systems }
     }
-    fn integrate_system(
+    fn forward_system(
         &self,
         integrator: &Integrator,
         system: (usize, &UnsizedSystem),
@@ -43,7 +43,7 @@ impl Engine for SimulationEngineV2 {
             .entities
             .par_iter()
             .enumerate()
-            .map(|(ent_id, ent)| self.integrate_entity(integrator, ((sys_id, ent_id), ent)))
+            .map(|(ent_id, ent)| self.forward_entity(integrator, ((sys_id, ent_id), ent)))
             .collect();
         UnsizedSystem {
             entities,
