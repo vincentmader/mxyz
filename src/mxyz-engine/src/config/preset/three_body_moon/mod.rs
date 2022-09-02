@@ -2,9 +2,10 @@
 #![allow(non_snake_case)]
 use crate::config::EngineConfig;
 use crate::entity::entity_v1::EntityV1;
-use crate::integrator::ForceIntegratorVariant;
+use crate::integrator::integrator_variant::object::force::ForceIntegratorVariant;
+use crate::integrator::integrator_variant::object::ObjectIntegratorVariant;
+use crate::integrator::integrator_variant::IntegratorVariant;
 use crate::integrator::Integrator;
-use crate::integrator::IntegratorVariant;
 use crate::interaction::force::Force;
 use crate::interaction::force::ForceVariant;
 use crate::interaction::Interaction;
@@ -52,7 +53,8 @@ pub fn preset(systems: &mut Vec<UnsizedSystem>, config: &mut EngineConfig) {
     }
     // INTEGRATORS
     let integrator_variant = ForceIntegratorVariant::EulerExplicit;
-    let integrator_variant = IntegratorVariant::ForceIntegratorV1(integrator_variant);
+    let integrator_variant = ObjectIntegratorVariant::ForceIntegrator(integrator_variant);
+    let integrator_variant = IntegratorVariant::Object(integrator_variant);
     let mut integrator = Integrator::new(integrator_variant);
     let mut interactions = vec![];
 
@@ -92,7 +94,8 @@ pub fn preset(systems: &mut Vec<UnsizedSystem>, config: &mut EngineConfig) {
     }
     // INTEGRATORS
     let integrator_variant = ForceIntegratorVariant::EulerExplicit;
-    let integrator_variant = IntegratorVariant::ForceIntegratorV1(integrator_variant);
+    let integrator_variant = ObjectIntegratorVariant::ForceIntegrator(integrator_variant);
+    let integrator_variant = IntegratorVariant::Object(integrator_variant);
     let mut integrator = Integrator::new(integrator_variant);
     let mut interactions = vec![];
 

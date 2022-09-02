@@ -1,27 +1,8 @@
-pub mod bulirsch_stoer;
-pub mod cellular_automata;
-pub mod collision;
-pub mod euler;
-pub mod lax_friedrichs;
-pub mod lax_wendroff;
-pub mod leapfrog;
-pub mod monte_carlo;
-pub mod runge_kutta;
-pub mod velocity_verlet;
-pub mod verlet;
-// -----------------------------------------------------------------------------
+pub mod integrator_variant;
 use crate::interaction::Interaction;
+use integrator_variant::IntegratorVariant;
 use serde::{Deserialize, Serialize};
-// -----------------------------------------------------------------------------
-#[derive(Debug, Serialize, Deserialize, Clone)]
-/// Entity Integrator
-pub enum IntegratorVariant {
-    ForceIntegratorV1(ForceIntegratorVariant),
-    Collision,
-    CellularAutomaton,
-    MonteCarlo,
-}
-// -----------------------------------------------------------------------------
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Integrator {
     pub variant: IntegratorVariant,
@@ -35,17 +16,4 @@ impl Integrator {
             interactions,
         }
     }
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub enum ForceIntegratorVariant {
-    EulerExplicit,
-    EulerImplicit,
-    RungeKutta2,
-    RungeKutta4,
-    RungeKuttaN,
-    VelocityVerlet,
-    Verlet,
-    LeapFrog,
-    BulirschStoer,
 }

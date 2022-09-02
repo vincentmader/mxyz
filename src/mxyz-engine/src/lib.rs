@@ -8,9 +8,11 @@ use config::preset;
 use config::simulation_variant::SimulationVariant;
 use config::EngineConfig;
 use entity::Entity;
-use integrator::ForceIntegratorVariant;
+use integrator::integrator_variant::field::FieldIntegratorVariant;
+use integrator::integrator_variant::object::force::ForceIntegratorVariant;
+use integrator::integrator_variant::object::ObjectIntegratorVariant;
+use integrator::integrator_variant::IntegratorVariant;
 use integrator::Integrator;
-use integrator::IntegratorVariant;
 use interaction::force::ForceVariant;
 use interaction::InteractionVariant;
 use state::UnsizedState;
@@ -102,21 +104,24 @@ pub trait Engine {
             entity.get_charge(),
         );
         match &integrator.variant {
-            IntegratorVariant::ForceIntegratorV1(integrator) => match integrator {
-                ForceIntegratorVariant::EulerExplicit => {
-                    let mut total_force = [0., 0., 0.];
-                    // Loop over systems.
-                    for (system_id, system) in state.systems.iter().enumerate() {
-                        // Define neighborhood.
-                        // - TODO
-                        // Loop over entities in other system.
-                        for (other_id, other) in system.entities.iter().enumerate() {
-                            let other_id = (system_id, other_id);
-                            if entity_id == (other_id) {
-                                continue;
-                            }
-                            for interaction in interactions.iter() {
-                                let get_force = match &interaction.variant {
+            IntegratorVariant::Object(object_integrator_variant) => match object_integrator_variant
+            {
+                ObjectIntegratorVariant::ForceIntegrator(force_integrator_variant) => {
+                    match force_integrator_variant {
+                        ForceIntegratorVariant::EulerExplicit => {
+                            let mut total_force = [0., 0., 0.];
+                            // Loop over systems.
+                            for (system_id, system) in state.systems.iter().enumerate() {
+                                // Define neighborhood.
+                                // - TODO
+                                // Loop over entities in other system.
+                                for (other_id, other) in system.entities.iter().enumerate() {
+                                    let other_id = (system_id, other_id);
+                                    if entity_id == (other_id) {
+                                        continue;
+                                    }
+                                    for interaction in interactions.iter() {
+                                        let get_force = match &interaction.variant {
                                     InteractionVariant::Force(force) => match force.variant {
                                         ForceVariant::NewtonianGravity => {
                                             crate::interaction::force::newtonian_gravity::from
@@ -128,25 +133,28 @@ pub trait Engine {
                                     },
                                     _ => todo!("Interaction Variant"),
                                 };
-                                let force = get_force(entity, other);
-                                total_force = [
-                                    total_force[0] + force[0],
-                                    total_force[1] + force[1],
-                                    total_force[2] + force[2],
-                                ];
+                                        let force = get_force(entity, other);
+                                        total_force = [
+                                            total_force[0] + force[0],
+                                            total_force[1] + force[1],
+                                            total_force[2] + force[2],
+                                        ];
+                                    }
+                                }
                             }
+                            let acc: Vec<f64> = (0..3).map(|i| total_force[i] / m).collect();
+                            let vel = entity.get_velocity();
+                            let vel: Vec<f64> = (0..3).map(|i| vel[i] + acc[i] * DT).collect();
+                            let pos: Vec<f64> = (0..3).map(|i| pos[i] + vel[i] * DT).collect();
+                            let pos = [pos[0], pos[1], pos[2]];
+                            let vel = [vel[0], vel[1], vel[2]];
+                            let entity = crate::entity::entity_v1::EntityV1::new(m, pos, vel, q);
+                            Box::new(entity)
                         }
+                        _ => todo!("Object Force Integrator Variant"),
                     }
-                    let acc: Vec<f64> = (0..3).map(|i| total_force[i] / m).collect();
-                    let vel = entity.get_velocity();
-                    let vel: Vec<f64> = (0..3).map(|i| vel[i] + acc[i] * DT).collect();
-                    let pos: Vec<f64> = (0..3).map(|i| pos[i] + vel[i] * DT).collect();
-                    let pos = [pos[0], pos[1], pos[2]];
-                    let vel = [vel[0], vel[1], vel[2]];
-                    let entity = crate::entity::entity_v1::EntityV1::new(m, pos, vel, q);
-                    Box::new(entity)
                 }
-                _ => todo!("Force Integrator Variant"),
+                _ => todo!("Object Integrator Variant"),
             },
             _ => todo!("Integrator Variant"),
         }

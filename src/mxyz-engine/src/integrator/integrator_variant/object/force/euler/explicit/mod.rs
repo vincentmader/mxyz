@@ -6,7 +6,11 @@ use crate::interaction::InteractionVariant;
 use crate::state::UnsizedState;
 use crate::system::unsized_system::{unsized_system_variant::UnsizedSystemVariant, UnsizedSystem};
 use rayon::prelude::*;
+use serde::{Deserialize, Serialize};
 use std::sync::{Arc, Mutex};
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct EulerExplicitObjectForceIntegrator {}
 
 const DT: f64 = 0.01;
 
