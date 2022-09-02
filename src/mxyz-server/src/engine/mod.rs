@@ -1,6 +1,6 @@
-pub mod runner;
+pub mod engine_runner_v2;
+use engine_runner_v2::EngineRunner;
 use mxyz_network::mpsc_msg::MpscMessage;
-use runner::EngineRunner;
 use std::io::Error;
 use std::sync::mpsc;
 

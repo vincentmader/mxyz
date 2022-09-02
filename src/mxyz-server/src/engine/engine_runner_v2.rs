@@ -52,7 +52,7 @@ impl EngineRunner {
         // Create & initialize new simulation engine.
         let mut engine = mxyz_server_engine::SimulationEngineV2::new(engine_id);
         engine.init(Some(simulation_variant));
-        engine.config.step_id.1 = usize::MAX;
+        // engine.config.step_id.1 = usize::MAX;
 
         // Run engine in new thread.
         std::thread::spawn(move || {
