@@ -33,6 +33,13 @@ pub fn get_title_from_simulation_variant(category: &str, simulation_variant: &st
                 simulation_variant
             ),
         },
+        "thermo-dynamics" => match simulation_variant {
+            "ising-model" => "Ising model",
+            _ => todo!(
+                "TODO: define title for simulation-id \"{}\"",
+                simulation_variant
+            ),
+        },
         _ => todo!("TODO: define title for category \"{}\"", category),
     }
     .to_string()
