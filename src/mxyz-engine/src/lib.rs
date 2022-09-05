@@ -1,5 +1,4 @@
 pub mod config;
-pub mod engine; // workes from rocket without export as well (???)
 pub mod entity;
 pub mod integrator;
 pub mod interaction;
