@@ -35,7 +35,12 @@ impl System {
                 system.entities = entities;
                 SizedSystemVariant::EntitiesV1(system)
             }
-            _ => todo!(),
+            UnsizedSystemVariant::Field => {
+                todo!()
+            }
+            UnsizedSystemVariant::Objects => {
+                todo!()
+            }
         };
         let system = SizedSystem::new(other_system_id, other_system_variant);
         system

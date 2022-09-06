@@ -75,12 +75,13 @@ pub fn handle_message(msg: MessageResult, tx: &mpsc::Sender<MpscMessage>) -> Mes
     match &msg {
         Ok(e) => match e {
             Message::Binary(bytes) => handle_binary_message(bytes.to_vec(), tx),
-            Message::Close(_) => msg, // TODO find out: can I shutdown engines with this? (remove from db etc)
-            _ => todo!("handle non-binary messages"),
-            // Message::Text(_) => msg,
-            // Message::Ping(_) => Ok(Message::Pong(vec![7, 4, 1])),
-            // Message::Pong(_) => Ok(Message::Ping(vec![1, 4, 7])),
-            // Message::Frame(_) => msg,
+            // TODO Find out: can I shutdown engines with this? (remove from db etc.)
+            Message::Close(_) => msg,
+            // TODO Handle non-binary messages.
+            Message::Text(_) => msg,
+            Message::Ping(_) => Ok(Message::Pong(vec![7, 4, 1])),
+            Message::Pong(_) => Ok(Message::Ping(vec![1, 4, 7])),
+            Message::Frame(_) => msg,
         },
         Err(e) => {
             println!("{:?}", e);

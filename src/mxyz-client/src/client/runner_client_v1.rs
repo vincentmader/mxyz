@@ -2,6 +2,8 @@ use super::EngineRunner;
 use crate::renderer::engine_renderer::EngineRenderer;
 use crate::utils::dom;
 use mxyz_client_engine::SimulationEngineV1;
+use mxyz_engine::state::SizedState;
+use mxyz_engine::state::UnsizedState;
 use mxyz_engine::Engine;
 use std::cell::RefCell;
 use std::future::Future;
@@ -59,8 +61,9 @@ impl EngineRunner for EngineRunnerClientV1 {
 
             engine.forward_engine();
             if state_id % NR_OF_FORWARDS_BTW_RENDER == 0 {
-                let state = engine.states.get(state_id).unwrap();
-                renderer.draw_state(state);
+                let state: &UnsizedState = engine.states.get(state_id).unwrap();
+                let state: SizedState = state.into();
+                renderer.draw_state(&state);
             }
 
             state_id += 1;

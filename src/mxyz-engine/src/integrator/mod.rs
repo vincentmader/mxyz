@@ -30,6 +30,7 @@ impl Integrator {
         entity: ((usize, usize), &Box<dyn Entity>),
         state: &UnsizedState,
     ) -> Box<dyn Entity> {
+        // println!("\n\n{:?}", entity);
         let (entity_id, entity) = entity;
         let interactions = &self.interactions;
         // ...

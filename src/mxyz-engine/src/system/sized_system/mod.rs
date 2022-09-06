@@ -27,16 +27,16 @@ impl SizedSystem {
     }
 }
 /// Convert from UnsizedSystem to SizedSystem.
-impl From<UnsizedSystem> for SizedSystem {
-    fn from(system: UnsizedSystem) -> SizedSystem {
+impl From<&UnsizedSystem> for SizedSystem {
+    fn from(system: &UnsizedSystem) -> SizedSystem {
         let system_id = system.system_id;
-        let integrators = system.integrators;
+        let integrators = &system.integrators;
         let variant = match system.variant {
             UnsizedSystemVariant::EntitiesV1 => {
                 let mut e = EntitiesV1::new();
                 e.entities = system
                     .entities
-                    .into_iter()
+                    .iter()
                     .map(|e| {
                         let mass = e.get_mass();
                         let position = *e.get_position();
@@ -57,7 +57,7 @@ impl From<UnsizedSystem> for SizedSystem {
         SizedSystem {
             system_id,
             variant,
-            integrators,
+            integrators: integrators.clone(), // TODO remove clone
         }
     }
 }
