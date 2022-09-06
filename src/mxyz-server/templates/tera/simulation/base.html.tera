@@ -38,12 +38,6 @@
                 </script>
             </div>
         </div>
-        <div id="page-column-right">
-            {% include "tera/boilerplate/section" %}
-            {% include "tera/boilerplate/section" %}
-            {% include "tera/boilerplate/section" %}
-            {% include "tera/boilerplate/section" %}
-            {% include "tera/boilerplate/section" %}
-        </div>
+        <div id="page-column-right"> </div>
     </div>
 {% endblock page_content %}
