@@ -18,7 +18,7 @@ const G: f64 = 1.;
 const Q: f64 = 0.;
 
 pub fn preset(systems: &mut Vec<UnsizedSystem>, config: &mut EngineConfig) {
-    config.step_id.1 = NR_OF_STEPS;
+    // config.step_id.1 = NR_OF_STEPS;
 
     let m0 = 1.;
     let m1 = 0.1;

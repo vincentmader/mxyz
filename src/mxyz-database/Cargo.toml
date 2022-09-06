@@ -9,6 +9,7 @@
     # mxyz-config = { path = "../mxyz-config" }
     mxyz-utils = { path="../mxyz-utils" }
     mxyz-engine = { path="../mxyz-engine" }
+    log = "0.4.17"
 
 [dependencies.diesel]
     features = ["postgres"]

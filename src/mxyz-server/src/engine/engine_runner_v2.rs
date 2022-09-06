@@ -55,16 +55,16 @@ impl EngineRunner {
         // engine.config.step_id.1 = usize::MAX;
 
         // Run engine in new thread.
-        std::thread::spawn(move || {
-            for _ in 0..engine.config.step_id.1 {
-                // Forward engine to next step-id.
-                engine.forward_engine();
-                // Every so often, export the engine to the database.
-                if engine.config.step_id.0 % engine.config.nr_of_steps_between_exports == 0 {
-                    export_engine(&mut engine);
-                }
+        // std::thread::spawn(move || {
+        for state_id in 0..engine.config.step_id.1 {
+            // Forward engine to next step-id.
+            engine.forward_engine();
+            // Every so often, export the engine to the database.
+            if engine.config.step_id.0 % engine.config.nr_of_steps_between_exports == 0 {
+                export_engine(&mut engine);
             }
-        });
+        }
+        // });
         println!("Engine-Runner added engine {}", engine_id);
     }
 
@@ -148,6 +148,9 @@ pub fn export_to_database<T: Engine>(engine: &mut T, states_to_save: &Vec<usize>
             state_id: &(*state_id as i32),
         };
         mxyz_database::models::state::create_state(&conn, db_state);
+        if states_to_save.len() > 0 {
+            engine.engine_config_mut().last_export_step_id = Some(*state_id);
+        }
     }
 }
 
