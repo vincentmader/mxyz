@@ -50,6 +50,7 @@ pub fn apply(
 
             // Loop over interacting systems.
             for (other_sys_id, other_sys) in current_state.systems.iter().enumerate() {
+                // if !
                 // Loop over entities in interacting system.
                 for (other_ent_id, other_ent) in other_sys.entities.iter().enumerate() {
                     // println!("{}-{} {}-{}", system_id, ent_id, other_sys_id, other_ent_id);

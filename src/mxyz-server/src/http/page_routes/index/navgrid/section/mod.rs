@@ -21,8 +21,8 @@ impl NavGridSection {
                 NavGridItem::new("newtonian-gravity", "3body-lagrange", "lagrange points", 0),
                 NavGridItem::new(
                     "newtonian-gravity",
-                    "nbody-satellites",
-                    "satellite constellations",
+                    "symmetric-satellites",
+                    "sym. satellite const.",
                     0,
                 ),
                 // more complex systems

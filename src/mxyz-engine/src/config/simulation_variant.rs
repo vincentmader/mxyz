@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 pub enum SimulationVariant {
     ThreeBodyFigureEight,
     ThreeBodyMoon,
+    SymmetricSatellites,
     ChargeInteraction,
     IsingModel,
 }
@@ -39,6 +40,7 @@ impl From<&str> for SimulationVariant {
             "3body-fig8" => SimulationVariant::ThreeBodyFigureEight,
             "nbody-charge-interaction" => SimulationVariant::ChargeInteraction,
             "ising-model" => SimulationVariant::IsingModel,
+            "symmetric-satellites" => SimulationVariant::SymmetricSatellites,
             _ => todo!(),
         }
     }

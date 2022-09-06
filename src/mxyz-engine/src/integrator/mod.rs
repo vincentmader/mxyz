@@ -29,6 +29,7 @@ impl Integrator {
         &self,
         entity: ((usize, usize), &Box<dyn Entity>),
         state: &UnsizedState,
+        config: &crate::config::EngineConfig,
     ) -> Box<dyn Entity> {
         let (entity_id, entity) = entity;
         let interactions = &self.interactions;
@@ -58,6 +59,9 @@ impl Integrator {
                                         continue;
                                     }
                                     for interaction in interactions.iter() {
+                                        if !interaction.matrix.entries[system_id].unwrap() {
+                                            continue;
+                                        }
                                         let get_force = match &interaction.variant {
                                     InteractionVariant::Force(force) => match force.variant {
                                         ForceVariant::NewtonianGravity => {

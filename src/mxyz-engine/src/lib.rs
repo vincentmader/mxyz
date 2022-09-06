@@ -112,7 +112,7 @@ pub trait Engine {
         entity: ((usize, usize), &Box<dyn Entity>),
     ) -> Box<dyn Entity> {
         let state = self.get_current_state();
-        let entity = integrator.forward_entity(entity, state);
+        let entity = integrator.forward_entity(entity, state, self.engine_config());
         entity
     }
 }

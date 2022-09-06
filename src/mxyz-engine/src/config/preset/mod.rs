@@ -1,6 +1,7 @@
 #![allow(unreachable_patterns)]
 pub mod charge_interaction;
 pub mod ising_model;
+pub mod symmetric_satellites;
 pub mod three_body_figure_eight;
 pub mod three_body_moon;
 use crate::config::simulation_variant::SimulationVariant;
@@ -19,6 +20,9 @@ pub fn initialize(
             SimulationVariant::ThreeBodyMoon => three_body_moon::preset(&mut systems, cfg),
             SimulationVariant::ChargeInteraction => charge_interaction::preset(&mut systems, cfg),
             SimulationVariant::IsingModel => ising_model::preset(&mut systems, cfg),
+            SimulationVariant::SymmetricSatellites => {
+                symmetric_satellites::preset(&mut systems, cfg)
+            }
             _ => todo!("{:?}", simulation_variant),
         },
         None => todo!("handle this earlier? (in str->enum sim-var conversion)"),

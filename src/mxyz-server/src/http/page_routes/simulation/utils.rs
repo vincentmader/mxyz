@@ -14,6 +14,7 @@ pub fn get_title_from_simulation_variant(category: &str, simulation_variant: &st
     match category {
         "newtonian-gravity" => match simulation_variant {
             "3body-moon" => "star + planet + moon",
+            "symmetric-satellites" => "symmetric satellites",
             _ => todo!(
                 "TODO: define title for simulation-id \"{}\"",
                 simulation_variant
