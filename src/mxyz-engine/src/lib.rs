@@ -44,16 +44,16 @@ pub trait Engine {
     fn init(&mut self, sim_variant: Option<SimulationVariant>) {
         let state = config::preset::initialize(sim_variant, self.engine_config_mut());
         self.add_engine_state(state);
-        self.run();
+        // self.run();
     }
 
-    /// Run engine.
-    fn run(&mut self) {
-        let max_step_id = self.engine_config().step_id.1;
-        for _state_id in 0..max_step_id {
-            self.forward_engine();
-        }
-    }
+    // /// Run engine.
+    // fn run(&mut self) {
+    //     let max_step_id = self.engine_config().step_id.1;
+    //     for _state_id in 0..max_step_id {
+    //         self.forward_engine();
+    //     }
+    // }
 
     /// Forward engine to next time-step.
     fn forward_engine(&mut self) {

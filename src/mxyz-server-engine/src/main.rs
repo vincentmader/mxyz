@@ -1,10 +1,10 @@
-use mxyz_engine::config::simulation_variant::SimulationVariant;
-use mxyz_engine::Engine;
-use mxyz_server_engine::engine::SimulationEngineV2;
+use mxyz_engine::engine::Engine;
+use mxyz_engine::preset::SimulationVariant;
+use mxyz_server_engine::SimulationEngineV2Server;
 
 fn main() {
     let engine_id = 0;
-    let mut engine = SimulationEngineV2::new(engine_id);
+    let mut engine = SimulationEngineV2Server::new(engine_id);
     engine.init(Some(SimulationVariant::ThreeBodyMoon));
-    // engine.run();
+    engine.run();
 }

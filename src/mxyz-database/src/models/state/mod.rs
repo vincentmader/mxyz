@@ -18,7 +18,8 @@ pub struct State {
     pub engine_id: i32,
     pub state_id: i32,
 }
-impl std::convert::Into<mxyz_engine::state::SizedState> for State {
+// impl std::convert::Into<mxyz_engine_universe::state::SizedState> for State {
+impl State {
     fn into(self) -> mxyz_engine::state::SizedState {
         let other_state_id = self.state_id as usize;
         let mut state = mxyz_engine::state::SizedState::new(other_state_id);
@@ -43,31 +44,33 @@ pub fn get_db_states(
     state_query: &StateQuery,
 ) -> Vec<State> {
     match state_query {
+        // TODO Get batch of newest states.
+
         // Get all states since a given state-id.
         StateQuery::BatchSince(batch_size, last_sync) => states
             .filter(engine_id.eq(&engine_query))
-            .filter(state_id.gt(*last_sync as i32))
-            .filter(state_id.le((*last_sync + *batch_size + 1) as i32)) // +1 needed?
+            .filter(state_id.gt(last_sync))
+            .filter(state_id.le(last_sync + batch_size))
             .load::<State>(conn)
             .expect("Error loading states"),
 
         // Get all states since a given state-id.
         StateQuery::AllSince(last_sync) => states
             .filter(engine_id.eq(&engine_query))
-            .filter(state_id.gt(*last_sync as i32))
+            .filter(state_id.gt(last_sync))
             .load::<State>(conn)
             .expect("Error loading states"),
 
         // Get all states between two state-ids.
         StateQuery::Between(from, to) => states
             .filter(engine_id.eq(&engine_query))
-            .filter(state_id.ge(*from as i32))
-            .filter(state_id.lt(*to as i32))
+            .filter(state_id.ge(from))
+            .filter(state_id.lt(to))
             .load::<State>(conn)
             .expect("Error loading states"),
-        // TODO Get all states from list of state-ids.
-        // StateQuery::FromIds(_ids) => {}
-        // TODO Get batch of newest states.
+
+        // Get all states from list of state-ids.
+        StateQuery::FromIds(_ids) => todo!("db-states from state-id list"),
     }
 }
 
@@ -77,7 +80,6 @@ pub fn get_states(
     state_query: &StateQuery,
 ) -> Vec<mxyz_engine::state::SizedState> {
     let db_states = get_db_states(conn, engine_query, &state_query);
-    // std::fs::write("../log/got_state_from_db.txt", "").unwrap();
     db_states
         .into_iter()
         .map(|db_state| db_state.into())

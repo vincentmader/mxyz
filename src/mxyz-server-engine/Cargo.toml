@@ -6,6 +6,4 @@
 
 [dependencies]
     mxyz-engine = { path="../mxyz-engine" }
-    mxyz-database = { path="../mxyz-database" }
     rayon = "1.5"
-    diesel = "1.4.8"
