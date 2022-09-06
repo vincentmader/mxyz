@@ -13,7 +13,7 @@ use crate::interaction::InteractionVariant;
 use crate::system::unsized_system::unsized_system_variant::UnsizedSystemVariant;
 use crate::system::unsized_system::UnsizedSystem;
 
-const NR_OF_STEPS: usize = 10;
+const NR_OF_STEPS: usize = usize::MAX;
 const G: f64 = 1.;
 const Q: f64 = 0.;
 

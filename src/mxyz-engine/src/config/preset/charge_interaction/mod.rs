@@ -14,7 +14,6 @@ use crate::system::unsized_system::unsized_system_variant::UnsizedSystemVariant;
 use crate::system::unsized_system::UnsizedSystem;
 use rand::prelude::*;
 
-const NR_OF_STEPS: usize = 10;
 const G: f64 = 1.;
 const Q: f64 = 1.;
 const N: usize = 50;
@@ -22,8 +21,6 @@ const M_P: f64 = 1.;
 const M_E: f64 = 0.1;
 
 pub fn preset(systems: &mut Vec<UnsizedSystem>, config: &mut EngineConfig) {
-    config.step_id.1 = NR_OF_STEPS;
-
     let mut rng = rand::thread_rng();
 
     // System 1: PROTONS
