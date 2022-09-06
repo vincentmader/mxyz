@@ -224,7 +224,7 @@ pub fn draw_states(
 
         let state = states.get(i as usize).unwrap(); // TODO (?)
 
-        renderer.draw_state(&state.into()); // TODO
+        renderer.display_state(&state.into()); // TODO
 
         //for system in state.systems.iter() {
         //    match &system.variant {

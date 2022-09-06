@@ -39,20 +39,13 @@ impl EngineRunner for EngineRunnerClientV1 {
         let mut renderer = EngineRenderer::new();
         renderer.init();
 
-        let n = usize::MAX;
-        // for state_id in 0..n {
-        //     // dom::console_log!("{:?}", state);
-        // }
+        let n = usize::MAX; // TODO make customizable (why not with config.step-id?)
 
         let f = Rc::new(RefCell::new(None));
         let g = f.clone();
         let mut state_id = 0;
         *g.borrow_mut() = Some(Closure::new(move || {
             if state_id > n {
-                // dom::body().set_text_content(Some("All done!"));
-
-                // Drop our handle to this closure so that it will get cleaned
-                // up once we return.
                 let _ = f.borrow_mut().take();
                 return;
             }
@@ -60,7 +53,7 @@ impl EngineRunner for EngineRunnerClientV1 {
             engine.forward_engine();
             if state_id % NR_OF_FORWARDS_BTW_RENDER == 0 {
                 let state = engine.states.get(state_id).unwrap();
-                renderer.draw_state(state);
+                renderer.display_state(state);
             }
 
             state_id += 1;
