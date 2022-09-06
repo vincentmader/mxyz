@@ -18,7 +18,7 @@ use web_sys::BinaryType::Arraybuffer;
 use web_sys::WebSocket;
 use web_sys::{ErrorEvent, MessageEvent};
 
-const STATE_BATCH_SIZE: usize = 1000;
+const STATE_BATCH_SIZE: i32 = 500;
 const PARTICLE_RADIUS: f64 = 3.;
 
 /// Web-Socket TCP Client
@@ -157,45 +157,32 @@ pub fn handle_received_states(
     query: StateQuery,
     states: Vec<SizedState>,
 ) {
-    let nr_of_received_states = states.len();
-    let did_receive_states = nr_of_received_states > 0;
-    let state_id_range_str = if did_receive_states {
-        let from = states[0].state_id;
-        let to = states[nr_of_received_states - 1].state_id;
-        format!("({}-{})", from, to)
-    } else {
-        String::new()
-    };
-    dom::console_log!(
-        "Engine-{} received {} States {}.",
-        engine_id,
-        nr_of_received_states,
-        state_id_range_str
-    );
-    // Ask for new States once again.
-    let state_query = match did_receive_states {
-        // If states were received, update state-query.
+    dom::console_log!("Received {} States for Engine {}.", states.len(), engine_id);
+
+    let nr_of_states = states.len();
+    let received_states = nr_of_states > 0;
+    let state_query = match received_states {
         true => {
-            let state_id = states.get(nr_of_received_states - 1).unwrap().state_id;
+            let state_id = states.get(nr_of_states - 1).unwrap().state_id as i32;
             let state_query = StateQuery::BatchSince(STATE_BATCH_SIZE, state_id);
-            dom::console_log!("Requesting: {:?}", state_query);
+            dom::console_log!("{:?}", state_query);
             state_query
         }
-        // If not, send the same query again.
         false => query,
     };
+
+    // Ask for new States once again.
+    let request = request::Request::GetUpdatedStates(engine_id, state_query);
+    let request = TcpPackage::Request(request).to_bytes();
+    ws.send_with_u8_array(&request).unwrap();
 
     // TODO do stuff with states (?)
     let mut finished_with_last_render = false;
     // if states.len() > 0 && finished_with_last_render {
-    if did_receive_states {
+    if states.len() > 0 {
         // finished_with_last_render = false;
         draw_states(states, &mut finished_with_last_render).unwrap();
     }
-    // Send request.
-    let request = request::Request::GetUpdatedStates(engine_id, state_query);
-    let request = TcpPackage::Request(request).to_bytes();
-    ws.send_with_u8_array(&request).unwrap();
 }
 
 // =============================================================================
@@ -207,36 +194,54 @@ pub fn draw_states(
     let states = Arc::new(Mutex::new(states));
 
     let mut renderer = EngineRenderer::new();
+
     let mut canvas = Canvas::new(0);
     canvas.init();
-    canvas.set_fill_style("green");
-    canvas.set_stroke_style("green");
+    // canvas.set_fill_style("green");
+    // canvas.set_stroke_style("green");
 
     let f = Rc::new(RefCell::new(None));
     let g = f.clone();
-    let mut i: usize = 0;
-    // let mut nr_of_states = 0;
+    let mut i = 0;
+    let mut nr_of_states = 0;
     *g.borrow_mut() = Some(Closure::wrap(Box::new(move || {
-        let states = states.clone();
-        let states = states.lock().unwrap();
-        let nr_of_states = states.len();
-
-        // if nr_of_states == states.len() {
-        //     // canvas.clear();
-        // } else {
-        //     nr_of_states = states.len();
-        // }
-        // dom::console_log!("{} / {}", i, nr_of_states);
-        // dom::console_log!("{} < {}", i, STATE_BATCH_SIZE);
-        // if i >= STATE_BATCH_SIZE || i >= states.len() {
-        if i >= nr_of_states {
-            // dom::console_log!("{} > {} !!!", i, nr_of_states);
+        if i >= STATE_BATCH_SIZE {
             let _ = f.borrow_mut().take();
             return;
         }
 
+        let states = states.clone();
+        let states = states.lock().unwrap();
+        if nr_of_states == states.len() {
+            // canvas.clear();
+        } else {
+            nr_of_states = states.len();
+        }
+        // dom::console_log!("{} / {}", i, nr_of_states);
+        // dom::console_log!("{} < {}", i, STATE_BATCH_SIZE);
+
+        // dom::console_log!("{}", i);
+
         let state = states.get(i as usize).unwrap(); // TODO (?)
-        renderer.draw_state(&state); // TODO
+
+        renderer.draw_state(&state.into()); // TODO
+
+        //for system in state.systems.iter() {
+        //    match &system.variant {
+        //        SizedSystemVariant::EntitiesV1(sys) => {
+        //            //
+        //            for entity in sys.entities.iter() {
+        //                let _mass = entity.mass;
+        //                let pos = entity.position;
+        //                let _vel = entity.velocity;
+
+        //                let _cnv_dim = canvas.dimensions;
+        //                canvas.draw_circle([pos[0], pos[1]], PARTICLE_RADIUS, true);
+        //            }
+        //        }
+        //        _ => {}
+        //    }
+        //}
 
         i += 1;
         // Schedule ourself for another requestAnimationFrame callback.
