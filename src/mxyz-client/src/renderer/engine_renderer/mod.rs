@@ -24,15 +24,50 @@ impl EngineRenderer {
         self.canvas.set_stroke_style("white");
     }
     /// Draw State.
-    pub fn draw_state(&mut self, state: &UnsizedState) {
+    pub fn display_state(&mut self, state: &UnsizedState) {
         self.canvas.clear();
-        // dom::console_log!("\nstate {}", state.state_id);
         for system in state.systems.iter().enumerate() {
-            self.draw_system(system);
+            self.draw_system(&system);
+            self.display_system(&system)
         }
     }
+    pub fn display_system(&mut self, system: &(usize, &UnsizedSystem)) {
+        let (system_id, system) = system;
+
+        let element_id = format!("system-section-{}", system_id); // TODO
+        let element = match dom::document().get_element_by_id(&element_id) {
+            Some(element) => element,
+            None => create_element((*system_id, system), &element_id),
+        };
+
+        fn create_element(system: (usize, &UnsizedSystem), element_id: &str) -> web_sys::Element {
+            let (system_id, system) = system;
+
+            let page_col_right = dom::document()
+                .get_element_by_id("page-column-right")
+                .unwrap();
+            let element = dom::document().create_element("div").unwrap();
+            element.set_id(element_id);
+            element.set_class_name("section");
+
+            let entities = &system.entities;
+            let system_size = entities.len();
+            let text = format!(
+                "System {} - size {} - html-id \"{}\"",
+                system_id, system_size, element_id
+            );
+            element.set_text_content(Some(&text));
+            page_col_right.append_child(&element).unwrap();
+            element
+        }
+
+        let foo = dom::document().create_element("div").unwrap();
+        // foo.set_i
+
+        element.append_child(&foo).unwrap();
+    }
     /// Draw System.
-    pub fn draw_system(&mut self, system: (usize, &UnsizedSystem)) {
+    pub fn draw_system(&mut self, system: &(usize, &UnsizedSystem)) {
         let (system_id, system) = system;
         for (entity_id, entity) in system.entities.iter().enumerate() {
             match system.variant {

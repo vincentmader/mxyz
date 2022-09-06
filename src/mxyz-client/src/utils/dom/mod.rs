@@ -162,48 +162,48 @@ pub(crate) use console_log;
 //    body.append_child(&paragraph).unwrap();
 //}
 
-//pub fn add_button_to_menu<F>(
-//    text: &str,
-//    // callback: &mut Box<F() -> ()>,
-//    // callback: Fn() -> (),
-//    // simulation: &'static mut Simulation,
-//    // callback: &'static mut F,
-//    callback: &'static mut Box<F>,
-//    // callback: FnMut (),
-//    // callback: fn(&mut Simulation),
-//) where
-//    F: FnMut(),
-//{
-//    let document = document();
-//    let section = document.get_element_by_id("button_menu-0").unwrap();
+// pub fn add_button_to_menu<F>(
+//     text: &str,
+//     // callback: &mut Box<F() -> ()>,
+//     // callback: Fn() -> (),
+//     // simulation: &'static mut Simulation,
+//     // callback: &'static mut F,
+//     callback: &'static mut Box<F>,
+//     // callback: FnMut (),
+//     // callback: fn(&mut Simulation),
+// ) where
+//     F: FnMut(),
+// {
+//     let document = document();
+//     let section = document.get_element_by_id("button_menu-0").unwrap();
 
-//    let button = document
-//        .create_element("button")
-//        .unwrap()
-//        .dyn_into::<web_sys::HtmlButtonElement>()
-//        .unwrap();
-//    // button.set_id("button");
-//    button.set_text_content(Some(text));
+//     let button = document
+//         .create_element("button")
+//         .unwrap()
+//         .dyn_into::<web_sys::HtmlButtonElement>()
+//         .unwrap();
+//     // button.set_id("button");
+//     button.set_text_content(Some(text));
 
-//    // let paragraph = document.create_element("p").unwrap()
-//    // 	.dyn_into::<web_sys::HtmlParagraphElement>().unwrap();
-//    // section.append_child(&paragraph).unwrap();
+//     // let paragraph = document.create_element("p").unwrap()
+//     // 	.dyn_into::<web_sys::HtmlParagraphElement>().unwrap();
+//     // section.append_child(&paragraph).unwrap();
 
-//    // use js_sys::Function;
-//    // fn f() {}
-//    // let f = || {}
-//    // let f = Function::from(f);
-//    // let optionn = Option::from(&f);
-//    // button.set_onclick(optionn);
+//     // use js_sys::Function;
+//     // fn f() {}
+//     // let f = || {}
+//     // let f = Function::from(f);
+//     // let optionn = Option::from(&f);
+//     // button.set_onclick(optionn);
 
-//    let on_click = EventListener::new(&button, "click", move |_event| {
-//        // paragraph.set_text_content(Some("Gloo: Hello World"));
-//        // let a = (*callback);
-//        callback();
-//    });
-//    on_click.forget();
-//    section.append_child(&button).unwrap();
-//}
+//     let on_click = web_sys::EventListener::new(&button, "click", move |_event| {
+//         // paragraph.set_text_content(Some("Gloo: Hello World"));
+//         // let a = (*callback);
+//         callback();
+//     });
+//     on_click.forget();
+//     section.append_child(&button).unwrap();
+// }
 
 //pub fn set_inner_html(id: &str, inner: &str) {
 //    let document = document();
