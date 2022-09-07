@@ -1,7 +1,8 @@
 .DS_Store
 /.git
+/log/
 Cargo.lock
-pkg/
-target/
 _*
 fuse.txt
+pkg/
+target/
