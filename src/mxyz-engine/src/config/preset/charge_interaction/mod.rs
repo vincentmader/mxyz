@@ -48,9 +48,9 @@ pub fn preset(systems: &mut Vec<UnsizedSystem>, config: &mut EngineConfig) {
 
     let interaction_variant = InteractionVariant::Force(force);
     let mut interaction = Interaction::new(interaction_variant);
-    interaction.matrix.init(&systems);
-    interaction.matrix.entries.push(Some(true));
-    interaction.matrix.entries.push(Some(true));
+    // interaction.matrix.init(&systems);
+    // interaction.matrix.entries.push(Some(true));
+    // interaction.matrix.entries.push(Some(true));
     interactions.push(interaction);
     integrator.interactions = interactions;
     system.integrators.push(integrator); // TODO needs to be run for each system!
@@ -80,9 +80,9 @@ pub fn preset(systems: &mut Vec<UnsizedSystem>, config: &mut EngineConfig) {
 
     let interaction_variant = InteractionVariant::Force(force);
     let mut interaction = Interaction::new(interaction_variant);
-    interaction.matrix.init(&systems);
-    interaction.matrix.entries.push(Some(true));
-    interaction.matrix.entries.push(Some(true));
+    // interaction.matrix.init(&systems);
+    // interaction.matrix.entries.push(Some(true));
+    // interaction.matrix.entries.push(Some(true));
     interactions.push(interaction);
     integrator.interactions = interactions;
     system.integrators.push(integrator); // TODO needs to be run for each system!

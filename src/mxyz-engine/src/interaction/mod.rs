@@ -6,6 +6,7 @@ pub mod game_of_life;
 pub mod ising_v1;
 use crate::system::unsized_system::UnsizedSystem;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 // ============================================================================
 
@@ -13,16 +14,18 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Interaction {
     pub variant: InteractionVariant,
-    pub matrix: InteractionVector,
+    // pub matrix: InteractionVector,
     // pub neighborhoods:Vec<>
     pub active: bool,
+    pub matrix: HashMap<usize, HashMap<usize, bool>>,
 }
 impl Interaction {
     pub fn new(variant: InteractionVariant) -> Self {
         Interaction {
             variant,
-            matrix: InteractionVector::new(),
+            // matrix: InteractionVector::new(),
             active: true,
+            matrix: HashMap::new(),
         }
     }
 }
@@ -42,45 +45,45 @@ pub enum InteractionVariant {
 
 // ============================================================================
 
-/// Interaction "Vector" (Interaction Matrix Row)
-#[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct InteractionVector {
-    pub entries: Vec<Option<bool>>, // pub entries: Vec<Vec<Option<bool>>>,
-}
-impl InteractionVector {
-    /// Creates a new Interaction Matrix Row
-    pub fn new() -> Self {
-        let entries = vec![];
-        InteractionVector { entries }
-    }
-    /// Initialize Interaction Matrix Row
-    pub fn init(&mut self, systems: &Vec<UnsizedSystem>) {
-        for _ in 0..systems.len() + 1 {
-            self.entries.push(None);
-        }
-    }
-    // TODO auto-add/rm rows/cells on system-add/rm
+// /// Interaction "Vector" (Interaction Matrix Row)
+// #[derive(Debug, Clone, Deserialize, Serialize)]
+// pub struct InteractionVector {
+//     pub entries: Vec<Option<bool>>, // pub entries: Vec<Vec<Option<bool>>>,
+// }
+// impl InteractionVector {
+//     /// Creates a new Interaction Matrix Row
+//     pub fn new() -> Self {
+//         let entries = vec![];
+//         InteractionVector { entries }
+//     }
+//     /// Initialize Interaction Matrix Row
+//     pub fn init(&mut self, systems: &Vec<UnsizedSystem>) {
+//         for _ in 0..systems.len() + 1 {
+//             self.entries.push(None);
+//         }
+//     }
+//     // TODO auto-add/rm rows/cells on system-add/rm
 
-    // TODO run tests for matrix on system-delete
+//     // TODO run tests for matrix on system-delete
 
-    // TODO run test for all simulation_variants (initialization)
-}
+//     // TODO run test for all simulation_variants (initialization)
+// }
 
 // use crate::entity::Entity;
 // pub fn foo(entities: Vec<Box<dyn Entity>>) {}
 
 // /// Interaction Matrix
 // #[derive(Debug)]
-pub struct InteractionMatrix {
-    //     pub rows: Vec<InteractionMatrixRow>, // pub entries: Vec<Vec<Option<bool>>>,
-}
-impl InteractionMatrix {
-    pub fn new() -> Self {
+// pub struct InteractionMatrix {
+//     pub rows: Vec<InteractionMatrixRow>, // pub entries: Vec<Vec<Option<bool>>>,
+// }
+// impl InteractionMatrix {
+//     pub fn new() -> Self {
 //         let rows = vec![];
-        InteractionMatrix { 
-            // rows 
-        }
-    }
+// InteractionMatrix {
+// rows
+// }
+// }
 //     pub fn init(&mut self, systems: &Vec<System>) {
 //         for _ in 0..systems.len() {
 //             let mut row = InteractionMatrixRow::new();
@@ -91,7 +94,7 @@ impl InteractionMatrix {
 //     // TODO auto-add/rm rows/cells on system-add/rm
 //     // TODO run tests for matrix on system-delete
 //     // TODO run test for all simulation_variants (initialization)
-}
+// }
 
 // #[derive(Debug)]
 // pub struct InteractionMatrixRow {

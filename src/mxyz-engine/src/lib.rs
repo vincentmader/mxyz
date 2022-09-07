@@ -19,22 +19,9 @@ pub trait Engine {
         self.add_engine_state(state);
     }
 
-    /// Add state to state-vector.
-    fn add_engine_state(&mut self, state: UnsizedState) {
-        self.engine_states_mut().push(state);
-    }
-    /// Get current state.
-    fn get_current_state(&self) -> &UnsizedState {
-        let state_id = self.engine_states().len() - 1;
-        let state = self.engine_states().get(state_id).unwrap();
-        state
-    }
-
     /// Forward engine to next time-step.
     fn forward_engine(&mut self) {
-        // Load current state.
-        let state_id = self.engine_config().step_id.0;
-        let state = &self.engine_states()[state_id];
+        let state = self.get_current_state();
         // Build trees / neighborhoods
         // TODO ...
         // Forward state to next time-step & append to state-vector.
@@ -105,4 +92,15 @@ pub trait Engine {
 
     /// Get mutable reference to engine-config.
     fn engine_config_mut(&mut self) -> &mut EngineConfig;
+
+    /// Add state to state-vector.
+    fn add_engine_state(&mut self, state: UnsizedState) {
+        self.engine_states_mut().push(state);
+    }
+    /// Get current state.
+    fn get_current_state(&self) -> &UnsizedState {
+        let state_id = self.engine_states().len() - 1;
+        let state = self.engine_states().get(state_id).unwrap();
+        state
+    }
 }

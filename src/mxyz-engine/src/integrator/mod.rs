@@ -59,9 +59,9 @@ impl Integrator {
                                         continue;
                                     }
                                     for interaction in interactions.iter() {
-                                        if !interaction.matrix.entries[system_id].unwrap() {
-                                            continue;
-                                        }
+                                        // if !interaction.matrix.entries[system_id].unwrap() {
+                                        //     continue;
+                                        // }
                                         let get_force = match &interaction.variant {
                                     InteractionVariant::Force(force) => match force.variant {
                                         ForceVariant::NewtonianGravity => {

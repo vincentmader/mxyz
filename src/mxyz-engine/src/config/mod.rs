@@ -3,6 +3,8 @@ pub mod engine_runner_variant;
 pub mod export_variant;
 pub mod preset;
 pub mod simulation_variant;
+use crate::integrator::Integrator;
+use crate::interaction::Interaction;
 use export_variant::ExportVariant;
 use simulation_variant::SimulationVariant;
 
@@ -14,6 +16,10 @@ pub struct EngineConfig {
     pub last_export_step_id: Option<usize>,
     // Preset
     pub simulation_variant: Option<SimulationVariant>,
+    //
+    pub interactions: Vec<Interaction>,
+    pub systems: Vec<SystemConfig>,
+    //
     // pub constants: Constants,
 }
 impl EngineConfig {
@@ -24,6 +30,9 @@ impl EngineConfig {
         let nr_of_steps_between_exports = 100;
         let simulation_variant = None;
         // let constants = Constants::new();
+        let interactions = vec![];
+        let systems = vec![];
+
         EngineConfig {
             step_id,
             export_variant,
@@ -31,6 +40,18 @@ impl EngineConfig {
             nr_of_steps_between_exports,
             simulation_variant,
             // constants,
+            interactions,
+            systems,
         }
+    }
+}
+
+pub struct SystemConfig {
+    integrators: Vec<Integrator>,
+}
+impl SystemConfig {
+    pub fn new() -> Self {
+        let integrators = vec![];
+        SystemConfig { integrators }
     }
 }
