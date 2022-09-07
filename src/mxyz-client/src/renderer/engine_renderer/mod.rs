@@ -26,6 +26,7 @@ impl EngineRenderer {
     /// Draw State.
     pub fn display_state(&mut self, state: &UnsizedState) {
         self.canvas.clear();
+        self.display_interaction_matrix();
         for system in state.systems.iter().enumerate() {
             self.draw_system(&system);
             let update_all = true; // TODO only on change in menus (?)
@@ -34,13 +35,19 @@ impl EngineRenderer {
             }
         }
     }
+    pub fn display_interaction_matrix(&mut self) {
+        // let interactions =
+        // for (interaction_idx, interaction) in interactions.iter().enumerate() {}
+    }
     pub fn display_system(&mut self, system: &(usize, &UnsizedSystem)) {
         let (system_id, system) = system;
 
+        // HTML Section Element
         let section_element_id = format!("system-section-{}", system_id);
         let section = get_or_create_element("page-column-right", "div", &section_element_id);
         section.set_class_name("section");
 
+        // HTML Header4 Element, Section Title
         let title_element_id = format!("system-section-{}-title", system_id);
         let title = get_or_create_element(&section_element_id, "h4", &title_element_id);
         title.set_text_content(Some(&format!(
@@ -49,6 +56,7 @@ impl EngineRenderer {
             system.entities.len()
         )));
 
+        // HTML p Element, Integrators Title
         let integrators_title_el_id = format!("system-section-{}-integrators-title", system_id);
         let title = get_or_create_element(&section_element_id, "p", &integrators_title_el_id);
         title.set_text_content(Some(&format!(
@@ -56,16 +64,19 @@ impl EngineRenderer {
             system.integrators.len()
         )));
 
+        //
         let integrators_id = format!("system-section-{}-integrators", system_id);
         let integrators = get_or_create_element(&section_element_id, "ul", &integrators_id);
 
         for (integrator_idx, integrator) in system.integrators.iter().enumerate() {
+            //
             let integrator_id =
                 format!("system-section-{}-integrator-{}", system_id, integrator_idx);
             let integrator_el = get_or_create_element(&integrators_id, "li", &integrator_id);
             let integrator_title: String = (&integrator.variant).to_string();
             integrator_el.set_inner_html(&format!("<p>{}</p><ul></ul>", integrator_title));
 
+            //
             let interactions_id = format!(
                 "system-section-{}-integrator-{}-interactions",
                 system_id, integrator_idx
@@ -75,6 +86,7 @@ impl EngineRenderer {
             // integrator_el.set_inner_html(&format!("<p>{}</p><ul></ul>", integrator_title));
 
             for (interaction_idx, interaction) in integrator.interactions.iter().enumerate() {
+                //
                 let interaction_id = format!(
                     "system-section-{}-integrator-{}-interaction-{}",
                     system_id, integrator_idx, interaction_idx

@@ -11,7 +11,7 @@ use wasm_bindgen::JsCast;
 
 const NR_OF_FORWARDS_BTW_RENDER: usize = 1;
 
-/// Simulation-Client v2
+/// Simulation-Client v1
 /// - Compute States
 /// - Render to Canvas (Animation Loop).
 pub struct EngineClientV1 {}
