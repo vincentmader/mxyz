@@ -31,11 +31,9 @@ impl EngineRunnerV2 {
         let msg = self.rx.recv().unwrap();
         println!("Engine Runner received msg: {:?}", msg);
         match &msg {
-            MpscMessage::Command(cmd) => match cmd {
-                mpsc_msg::command::Command::AddEngine(engine_id, client_id, simulation_variant) => {
-                    self.add_engine(*engine_id, *client_id, simulation_variant)
-                }
-            },
+            mpsc_msg::MpscMessage::AddEngine(engine_id, client_id, simulation_variant) => {
+                self.add_engine(*engine_id, *client_id, simulation_variant)
+            }
         };
         println!("Engine-Runner received MPSC msg: {:#?}", msg);
     }

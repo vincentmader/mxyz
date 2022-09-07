@@ -1,13 +1,9 @@
-// use mxyz_engine::state::preset::SimulationVariant;
-pub mod command;
+use mxyz_engine::config::simulation_variant::SimulationVariant;
 
 #[derive(Debug)]
 pub enum MpscMessage {
-    Command(command::Command),
-    //     AddEngine(SimulationVariant),
-    //     RemoveEngine(usize),
-
-    //     TODO move stuff from tcp_package in here
+    /// Message: Add Engine.
+    /// - engine-id
+    /// - simulation-variant
+    AddEngine(usize, usize, SimulationVariant),
 }
-
-// // pub type Message = Vec<u8>;

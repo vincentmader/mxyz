@@ -2,7 +2,6 @@ use futures_util::{future, StreamExt, TryStreamExt};
 use log::info;
 use mxyz_database::models;
 use mxyz_network::mpsc_msg;
-use mxyz_network::mpsc_msg::command::Command;
 use mxyz_network::mpsc_msg::MpscMessage;
 use mxyz_network::tcp_pkg::request::Request;
 use mxyz_network::tcp_pkg::response::Response;
@@ -123,10 +122,8 @@ pub fn handle_request(request: Request, tx: &mpsc::Sender<MpscMessage>) -> TcpPa
             let engine = models::engine::create_engine(&conn, client_id);
             let engine_id = engine.engine_id as usize;
             // Send add-engine command to engine-runner.
-            let command =
-                mpsc_msg::command::Command::AddEngine(engine_id, client_id, simulation_variant);
-            let package = mpsc_msg::MpscMessage::Command(command);
-            tx.send(package).unwrap();
+            let msg = mpsc_msg::MpscMessage::AddEngine(engine_id, client_id, simulation_variant);
+            tx.send(msg).unwrap();
             //   ^ TODO do this differently (it's just forwarding the msg, skip one step?)
             // Send back added-engine response to client.
             let response = Response::AddedEngine(engine_id);
@@ -154,12 +151,5 @@ pub fn handle_response(response: Response) -> TcpPackage {
         // Response::StateVector(_) => TcpPackage::Response(Response::Empty),
         // Response::AddedEngine => TcpPackage::Response(Response::Empty),
         // Response::AddedClient(client_id) => TcpPackage::Response(Response::Empty),
-    }
-}
-
-pub fn handle_command(command: Command) -> TcpPackage {
-    match command {
-        // Command::SaveStatesToDatabase => TcpPackage::Response(Response::Empty),
-        _ => todo!("handle commands"),
     }
 }
