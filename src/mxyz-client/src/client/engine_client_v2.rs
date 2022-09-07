@@ -1,18 +1,18 @@
-use super::EngineRunner;
+use super::EngineClient;
 use crate::config::ClientConfig;
 use crate::utils::dom;
 use crate::websocket::client::WebSocketClient;
-use std::future::Future;
+// use std::future::Future;
 
 /// Simulation-Client v2
 /// - Receive states via WebSocket.
 /// - Render to Canvas (Animation Loop).
-pub struct EngineRendererClientV2 {
+pub struct EngineClientV2 {
     config: ClientConfig,
     websocket: WebSocketClient,
 }
 
-impl EngineRendererClientV2 {
+impl EngineClientV2 {
     /// Create new Simulation-Renderer-Client.
     /// - Create Client Config.
     /// - Create WebSocket Client.
@@ -22,10 +22,10 @@ impl EngineRendererClientV2 {
         // Create WebSocket Client using host & port from Client Config.
         let websocket = WebSocketClient::new(&config.websocket_host, config.websocket_port);
 
-        EngineRendererClientV2 { config, websocket }
+        EngineClientV2 { config, websocket }
     }
 }
-impl EngineRunner for EngineRendererClientV2 {
+impl EngineClient for EngineClientV2 {
     /// Initialize Renderer-Client.
     /// - ... page-id
     /// - ... panic hook

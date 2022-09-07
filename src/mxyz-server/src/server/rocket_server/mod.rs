@@ -43,7 +43,9 @@ impl RocketServer {
 
         // Start Engine-Runner (server-engine API).
         std::thread::spawn(move || {
-            crate::engine::start_engine_runner(rx_1).unwrap();
+            // crate::engine::start_engine_runner(rx_1).unwrap();
+            let mut engine_runner = crate::engine_runner_v2::EngineRunnerV2::new(rx_1);
+            engine_runner.init();
         });
 
         // Launch Rocket.

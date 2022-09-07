@@ -6,15 +6,15 @@ use mxyz_network::mpsc_msg;
 use mxyz_network::mpsc_msg::MpscMessage;
 use std::sync::mpsc;
 
-/// Engine Runner
-pub struct EngineRunner {
+/// Engine Runner v2 (server-side computes)
+pub struct EngineRunnerV2 {
     rx: mpsc::Receiver<MpscMessage>,
 }
 
-impl EngineRunner {
+impl EngineRunnerV2 {
     /// Creates a new Engine-Runner instance
     pub fn new(rx: mpsc::Receiver<MpscMessage>) -> Self {
-        EngineRunner { rx }
+        EngineRunnerV2 { rx }
     }
 
     /// Initializes MPSC Receiver

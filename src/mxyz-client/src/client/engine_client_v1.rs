@@ -1,4 +1,4 @@
-use super::EngineRunner;
+use super::EngineClient;
 use crate::renderer::engine_renderer::EngineRenderer;
 use crate::utils::dom;
 use mxyz_engine::Engine;
@@ -14,15 +14,15 @@ const NR_OF_FORWARDS_BTW_RENDER: usize = 1;
 /// Simulation-Client v2
 /// - Compute States
 /// - Render to Canvas (Animation Loop).
-pub struct EngineRunnerClientV1 {}
+pub struct EngineClientV1 {}
 
-impl EngineRunnerClientV1 {
+impl EngineClientV1 {
     /// Create new Simulation-Compute-Client.
     pub fn new() -> Self {
-        EngineRunnerClientV1 {}
+        EngineClientV1 {}
     }
 }
-impl EngineRunner for EngineRunnerClientV1 {
+impl EngineClient for EngineClientV1 {
     /// Initialize Compute-Client.
     /// - ... page-id
     /// - ... panic hook
