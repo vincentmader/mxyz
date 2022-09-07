@@ -4,12 +4,20 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum Request {
-    /// Adds Client
+    /// Request: Add new Client.
     AddClient,
-    /// Adds Engine with given Client-ID & SimulationVariant
+
+    /// Request: Add new Engine.
+    /// - client-id
+    /// - simulation-variant
     AddEngine(usize, SimulationVariant),
-    /// Removes Engine
+
+    /// Request: Remove Engine.
+    /// - engine-id
     RemoveEngine(usize),
-    /// Gets States since last Update
-    GetUpdatedStates(usize, StateQuery), // engine-id, state-id
+
+    /// Request: Get States.
+    /// - engine-id
+    /// - state-query
+    GetUpdatedStates(usize, StateQuery),
 }

@@ -4,8 +4,19 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum Response {
-    Empty,
-    StateVector(usize, StateQuery, Vec<SizedState>), // engine-id, query, state-vec
-    AddedEngine(usize),
+    /// Response: Client was added.
+    /// - client-id
     AddedClient(usize),
+
+    /// Response: Engine was added.
+    /// - engine-id
+    AddedEngine(usize),
+
+    /// Response: State Vector.
+    /// - engine-id
+    /// - state-query
+    /// - state-vector
+    StateVector(usize, StateQuery, Vec<SizedState>),
+
+    Empty,
 }
