@@ -37,8 +37,9 @@ pub trait Engine {
     /// Forward system to next time-step, or clone (if no integrators are active).
     fn forward_or_clone_system(&self, system: (usize, &UnsizedSystem)) -> UnsizedSystem {
         let (system_id, system) = system;
-        let system_cfg = self.engine_config().systems.get(&system_id).unwrap();
-        let integrators = &system_cfg.integrators;
+        // let system_cfg = self.engine_config().systems.get(&system_id).unwrap();
+        // let integrators = &system_cfg.integrators;
+        let integrators = &system.integrators;
         // Loop over all integrators.
         let next_system = match integrators.len() {
             // If no integrators are active, then clone the system.

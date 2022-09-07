@@ -12,18 +12,18 @@ pub struct UnsizedSystem {
     pub system_id: usize,
     pub entities: Vec<Box<dyn Entity>>,
     pub variant: UnsizedSystemVariant,
-    // pub integrators: Vec<Integrator>, // TODO move integrators to config
+    pub integrators: Vec<Integrator>, // TODO move integrators to config
 }
 impl UnsizedSystem {
     /// Create a new System.
     pub fn new(system_id: usize, variant: UnsizedSystemVariant) -> Self {
         let entities = vec![];
-        // let integrators = vec![];
+        let integrators = vec![];
         UnsizedSystem {
             system_id,
             variant,
             entities,
-            // integrators,
+            integrators,
         }
     }
 }
@@ -32,7 +32,7 @@ impl From<&SizedSystem> for UnsizedSystem {
     fn from(system: &SizedSystem) -> UnsizedSystem {
         let system_id = system.system_id;
         let variant = (&system.variant).into();
-        // let integrators = system.integrators.clone(); // TODO move integrators to config
+        let integrators = system.integrators.clone(); // TODO move integrators to config
 
         let mut entities: Vec<Box<dyn Entity>> = vec![];
         match &system.variant {
@@ -56,7 +56,7 @@ impl From<&SizedSystem> for UnsizedSystem {
             system_id,
             entities,
             variant,
-            // integrators,
+            integrators,
         }
     }
 }

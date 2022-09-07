@@ -65,12 +65,10 @@ fn setup_systems(systems: &mut Vec<UnsizedSystem>) {
     systems.push(system);
 }
 
-fn setup_config(config: &mut EngineConfig) {
+fn setup_config(config: &mut EngineConfig, systems: &mut Vec<UnsizedSystem>) {
     config.step_id.1 = NR_OF_STEPS;
 
     // SYSTEM 0: STAR
-    let system_cfg = crate::config::SystemConfig::new();
-    config.systems.insert(0, system_cfg);
 
     // SYSTEM 1: PLANETS
     let mut integrators = vec![];
@@ -90,9 +88,7 @@ fn setup_config(config: &mut EngineConfig) {
     interactions.push(interaction);
     integrator.interactions = interactions;
     integrators.push(integrator); // TODO needs to be run for each system!
-    let mut system_cfg = crate::config::SystemConfig::new();
-    system_cfg.integrators = integrators;
-    config.systems.insert(1, system_cfg);
+    systems[1].integrators = integrators;
 
     // SYSTEM 2: MOONS
     let mut integrators = vec![];
@@ -110,12 +106,10 @@ fn setup_config(config: &mut EngineConfig) {
     interactions.push(interaction);
     integrator.interactions = interactions;
     integrators.push(integrator);
-    let mut system_cfg = crate::config::SystemConfig::new();
-    system_cfg.integrators = integrators;
-    config.systems.insert(2, system_cfg);
+    systems[2].integrators = integrators;
 }
 
 pub fn preset(systems: &mut Vec<UnsizedSystem>, config: &mut EngineConfig) {
     setup_systems(systems);
-    setup_config(config);
+    setup_config(config, systems);
 }

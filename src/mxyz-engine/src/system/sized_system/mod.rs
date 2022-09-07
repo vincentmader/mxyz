@@ -1,5 +1,5 @@
 use crate::entity::entity_v1::EntityV1;
-// use crate::integrator::Integrator;
+use crate::integrator::Integrator;
 use crate::system::entities_v1::EntitiesV1;
 use crate::system::unsized_system::unsized_system_variant::UnsizedSystemVariant;
 use crate::system::unsized_system::UnsizedSystem;
@@ -13,16 +13,16 @@ pub mod sized_system_variant;
 pub struct SizedSystem {
     pub system_id: usize,
     pub variant: SizedSystemVariant,
-    // pub integrators: Vec<Integrator>, // TODO move integrators to config
+    pub integrators: Vec<Integrator>, // TODO move integrators to config
 }
 impl SizedSystem {
     /// Create a new System.
     pub fn new(system_id: usize, variant: SizedSystemVariant) -> Self {
-        // let integrators = vec![];
+        let integrators = vec![];
         SizedSystem {
             system_id,
             variant,
-            // integrators,
+            integrators,
         }
     }
 }
@@ -30,7 +30,7 @@ impl SizedSystem {
 impl From<UnsizedSystem> for SizedSystem {
     fn from(system: UnsizedSystem) -> SizedSystem {
         let system_id = system.system_id;
-        // let integrators = system.integrators;
+        let integrators = system.integrators;
         let variant = match system.variant {
             UnsizedSystemVariant::EntitiesV1 => {
                 let mut e = EntitiesV1::new();
@@ -57,7 +57,7 @@ impl From<UnsizedSystem> for SizedSystem {
         SizedSystem {
             system_id,
             variant,
-            // integrators,
+            integrators,
         }
     }
 }

@@ -52,11 +52,24 @@ impl EngineRenderer {
 
             let entities = &system.entities;
             let system_size = entities.len();
-            let text = format!(
-                "System {} - size {} - html-id \"{}\"",
-                system_id, system_size, element_id
-            );
-            element.set_text_content(Some(&text));
+            element.set_inner_html(&format!(
+                "<div>
+                   <p>System {}</p>
+                   <ul>
+                     <li>Size {}</li>
+                     <li>html-id {}</li>
+                   </ul>
+                   <p>Integrators</p>
+                   <ul>
+                     <li>...</li>
+                   </ul>
+                 </div>",
+                system_id,
+                system_size,
+                element_id,
+                // config.systems.get(system_id).unwrap().integrators.len(),
+            ));
+
             page_col_right.append_child(&element).unwrap();
             element
         }
