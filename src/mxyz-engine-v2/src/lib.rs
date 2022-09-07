@@ -48,8 +48,8 @@ impl Engine for SimulationEngineV2 {
             .collect();
         UnsizedSystem {
             entities,
-            integrators: system.integrators.clone(), // todo: move to config
-            variant: system.variant.clone(),         // todo: move to config
+            // integrators: system.integrators.clone(), // todo: move to config
+            variant: system.variant.clone(), // todo: move to config
             system_id: system.system_id,
         }
     }

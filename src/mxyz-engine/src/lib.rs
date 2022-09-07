@@ -5,7 +5,7 @@ pub mod interaction;
 pub mod state;
 pub mod system;
 use config::simulation_variant::SimulationVariant;
-use config::EngineConfig;
+use config::{preset, EngineConfig};
 use entity::Entity;
 use integrator::Integrator;
 use state::UnsizedState;
@@ -15,8 +15,8 @@ use system::unsized_system::UnsizedSystem;
 pub trait Engine {
     /// Initialize state & engine-config.
     fn init(&mut self, sim_variant: Option<SimulationVariant>) {
-        let state = config::preset::initialize(sim_variant, self.engine_config_mut());
-        self.add_engine_state(state);
+        let initial_state = preset::get_initial_state(sim_variant, self.engine_config_mut());
+        self.add_engine_state(initial_state);
     }
 
     /// Forward engine to next time-step.
@@ -37,8 +37,8 @@ pub trait Engine {
     /// Forward system to next time-step, or clone (if no integrators are active).
     fn forward_or_clone_system(&self, system: (usize, &UnsizedSystem)) -> UnsizedSystem {
         let (system_id, system) = system;
-        // Load list of integrators for system.
-        let integrators = &system.integrators;
+        let system_cfg = self.engine_config().systems.get(&system_id).unwrap();
+        let integrators = &system_cfg.integrators;
         // Loop over all integrators.
         let next_system = match integrators.len() {
             // If no integrators are active, then clone the system.

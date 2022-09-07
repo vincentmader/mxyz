@@ -37,6 +37,8 @@ pub fn preset(systems: &mut Vec<UnsizedSystem>, config: &mut EngineConfig) {
         system.entities.push(Box::new(entity));
     }
     // INTEGRATORS
+    let mut integrators = vec![];
+
     let integrator_variant = ForceIntegratorVariant::EulerExplicit;
     let integrator_variant = ObjectIntegratorVariant::ForceIntegrator(integrator_variant);
     let integrator_variant = IntegratorVariant::Object(integrator_variant);
@@ -53,38 +55,41 @@ pub fn preset(systems: &mut Vec<UnsizedSystem>, config: &mut EngineConfig) {
     // interaction.matrix.entries.push(Some(true));
     interactions.push(interaction);
     integrator.interactions = interactions;
-    system.integrators.push(integrator); // TODO needs to be run for each system!
+    integrators.push(integrator); // TODO needs to be run for each system!
+    let mut system_cfg = crate::config::SystemConfig::new();
+    system_cfg.integrators = integrators;
+    config.systems.insert(system_id, system_cfg);
     systems.push(system);
 
     // System 1: ELECTRONS
     // ------------------------------------------------------------------------
-    // SYSTEM
-    let system_id = 1;
-    let variant = UnsizedSystemVariant::EntitiesV1;
-    let mut system = UnsizedSystem::new(system_id, variant);
-    for entity_id in 0..N {
-        let x = [rng.gen(), rng.gen(), rng.gen()];
-        let v = [0., 0., 0.];
-        let entity = EntityV1::new(M_E, x, v, Q);
-        system.entities.push(Box::new(entity));
-    }
-    // INTEGRATORS
-    let integrator_variant = ForceIntegratorVariant::EulerExplicit;
-    let integrator_variant = ObjectIntegratorVariant::ForceIntegrator(integrator_variant);
-    let integrator_variant = IntegratorVariant::Object(integrator_variant);
-    let mut integrator = Integrator::new(integrator_variant);
-    let mut interactions = vec![];
+    // // SYSTEM
+    // let system_id = 1;
+    // let variant = UnsizedSystemVariant::EntitiesV1;
+    // let mut system = UnsizedSystem::new(system_id, variant);
+    // for entity_id in 0..N {
+    //     let x = [rng.gen(), rng.gen(), rng.gen()];
+    //     let v = [0., 0., 0.];
+    //     let entity = EntityV1::new(M_E, x, v, Q);
+    //     system.entities.push(Box::new(entity));
+    // }
+    // // INTEGRATORS
+    // let integrator_variant = ForceIntegratorVariant::EulerExplicit;
+    // let integrator_variant = ObjectIntegratorVariant::ForceIntegrator(integrator_variant);
+    // let integrator_variant = IntegratorVariant::Object(integrator_variant);
+    // let mut integrator = Integrator::new(integrator_variant);
+    // let mut interactions = vec![];
 
-    let force_variant = ForceVariant::Coulomb;
-    let force = Force::new(force_variant);
+    // let force_variant = ForceVariant::Coulomb;
+    // let force = Force::new(force_variant);
 
-    let interaction_variant = InteractionVariant::Force(force);
-    let mut interaction = Interaction::new(interaction_variant);
-    // interaction.matrix.init(&systems);
-    // interaction.matrix.entries.push(Some(true));
-    // interaction.matrix.entries.push(Some(true));
-    interactions.push(interaction);
-    integrator.interactions = interactions;
-    system.integrators.push(integrator); // TODO needs to be run for each system!
-    systems.push(system);
+    // let interaction_variant = InteractionVariant::Force(force);
+    // let mut interaction = Interaction::new(interaction_variant);
+    // // interaction.matrix.init(&systems);
+    // // interaction.matrix.entries.push(Some(true));
+    // // interaction.matrix.entries.push(Some(true));
+    // interactions.push(interaction);
+    // integrator.interactions = interactions;
+    // system.integrators.push(integrator); // TODO needs to be run for each system!
+    // systems.push(system);
 }

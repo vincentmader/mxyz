@@ -9,7 +9,7 @@ use crate::config::EngineConfig;
 use crate::state::UnsizedState;
 
 /// Initialize State & Config
-pub fn initialize(
+pub fn get_initial_state(
     simulation_variant: Option<SimulationVariant>,
     cfg: &mut EngineConfig,
 ) -> UnsizedState {
@@ -18,11 +18,11 @@ pub fn initialize(
     match simulation_variant {
         Some(simulation_variant) => match simulation_variant {
             SimulationVariant::ThreeBodyMoon => three_body_moon::preset(&mut systems, cfg),
-            SimulationVariant::ChargeInteraction => charge_interaction::preset(&mut systems, cfg),
-            SimulationVariant::IsingModel => ising_model::preset(&mut systems, cfg),
-            SimulationVariant::SymmetricSatellites => {
-                symmetric_satellites::preset(&mut systems, cfg)
-            }
+            // SimulationVariant::ChargeInteraction => charge_interaction::preset(&mut systems, cfg),
+            // SimulationVariant::IsingModel => ising_model::preset(&mut systems, cfg),
+            // SimulationVariant::SymmetricSatellites => {
+            //     symmetric_satellites::preset(&mut systems, cfg)
+            // }
             _ => todo!("{:?}", simulation_variant),
         },
         None => todo!("handle this earlier? (in str->enum sim-var conversion)"),

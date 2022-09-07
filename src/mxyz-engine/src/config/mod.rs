@@ -7,6 +7,7 @@ use crate::integrator::Integrator;
 use crate::interaction::Interaction;
 use export_variant::ExportVariant;
 use simulation_variant::SimulationVariant;
+use std::collections::HashMap;
 
 pub struct EngineConfig {
     pub step_id: (usize, usize),
@@ -18,7 +19,7 @@ pub struct EngineConfig {
     pub simulation_variant: Option<SimulationVariant>,
     //
     pub interactions: Vec<Interaction>,
-    pub systems: Vec<SystemConfig>,
+    pub systems: HashMap<usize, SystemConfig>,
     //
     // pub constants: Constants,
 }
@@ -31,7 +32,7 @@ impl EngineConfig {
         let simulation_variant = None;
         // let constants = Constants::new();
         let interactions = vec![];
-        let systems = vec![];
+        let systems = HashMap::new();
 
         EngineConfig {
             step_id,
@@ -47,7 +48,7 @@ impl EngineConfig {
 }
 
 pub struct SystemConfig {
-    integrators: Vec<Integrator>,
+    pub integrators: Vec<Integrator>,
 }
 impl SystemConfig {
     pub fn new() -> Self {
