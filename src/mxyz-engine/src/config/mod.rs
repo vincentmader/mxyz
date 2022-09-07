@@ -6,9 +6,11 @@ pub mod simulation_variant;
 use crate::integrator::Integrator;
 use crate::interaction::Interaction;
 use export_variant::ExportVariant;
+use serde::{Deserialize, Serialize};
 use simulation_variant::SimulationVariant;
 use std::collections::HashMap;
 
+#[derive(Deserialize, Serialize, Debug)]
 pub struct EngineConfig {
     pub step_id: (usize, usize),
     // Database

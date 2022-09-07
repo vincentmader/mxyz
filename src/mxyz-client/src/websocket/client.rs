@@ -2,6 +2,7 @@ use crate::renderer::components::canvas::Canvas;
 use crate::renderer::engine_renderer::EngineRenderer;
 use crate::utils::dom;
 use mxyz_engine::config::simulation_variant::SimulationVariant;
+use mxyz_engine::config::EngineConfig;
 use mxyz_engine::state::SizedState;
 use mxyz_engine::state::StateQuery;
 use mxyz_engine::system::sized_system::sized_system_variant::SizedSystemVariant;
@@ -119,8 +120,8 @@ pub fn handle_response(ws: &mut WebSocket, response: Response) {
     match response {
         Response::AddedClient(client_id) => handle_added_client(ws, client_id),
         Response::AddedEngine(engine_id) => handle_added_engine(ws, engine_id),
-        Response::StateVector(engine_id, query, states) => {
-            handle_received_states(ws, engine_id, query, states)
+        Response::StateVector(engine_id, query, states, config) => {
+            handle_received_states(ws, engine_id, query, states, config)
         }
         Response::Empty => {}
     }
@@ -156,6 +157,7 @@ pub fn handle_received_states(
     engine_id: usize,
     query: StateQuery,
     states: Vec<SizedState>,
+    config: EngineConfig,
 ) {
     dom::console_log!("Received {} States for Engine {}.", states.len(), engine_id);
 

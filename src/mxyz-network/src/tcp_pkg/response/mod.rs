@@ -1,3 +1,4 @@
+use mxyz_engine::config::EngineConfig;
 use mxyz_engine::state::SizedState;
 use mxyz_engine::state::StateQuery;
 use serde::{Deserialize, Serialize};
@@ -12,11 +13,11 @@ pub enum Response {
     /// - engine-id
     AddedEngine(usize),
 
-    /// Response: State Vector.
+    /// Response: Engine.
     /// - engine-id
     /// - state-query
     /// - state-vector
-    StateVector(usize, StateQuery, Vec<SizedState>),
-
+    StateVector(usize, StateQuery, Vec<SizedState>, EngineConfig),
+    // TODO rename to Engine
     Empty,
 }

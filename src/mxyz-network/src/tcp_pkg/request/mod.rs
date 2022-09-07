@@ -16,8 +16,9 @@ pub enum Request {
     /// - engine-id
     RemoveEngine(usize),
 
-    /// Request: Get States.
+    /// Request: Get Engine
     /// - engine-id
     /// - state-query
     GetUpdatedStates(usize, StateQuery),
+    // TODO rename: GetEngine
 }
