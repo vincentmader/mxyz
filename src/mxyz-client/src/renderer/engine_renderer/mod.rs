@@ -44,7 +44,7 @@ impl EngineRenderer {
         let title_element_id = format!("system-section-{}-title", system_id);
         let title = get_or_create_element(&section_element_id, "h4", &title_element_id);
         title.set_text_content(Some(&format!(
-            "System {}, constisting of {} entities",
+            "System {}, entities: {}",
             system_id,
             system.entities.len()
         )));

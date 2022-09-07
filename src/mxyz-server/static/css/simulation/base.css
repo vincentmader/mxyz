@@ -93,3 +93,11 @@
 #spacer {
   height: calc(var(--font-size-title) + var(--page_column_pad));
 }
+
+h4 {
+  margin: 0;
+}
+ul {
+  margin-top: 0;
+  margin-bottom: 0;
+}
