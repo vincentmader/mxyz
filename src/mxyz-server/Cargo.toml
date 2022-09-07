@@ -12,8 +12,8 @@
     mxyz-database = { path = "../mxyz-database" }
     mxyz-engine = { path = "../mxyz-engine" }
     mxyz-network = { path = "../mxyz-network" }
-    mxyz-server-engine = { path = "../mxyz-server-engine" }
-    mxyz-client-engine = { path = "../mxyz-client-engine" }
+    mxyz-engine-v1 = { path = "../mxyz-engine-v1" }
+    mxyz-engine-v2 = { path = "../mxyz-engine-v2" }
     rayon = "1.5"
     rocket_contrib = "0.4.10"
     serde_json = "1.0"

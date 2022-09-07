@@ -16,7 +16,7 @@
     # gloo-timers = "0.2.4"
     js-sys = "0.3"
     # mxyz-config = { path = "../mxyz-config" }
-    mxyz-client-engine = { path = "../mxyz-client-engine" }
+    mxyz-engine-v1 = { path = "../mxyz-engine-v1" }
     mxyz-engine = { path = "../mxyz-engine" }
     mxyz-network = { path = "../mxyz-network" }
     mxyz-utils = { path = "../mxyz-utils" }

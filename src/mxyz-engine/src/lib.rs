@@ -13,47 +13,22 @@ use system::unsized_system::UnsizedSystem;
 
 /// MXYZ Simulation-Engine
 pub trait Engine {
-    /// Get reference to engine-id.
-    fn engine_id(&self) -> &usize;
-
-    /// Get reference to state-vector.
-    fn engine_states(&self) -> &Vec<UnsizedState>;
-
-    /// Get mutable reference to state-vector.
-    fn engine_states_mut(&mut self) -> &mut Vec<UnsizedState>;
-
-    /// Get reference to engine-config.
-    fn engine_config(&self) -> &EngineConfig;
-
-    /// Get mutable reference to engine-config.
-    fn engine_config_mut(&mut self) -> &mut EngineConfig;
+    /// Initialize state & engine-config.
+    fn init(&mut self, sim_variant: Option<SimulationVariant>) {
+        let state = config::preset::initialize(sim_variant, self.engine_config_mut());
+        self.add_engine_state(state);
+    }
 
     /// Add state to state-vector.
     fn add_engine_state(&mut self, state: UnsizedState) {
         self.engine_states_mut().push(state);
     }
-
     /// Get current state.
     fn get_current_state(&self) -> &UnsizedState {
         let state_id = self.engine_states().len() - 1;
         let state = self.engine_states().get(state_id).unwrap();
         state
     }
-
-    /// Initialize state & engine-config.
-    fn init(&mut self, sim_variant: Option<SimulationVariant>) {
-        let state = config::preset::initialize(sim_variant, self.engine_config_mut());
-        self.add_engine_state(state);
-        // self.run();
-    }
-
-    // /// Run engine.
-    // fn run(&mut self) {
-    //     let max_step_id = self.engine_config().step_id.1;
-    //     for _state_id in 0..max_step_id {
-    //         self.forward_engine();
-    //     }
-    // }
 
     /// Forward engine to next time-step.
     fn forward_engine(&mut self) {
@@ -115,4 +90,19 @@ pub trait Engine {
         let entity = integrator.forward_entity(entity, state, self.engine_config());
         entity
     }
+
+    /// Get reference to engine-id.
+    fn engine_id(&self) -> &usize;
+
+    /// Get reference to state-vector.
+    fn engine_states(&self) -> &Vec<UnsizedState>;
+
+    /// Get mutable reference to state-vector.
+    fn engine_states_mut(&mut self) -> &mut Vec<UnsizedState>;
+
+    /// Get reference to engine-config.
+    fn engine_config(&self) -> &EngineConfig;
+
+    /// Get mutable reference to engine-config.
+    fn engine_config_mut(&mut self) -> &mut EngineConfig;
 }

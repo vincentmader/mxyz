@@ -1,8 +1,8 @@
 use super::EngineRunner;
 use crate::renderer::engine_renderer::EngineRenderer;
 use crate::utils::dom;
-use mxyz_client_engine::SimulationEngineV1;
 use mxyz_engine::Engine;
+use mxyz_engine_v1::SimulationEngineV1;
 use std::cell::RefCell;
 use std::future::Future;
 use std::rc::Rc;
@@ -33,7 +33,7 @@ impl EngineRunner for EngineRunnerClientV1 {
         dom::set_panic_hook();
 
         let simulation_variant = Some(simulation_variant.into());
-        let mut engine = mxyz_client_engine::SimulationEngineV1::new(0);
+        let mut engine = mxyz_engine_v1::SimulationEngineV1::new(0);
         engine.init(simulation_variant);
 
         let mut renderer = EngineRenderer::new();

@@ -71,14 +71,16 @@ impl InteractionVector {
 
 // /// Interaction Matrix
 // #[derive(Debug)]
-// pub struct InteractionMatrix {
-//     pub rows: Vec<InteractionMatrixRow>, // pub entries: Vec<Vec<Option<bool>>>,
-// }
-// impl InteractionMatrix {
-//     pub fn new() -> Self {
+pub struct InteractionMatrix {
+    //     pub rows: Vec<InteractionMatrixRow>, // pub entries: Vec<Vec<Option<bool>>>,
+}
+impl InteractionMatrix {
+    pub fn new() -> Self {
 //         let rows = vec![];
-//         InteractionMatrix { rows }
-//     }
+        InteractionMatrix { 
+            // rows 
+        }
+    }
 //     pub fn init(&mut self, systems: &Vec<System>) {
 //         for _ in 0..systems.len() {
 //             let mut row = InteractionMatrixRow::new();
@@ -89,7 +91,7 @@ impl InteractionVector {
 //     // TODO auto-add/rm rows/cells on system-add/rm
 //     // TODO run tests for matrix on system-delete
 //     // TODO run test for all simulation_variants (initialization)
-// }
+}
 
 // #[derive(Debug)]
 // pub struct InteractionMatrixRow {

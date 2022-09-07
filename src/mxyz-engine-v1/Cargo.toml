@@ -1,9 +1,8 @@
 [package]
-    name = "mxyz-server-engine"
+    name = "mxyz-engine-v1"
     edition = "2018"
     version = "0.1.0"
     authors = [ "Vincent C. Mader <vincent@mader.xyz>" ]
 
 [dependencies]
     mxyz-engine = { path="../mxyz-engine" }
-    rayon = "1.5"
