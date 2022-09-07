@@ -205,17 +205,17 @@ pub fn draw_states(
     let mut i = 0;
     let mut nr_of_states = 0;
     *g.borrow_mut() = Some(Closure::wrap(Box::new(move || {
-        if i >= STATE_BATCH_SIZE {
-            let _ = f.borrow_mut().take();
-            return;
-        }
-
         let states = states.clone();
         let states = states.lock().unwrap();
         if nr_of_states == states.len() {
             // canvas.clear();
         } else {
             nr_of_states = states.len();
+        }
+
+        if i >= STATE_BATCH_SIZE || i >= nr_of_states as i32 {
+            let _ = f.borrow_mut().take();
+            return;
         }
         // dom::console_log!("{} / {}", i, nr_of_states);
         // dom::console_log!("{} < {}", i, STATE_BATCH_SIZE);

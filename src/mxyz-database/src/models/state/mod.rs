@@ -20,10 +20,9 @@ pub struct State {
 }
 // impl std::convert::Into<mxyz_engine_universe::state::SizedState> for State {
 impl State {
-    fn into(self) -> mxyz_engine::state::SizedState {
+    fn into(self, conn: &PgConnection) -> mxyz_engine::state::SizedState {
         let other_state_id = self.state_id as usize;
         let mut state = mxyz_engine::state::SizedState::new(other_state_id);
-        let conn = crate::establish_connection();
         state.systems = crate::system::get_systems(&conn, self.engine_id, self.state_id);
         state
     }
@@ -82,6 +81,6 @@ pub fn get_states(
     let db_states = get_db_states(conn, engine_query, &state_query);
     db_states
         .into_iter()
-        .map(|db_state| db_state.into())
+        .map(|db_state| db_state.into(conn))
         .collect()
 }
