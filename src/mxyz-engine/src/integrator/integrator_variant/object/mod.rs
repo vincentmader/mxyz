@@ -1,6 +1,5 @@
 pub mod collision;
 pub mod force;
-use force::ForceIntegratorVariant;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -8,4 +7,13 @@ use serde::{Deserialize, Serialize};
 pub enum ObjectIntegratorVariant {
     ForceIntegrator(force::ForceIntegratorVariant),
     Collision(collision::CollisionIntegratorVariant),
+}
+
+impl ToString for ObjectIntegratorVariant {
+    fn to_string(&self) -> String {
+        match self {
+            Self::ForceIntegrator(x) => x.to_string(),
+            Self::Collision(x) => x.to_string(),
+        }
+    }
 }

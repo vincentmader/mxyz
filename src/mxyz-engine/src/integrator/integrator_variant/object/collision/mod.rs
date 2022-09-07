@@ -6,4 +6,16 @@ use serde::{Deserialize, Serialize};
 // - wall collisions (?)
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub enum CollisionIntegratorVariant {}
+pub enum CollisionIntegratorVariant {
+    ElasticCollision,
+    InelasticCollision,
+}
+
+impl ToString for CollisionIntegratorVariant {
+    fn to_string(&self) -> String {
+        match self {
+            ElasticCollision => "Elastic Collision".into(),
+            InelasticCollision => "Inelastic Collision".into(),
+        }
+    }
+}

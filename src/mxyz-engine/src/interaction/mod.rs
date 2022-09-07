@@ -40,3 +40,11 @@ pub enum InteractionVariant {
     // Ising(ising::Ising),
     // Composed(Box<dyn InteractionTrait>),
 }
+impl ToString for InteractionVariant {
+    fn to_string(&self) -> String {
+        match self {
+            Self::Force(x) => x.variant.to_string(),
+            Self::Collision(_x) => "Collision".into(),
+        }
+    }
+}

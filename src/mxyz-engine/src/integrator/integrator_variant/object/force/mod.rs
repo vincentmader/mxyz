@@ -12,12 +12,22 @@ use serde::{Deserialize, Serialize};
 pub enum ForceIntegratorVariant {
     // EulerExplicit(euler::explicit::EulerExplicitObjectForceIntegrator),
     EulerExplicit,
-    EulerImplicit,
-    RungeKutta2,
-    RungeKutta4,
-    RungeKuttaN,
-    VelocityVerlet,
-    Verlet,
-    LeapFrog,
-    BulirschStoer,
+    // EulerImplicit,
+    // RungeKutta2,
+    // RungeKutta4,
+    // RungeKuttaN,
+    // VelocityVerlet,
+    // Verlet,
+    // LeapFrog,
+    // BulirschStoer,
+}
+impl ToString for ForceIntegratorVariant {
+    fn to_string(&self) -> String {
+        match self {
+            Self::EulerExplicit => "Explicit Euler".into(),
+            // Self::EulerImplicit => "Implicit Euler",
+            // Self::RungeKutta2 => "2nd Order Runge-Kutta",
+            // Self::RungeKutta4 => "4th Order Runge-Kutta",
+        }
+    }
 }

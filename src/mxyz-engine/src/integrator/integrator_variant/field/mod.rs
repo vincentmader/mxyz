@@ -11,6 +11,14 @@ pub mod monte_carlo;
 #[derive(Debug, Serialize, Deserialize, Clone)]
 /// Entity Integrator
 pub enum FieldIntegratorVariant {
-    // CellularAutomaton,
+    CellularAutomaton,
     // MonteCarlo,
+}
+
+impl ToString for FieldIntegratorVariant {
+    fn to_string(&self) -> String {
+        match self {
+            Self::CellularAutomaton => "Cellular Automaton".into(),
+        }
+    }
 }
