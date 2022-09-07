@@ -13,12 +13,6 @@ CREATE TABLE engines (
   engine_id INT NOT NULL
 );
 
--- CONFIGS
-CREATE TABLE configs (
-  dbentry_id SERIAL PRIMARY KEY,
-  engine_id INT NOT NULL
-);
-
 -- STATES
 CREATE TABLE states (
   dbentry_id SERIAL PRIMARY KEY,

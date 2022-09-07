@@ -4,5 +4,4 @@ DROP TABLE engines;
 DROP TABLE entities_v1;
 DROP TABLE states;
 DROP TABLE systems;
-DROP TABLE configs;
 /* DROP TABLE planets; */
