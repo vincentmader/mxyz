@@ -44,6 +44,7 @@ db:
 clean:
 	rm -r ./src/target/* 2> /dev/null
 	rm ./src/Cargo.lock 2> /dev/null
+	rm ./src/mxyz-server/static/pkg/* 2> /dev/null
 stats:
 	./bin/stats/fuse.py
 	./bin/stats/show_nr_of_lines_in_proj.py
