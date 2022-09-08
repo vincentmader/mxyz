@@ -2,12 +2,14 @@ pub mod config;
 pub mod entity;
 pub mod integrator;
 pub mod interaction;
+pub mod neighborhoods;
 pub mod state;
 pub mod system;
 use config::simulation_variant::SimulationVariant;
 use config::{preset, EngineConfig};
 use entity::Entity;
 use integrator::Integrator;
+use neighborhoods::Neighborhoods;
 use state::UnsizedState;
 use system::unsized_system::UnsizedSystem;
 
@@ -15,24 +17,28 @@ use system::unsized_system::UnsizedSystem;
 pub trait Engine {
     /// Initialize state & engine-config.
     fn init(&mut self, sim_variant: Option<SimulationVariant>) {
+        // Initialize state.
         let initial_state = preset::get_initial_state(sim_variant, self.engine_config_mut());
+        // Add state to engine state-vector.
         self.add_engine_state(initial_state);
     }
 
     /// Forward engine to next time-step.
     fn forward_engine(&mut self) {
+        // Get current state.
         let state = self.get_current_state();
-        // Build trees / neighborhoods
-        // TODO ...
-        // Forward state to next time-step & append to state-vector.
-        let state = self.forward_state(&state);
+        // Build trees/neighborhoods/? from current state.
+        let neighborhoods = Neighborhoods::from(state);
+        // Forward state to next time-step.
+        let state = self.forward_state(&state, &neighborhoods);
+        // Append next state to engine state-vector.
         self.add_engine_state(state);
         // Update step-id in engine-config.
         self.engine_config_mut().step_id.0 += 1;
     }
 
     /// Forward state to next time-step.
-    fn forward_state(&self, state: &UnsizedState) -> UnsizedState;
+    fn forward_state(&self, state: &UnsizedState, neighborhoods: &Neighborhoods) -> UnsizedState;
 
     /// Forward system to next time-step, or clone (if no integrators are active).
     fn forward_or_clone_system(&self, system: (usize, &UnsizedSystem)) -> UnsizedSystem {

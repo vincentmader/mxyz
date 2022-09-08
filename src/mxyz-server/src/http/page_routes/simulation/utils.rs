@@ -41,6 +41,13 @@ pub fn get_title_from_simulation_variant(category: &str, simulation_variant: &st
                 simulation_variant
             ),
         },
+        "emergent-behavior" => match simulation_variant {
+            "nbody-boids" => "boids",
+            _ => todo!(
+                "TODO: define title for simulation-id \"{}\"",
+                simulation_variant
+            ),
+        },
         _ => todo!("TODO: define title for category \"{}\"", category),
     }
     .to_string()

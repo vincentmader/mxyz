@@ -8,15 +8,17 @@ pub enum SimulationVariant {
     SymmetricSatellites,
     ChargeInteraction,
     IsingModel,
+    Boids,
 }
 impl std::convert::Into<usize> for SimulationVariant {
     // NOTE: This is only used for to-file engine exports (directory names) at the moment.
     fn into(self) -> usize {
         match self {
-            SimulationVariant::ThreeBodyMoon => 0,
-            SimulationVariant::ThreeBodyFigureEight => 1,
-            SimulationVariant::ChargeInteraction => 2,
-            SimulationVariant::IsingModel => 3,
+            Self::ThreeBodyMoon => 0,
+            Self::ThreeBodyFigureEight => 1,
+            Self::ChargeInteraction => 2,
+            Self::IsingModel => 3,
+            Self::Boids => 4,
             _ => todo!(),
         }
     }
@@ -25,10 +27,11 @@ impl From<usize> for SimulationVariant {
     // NOTE: This is not used at the moment.
     fn from(simulation_variant: usize) -> Self {
         match simulation_variant {
-            0 => SimulationVariant::ThreeBodyMoon,
-            1 => SimulationVariant::ThreeBodyFigureEight,
-            2 => SimulationVariant::ChargeInteraction,
-            3 => SimulationVariant::IsingModel,
+            0 => Self::ThreeBodyMoon,
+            1 => Self::ThreeBodyFigureEight,
+            2 => Self::ChargeInteraction,
+            3 => Self::IsingModel,
+            4 => Self::Boids,
             _ => todo!(),
         }
     }
@@ -36,11 +39,12 @@ impl From<usize> for SimulationVariant {
 impl From<&str> for SimulationVariant {
     fn from(simulation_variant: &str) -> Self {
         match simulation_variant {
-            "3body-moon" => SimulationVariant::ThreeBodyMoon,
-            "3body-fig8" => SimulationVariant::ThreeBodyFigureEight,
-            "nbody-charge-interaction" => SimulationVariant::ChargeInteraction,
-            "ising-model" => SimulationVariant::IsingModel,
-            "symmetric-satellites" => SimulationVariant::SymmetricSatellites,
+            "3body-moon" => Self::ThreeBodyMoon,
+            "3body-fig8" => Self::ThreeBodyFigureEight,
+            "nbody-charge-interaction" => Self::ChargeInteraction,
+            "ising-model" => Self::IsingModel,
+            "symmetric-satellites" => Self::SymmetricSatellites,
+            "nbody-boids" => Self::Boids,
             _ => todo!(),
         }
     }

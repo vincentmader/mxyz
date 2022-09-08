@@ -70,11 +70,23 @@ impl Integrator {
                                         ForceVariant::Coulomb => {
                                             crate::interaction::force::coulomb_interaction::from
                                         }
+                                        ForceVariant::LennardJones => {
+                                            crate::interaction::force::lennard_jones_interaction::from
+                                        }
+                                        ForceVariant::BoidAlignment => {
+                                            crate::interaction::force::boid::alignment::from
+                                        }
+                                        // ForceVariant::BoidRepulsion => {
+                                        //     crate::interaction::force::boid::repulsion::from
+                                        // }
+                                        // ForceVariant::BoidAttraction => {
+                                        //     crate::interaction::force::boid::attraction::from
+                                        // }
                                         _ => todo!("Force Interaction Variant"),
                                     },
                                     _ => todo!("Interaction Variant"),
                                 };
-                                        let force = get_force(entity, other);
+                                        let force = get_force(entity, other, &system.entities);
                                         total_force = [
                                             total_force[0] + force[0],
                                             total_force[1] + force[1],

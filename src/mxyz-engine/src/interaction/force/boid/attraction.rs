@@ -15,5 +15,7 @@ pub fn from(
     let unit = [rel_x[0] / dist, rel_x[1] / dist, rel_x[2] / dist];
     let force = G * (m1 * m2) / dist.powf(2.);
     let force = [unit[0] * force, unit[1] * force, unit[2] * force];
+
+    let force = [0., 0., 0.];
     force
 }

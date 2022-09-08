@@ -1,5 +1,6 @@
 use mxyz_engine::config::EngineConfig;
 use mxyz_engine::integrator::Integrator;
+use mxyz_engine::neighborhoods::Neighborhoods;
 use mxyz_engine::state::UnsizedState;
 use mxyz_engine::system::unsized_system::UnsizedSystem;
 use mxyz_engine::Engine;
@@ -23,7 +24,7 @@ impl SimulationEngineV1 {
     }
 }
 impl Engine for SimulationEngineV1 {
-    fn forward_state(&self, state: &UnsizedState) -> UnsizedState {
+    fn forward_state(&self, state: &UnsizedState, neighborhoods: &Neighborhoods) -> UnsizedState {
         let systems = state
             .systems
             .iter()
@@ -44,7 +45,7 @@ impl Engine for SimulationEngineV1 {
             .entities
             .iter()
             .enumerate()
-            .map(|(ent_id, x)| self.forward_entity(integrator, ((system_id, ent_id), x)))
+            .map(|(ent_id, ent)| self.forward_entity(integrator, ((system_id, ent_id), ent)))
             .collect();
         UnsizedSystem {
             entities,

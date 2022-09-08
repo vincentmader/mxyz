@@ -1,3 +1,4 @@
+pub mod boid;
 pub mod coulomb_interaction;
 pub mod lennard_jones_interaction;
 pub mod newtonian_gravity;
@@ -8,8 +9,8 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum ForceVariant {
     BoidAlignment,
-    BoidAvoidance,
-    BoidCohesion,
+    // BoidRepulsion,
+    // BoidAttraction,
     Coulomb,
     Hooke,
     LennardJones,
@@ -19,8 +20,8 @@ impl ToString for ForceVariant {
     fn to_string(&self) -> String {
         match self {
             Self::BoidAlignment => "Boid Alignment".into(),
-            Self::BoidAvoidance => "Boid Avodiance".into(),
-            Self::BoidCohesion => "Boid Cohesion".into(),
+            // Self::BoidRepulsion => "Boid Repulsion".into(),
+            // Self::BoidAttraction => "Boid Attraction".into(),
             Self::Coulomb => "Coulomb".into(),
             Self::Hooke => "Hooke".into(),
             Self::LennardJones => "Lennard-Jones".into(),

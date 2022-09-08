@@ -13,7 +13,13 @@ pub fn from(
     let rel_x = [x2[0] - x1[0], x2[1] - x1[1], x2[2] - x1[2]];
     let dist = rel_x.iter().map(|dx| dx * dx).sum::<f64>().powf(0.5);
     let unit = [rel_x[0] / dist, rel_x[1] / dist, rel_x[2] / dist];
-    let force = G * (m1 * m2) / dist.powf(2.);
-    let force = [unit[0] * force, unit[1] * force, unit[2] * force];
+    // let force = G * (m1 * m2) / dist.powf(2.);
+    // let force = [unit[0] * force, unit[1] * force, unit[2] * force];
+    let vel = entity.get_velocity();
+    let k = 0.01;
+    // let force = [k * unit[0], k * unit[1], k * unit[2]];
+    let force = [k * vel[0], k * vel[1], k * vel[2]];
+
+    // let force = [0., 0., 0.];
     force
 }
