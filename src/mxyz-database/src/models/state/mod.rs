@@ -43,8 +43,6 @@ pub fn get_db_states(
     state_query: &StateQuery,
 ) -> Vec<State> {
     match state_query {
-        // TODO Get batch of newest states.
-
         // Get all states since a given state-id.
         StateQuery::BatchSince(batch_size, last_sync) => states
             .filter(engine_id.eq(&engine_query))

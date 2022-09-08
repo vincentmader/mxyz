@@ -1,6 +1,7 @@
 use super::EngineClient;
 use crate::renderer::engine_renderer::EngineRenderer;
 use crate::utils::dom;
+use mxyz_engine::config::engine_runner_variant::EngineRunnerVariant;
 use mxyz_engine::Engine;
 use mxyz_engine_v1::SimulationEngineV1;
 use std::cell::RefCell;
@@ -36,7 +37,7 @@ impl EngineClient for EngineClientV1 {
         let mut engine = mxyz_engine_v1::SimulationEngineV1::new(0);
         engine.init(simulation_variant);
 
-        let mut renderer = EngineRenderer::new();
+        let mut renderer = EngineRenderer::new(EngineRunnerVariant::ClientWASM);
         renderer.init();
 
         let n = usize::MAX; // TODO make customizable (why not with config.step-id?)

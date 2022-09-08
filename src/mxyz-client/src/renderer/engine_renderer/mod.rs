@@ -1,5 +1,6 @@
 use crate::renderer::components::canvas::Canvas;
 use crate::utils::dom;
+use mxyz_engine::config::engine_runner_variant::EngineRunnerVariant;
 use mxyz_engine::state::UnsizedState;
 use mxyz_engine::system::unsized_system::unsized_system_variant::UnsizedSystemVariant;
 use mxyz_engine::system::unsized_system::UnsizedSystem;
@@ -10,13 +11,17 @@ const DRAWING_RADIUS: f64 = 3.;
 /// Renderer
 pub struct EngineRenderer {
     pub canvas: Canvas,
+    engine_runner_variant: EngineRunnerVariant,
 }
 
 impl EngineRenderer {
     /// Create new Renderer.
-    pub fn new() -> Self {
+    pub fn new(engine_runner_variant: EngineRunnerVariant) -> Self {
         let canvas = Canvas::new(CANVAS_ID);
-        EngineRenderer { canvas }
+        EngineRenderer {
+            engine_runner_variant,
+            canvas,
+        }
     }
     /// Initialize Renderer.
     pub fn init(&mut self) {
