@@ -18,7 +18,7 @@
     {{ super() }}
 
     <!-- ====== SIMULATION SCRIPT ========================= -->
-    <script type="module" 
+    <script defer type="module" 
         id="simulation.js"
         src="../../static/js/simulation/base.js"
         category="{{ category }}"
