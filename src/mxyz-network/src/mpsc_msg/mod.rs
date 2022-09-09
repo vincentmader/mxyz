@@ -5,5 +5,5 @@ pub enum MpscMessage {
     /// Message: Add Engine.
     /// - engine-id
     /// - simulation-variant
-    AddEngine(usize, usize, SimulationVariant),
+    AddEngine(usize, SimulationVariant),
 }

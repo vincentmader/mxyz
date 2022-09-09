@@ -31,11 +31,10 @@ impl EngineRunnerV2 {
 
     /// Receive MPSC Messages.
     pub fn receive(&mut self) {
-        println!("Engine Runner listening...");
         let msg = self.rx.recv().unwrap();
-        println!("Engine Runner received msg: {:?}", msg);
+        println!("Server-side engine-runner received msg:\n\n{:?}", msg);
         match &msg {
-            mpsc_msg::MpscMessage::AddEngine(engine_id, _client_id, simulation_variant) => {
+            mpsc_msg::MpscMessage::AddEngine(engine_id, simulation_variant) => {
                 self.add_engine(*engine_id, simulation_variant)
             }
         };

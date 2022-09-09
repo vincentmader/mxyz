@@ -122,7 +122,7 @@ pub fn handle_request(request: Request, tx: &mpsc::Sender<MpscMessage>) -> TcpPa
             let engine = models::engine::create_engine(&conn, client_id);
             let engine_id = engine.engine_id as usize;
             // Send add-engine command to engine-runner.
-            let msg = mpsc_msg::MpscMessage::AddEngine(engine_id, client_id, simulation_variant);
+            let msg = mpsc_msg::MpscMessage::AddEngine(engine_id, simulation_variant);
             tx.send(msg).unwrap();
             //   ^ TODO do this differently (it's just forwarding the msg, skip one step?)
             // Send back added-engine response to client.
