@@ -24,6 +24,9 @@ impl SimulationEngineV1 {
     }
 }
 impl Engine for SimulationEngineV1 {
+    fn run(&mut self) {
+        todo!()
+    }
     fn forward_state(&self, state: &UnsizedState, neighborhoods: &Neighborhoods) -> UnsizedState {
         let systems = state
             .systems

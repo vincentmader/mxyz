@@ -23,6 +23,8 @@ pub trait Engine {
         self.add_engine_state(initial_state);
     }
 
+    fn run(&mut self);
+
     /// Forward engine to next time-step.
     fn forward_engine(&mut self) {
         // Get current state.
