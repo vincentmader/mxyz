@@ -3,48 +3,25 @@ pub mod composed;
 pub mod diffusion_v1;
 pub mod force;
 pub mod game_of_life;
+pub mod interaction_variant;
 pub mod ising_v1;
-// pub mod interaction_variant;
-use crate::integrator::integrator_variant::IntegratorVariant;
+use interaction_variant::InteractionVariant;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-// use crate::interaction::interaction_variant::InteractionVariant;
-// use crate::system::unsized_system::UnsizedSystem;
 
 /// Interaction
+/// - Variant, e.g.: Force, Collision
+/// - Interaction Matrix
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Interaction {
     pub variant: InteractionVariant,
-    pub active: bool,
     pub matrix: HashMap<usize, HashMap<usize, bool>>,
 }
 impl Interaction {
     pub fn new(variant: InteractionVariant) -> Self {
         Interaction {
             variant,
-            active: true,
             matrix: HashMap::new(),
-        }
-    }
-}
-
-// ============================================================================
-
-/// Interaction Variant
-#[derive(Debug, Clone, Deserialize, Serialize)]
-pub enum InteractionVariant {
-    Force(force::Force),
-    Collision(collision::Collision),
-    // Diffusion(diffusion::Diffusion),
-    // GameOfLife(game_of_life::GameOfLife),
-    // Ising(ising::Ising),
-    // Composed(Box<dyn InteractionTrait>),
-}
-impl ToString for InteractionVariant {
-    fn to_string(&self) -> String {
-        match self {
-            Self::Force(x) => x.variant.to_string(),
-            Self::Collision(_x) => "Collision".into(),
         }
     }
 }

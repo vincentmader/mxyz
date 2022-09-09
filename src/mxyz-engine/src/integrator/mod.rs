@@ -1,10 +1,9 @@
 pub mod integrator_variant;
 use crate::entity::Entity;
 use crate::interaction::force::ForceVariant;
+use crate::interaction::interaction_variant::InteractionVariant;
 use crate::interaction::Interaction;
-use crate::interaction::InteractionVariant;
 use crate::state::UnsizedState;
-use integrator_variant::field::FieldIntegratorVariant;
 use integrator_variant::object::force::ForceIntegratorVariant;
 use integrator_variant::object::ObjectIntegratorVariant;
 use integrator_variant::IntegratorVariant;
