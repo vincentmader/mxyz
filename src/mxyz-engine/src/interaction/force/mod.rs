@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum ForceVariant {
-    BoidAlignment,
+    // BoidAlignment,
     // BoidRepulsion,
     // BoidAttraction,
     Coulomb,
@@ -19,7 +19,7 @@ pub enum ForceVariant {
 impl ToString for ForceVariant {
     fn to_string(&self) -> String {
         match self {
-            Self::BoidAlignment => "Boid Alignment".into(),
+            // Self::BoidAlignment => "Boid Alignment".into(),
             // Self::BoidRepulsion => "Boid Repulsion".into(),
             // Self::BoidAttraction => "Boid Attraction".into(),
             Self::Coulomb => "Coulomb".into(),

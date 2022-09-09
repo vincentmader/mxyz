@@ -73,9 +73,9 @@ impl Integrator {
                                         ForceVariant::LennardJones => {
                                             crate::interaction::force::lennard_jones_interaction::from
                                         }
-                                        ForceVariant::BoidAlignment => {
-                                            crate::interaction::force::boid::alignment::from
-                                        }
+                                        // ForceVariant::BoidAlignment => {
+                                        //     crate::interaction::force::boid::alignment::from
+                                        // }
                                         // ForceVariant::BoidRepulsion => {
                                         //     crate::interaction::force::boid::repulsion::from
                                         // }
@@ -107,9 +107,20 @@ impl Integrator {
                         _ => todo!("Object Force Integrator Variant"),
                     }
                 }
+                ObjectIntegratorVariant::FooBaz(foo_baz) => match foo_baz {
+                    FooBazIntegratorVariant::Boid => {
+                        let m = 1.;
+                        let pos = [0., 0., 0.];
+                        let vel = [0., 0., 0.];
+                        let q = 1.;
+                        let entity = crate::entity::entity_v1::EntityV1::new(m, pos, vel, q);
+                        Box::new(entity)
+                    }
+                },
                 _ => todo!("Object Integrator Variant"),
             },
             _ => todo!("Integrator Variant"),
         }
     }
 }
+use crate::integrator::integrator_variant::object::foo_baz::FooBazIntegratorVariant;

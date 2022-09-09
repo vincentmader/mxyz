@@ -90,10 +90,10 @@ fn setup_config(config: &mut EngineConfig, systems: &mut Vec<UnsizedSystem>) {
     // let force = Interaction::new(force);
     // interactions.push(force);
 
-    let force = Force::new(ForceVariant::BoidAlignment);
-    let force = InteractionVariant::Force(force);
-    let force = Interaction::new(force);
-    interactions.push(force);
+    // let force = Force::new(ForceVariant::BoidAlignment);
+    // let force = InteractionVariant::Force(force);
+    // let force = Interaction::new(force);
+    // interactions.push(force);
 
     let force = Force::new(ForceVariant::LennardJones);
     let force = InteractionVariant::Force(force);

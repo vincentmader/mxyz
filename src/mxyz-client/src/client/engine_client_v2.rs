@@ -1,14 +1,17 @@
 use super::EngineClient;
-use crate::config::ClientConfig;
 use crate::utils::dom;
 use crate::websocket::client::WebSocketClient;
 // use std::future::Future;
 
+const WS_HOST: &str = "127.0.0.1";
+const WS_PORT: u16 = 1234;
+
 /// Simulation-Client v2
+///
+/// Function:
 /// - Receive states via WebSocket.
-/// - Render to Canvas (Animation Loop).
+/// - Render to Canvas (in Animation Loop).
 pub struct EngineClientV2 {
-    config: ClientConfig,
     websocket: WebSocketClient,
 }
 
@@ -17,12 +20,10 @@ impl EngineClientV2 {
     /// - Create Client Config.
     /// - Create WebSocket Client.
     pub fn new() -> Self {
-        // Create config.
-        let config = ClientConfig::new();
         // Create WebSocket Client using host & port from Client Config.
-        let websocket = WebSocketClient::new(&config.websocket_host, config.websocket_port);
+        let websocket = WebSocketClient::new(WS_HOST, WS_PORT);
 
-        EngineClientV2 { config, websocket }
+        EngineClientV2 { websocket }
     }
 }
 impl EngineClient for EngineClientV2 {

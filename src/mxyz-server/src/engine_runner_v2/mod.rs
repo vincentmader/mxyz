@@ -7,25 +7,31 @@ use mxyz_network::mpsc_msg::MpscMessage;
 use std::sync::mpsc;
 
 /// Engine Runner v2 (server-side computes)
+///
+/// 1. Start an MPSC listener.
+/// 2. Listen for AddEngine command.
+/// 3. Start engine in new thread.
+/// 4. Periodically export engine states to file/database.
+///
 pub struct EngineRunnerV2 {
     rx: mpsc::Receiver<MpscMessage>,
 }
 
 impl EngineRunnerV2 {
-    /// Creates a new Engine-Runner instance
+    /// Create a new Engine-Runner-v2 instance.
     pub fn new(rx: mpsc::Receiver<MpscMessage>) -> Self {
         EngineRunnerV2 { rx }
     }
 
-    /// Initializes MPSC Receiver
+    /// Initialize MPSC Receiver.
     pub fn init(&mut self) {
-        println!("Initializing Engine Runner...");
+        // Start MPSC receive loop.
         loop {
             self.receive();
         }
     }
 
-    /// Receives MPSC Messages
+    /// Receive MPSC Messages.
     pub fn receive(&mut self) {
         println!("Engine Runner listening...");
         let msg = self.rx.recv().unwrap();
@@ -35,22 +41,18 @@ impl EngineRunnerV2 {
                 self.add_engine(*engine_id, *client_id, simulation_variant)
             }
         };
-        println!("Engine-Runner received MPSC msg: {:#?}", msg);
     }
 
-    /// Adds Engine
+    /// Add Engine.
     pub fn add_engine(
         &mut self,
         engine_id: usize,
         _client_id: usize, // TODO needed?
         simulation_variant: &SimulationVariant,
     ) {
-        let simulation_variant = simulation_variant.clone();
-
         // Create & initialize new simulation engine.
         let mut engine = mxyz_engine_v2::SimulationEngineV2::new(engine_id);
-        engine.init(Some(simulation_variant));
-        // engine.config.step_id.1 = usize::MAX;
+        engine.init(Some(simulation_variant.clone()));
 
         // Run engine in new thread.
         std::thread::spawn(move || {
@@ -63,19 +65,18 @@ impl EngineRunnerV2 {
                 }
             }
         });
-        println!("Engine-Runner added engine {}", engine_id);
     }
 
-    /// Removes Engine
-    pub fn remove_engine(&mut self, engine_id: &usize) {
+    /// Stop & Remove Engine.
+    pub fn remove_engine(&mut self, _engine_id: &usize) {
         // TODO stop compute-loop
         // - communicate with engines via MPSC?
         // TODO remove from database
-        println!("Engine-Runner removed engine {}", engine_id);
+        // println!("Engine-Runner removed engine {}", engine_id);
     }
 }
 
-/// Exports Engine
+/// Export Engine.
 pub fn export_engine<T: Engine>(engine: &mut T) {
     // Get state-ids.
     let states_to_save = get_unsaved_state_ids(engine);
@@ -89,7 +90,7 @@ pub fn export_engine<T: Engine>(engine: &mut T) {
     engine.engine_config_mut().last_export_step_id = state_id;
 }
 
-/// Exports Engine to Database
+/// Export Engine to Database.
 pub fn export_to_database<T: Engine>(engine: &mut T, states_to_save: &Vec<usize>) {
     let conn = mxyz_database::establish_connection();
 
@@ -149,7 +150,7 @@ pub fn export_to_database<T: Engine>(engine: &mut T, states_to_save: &Vec<usize>
     }
 }
 
-/// Exports Engine to File
+/// Export Engine to File.
 pub fn export_to_file<T: Engine>(engine: &mut T, states_to_save: &Vec<usize>) {
     // Get simulation variant & state vector.
     let simulation_variant = engine.engine_config().simulation_variant.as_ref().unwrap();
@@ -166,7 +167,7 @@ pub fn export_to_file<T: Engine>(engine: &mut T, states_to_save: &Vec<usize>) {
     }
 }
 
-/// Gets state-ids of states not yet saved to database.
+/// Get state-ids of states not yet saved to database.
 pub fn get_unsaved_state_ids<T: Engine>(engine: &T) -> Vec<usize> {
     engine
         .engine_states()
