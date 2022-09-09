@@ -1,6 +1,7 @@
 use crate::renderer::components::canvas::Canvas;
 use crate::utils::dom;
 use mxyz_engine::config::engine_runner_variant::EngineRunnerVariant;
+use mxyz_engine::config::EngineConfig;
 use mxyz_engine::state::UnsizedState;
 use mxyz_engine::system::unsized_system::unsized_system_variant::UnsizedSystemVariant;
 use mxyz_engine::system::unsized_system::UnsizedSystem;
@@ -29,7 +30,7 @@ impl EngineRenderer {
         self.canvas.set_stroke_style("white");
     }
     /// Draw State.
-    pub fn display_state(&mut self, state: &UnsizedState) {
+    pub fn display_state(&mut self, state: &UnsizedState, config: Option<&mut EngineConfig>) {
         self.canvas.clear();
         self.display_interaction_matrix();
         for system in state.systems.iter().enumerate() {

@@ -56,7 +56,7 @@ impl EngineClient for EngineClientV1 {
             engine.forward_engine();
             if state_id % NR_OF_FORWARDS_BTW_RENDER == 0 {
                 let state = engine.states.get(state_id).unwrap();
-                renderer.display_state(state);
+                renderer.display_state(state, Some(&mut engine.config));
             }
 
             state_id += 1;

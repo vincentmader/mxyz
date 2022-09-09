@@ -213,7 +213,7 @@ pub fn draw_states(
         }
 
         let state = states.get(idx as usize).unwrap();
-        renderer.display_state(&state.into());
+        renderer.display_state(&state.into(), None);
 
         idx += 1;
         dom::request_animation_frame(f.borrow().as_ref().unwrap());
