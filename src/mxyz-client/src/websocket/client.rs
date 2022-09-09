@@ -3,6 +3,7 @@ use crate::renderer::engine_renderer::EngineRenderer;
 use crate::utils::dom;
 use mxyz_engine::config::engine_runner_variant::EngineRunnerVariant;
 use mxyz_engine::config::simulation_variant::SimulationVariant;
+use mxyz_engine::config::EngineConfig;
 use mxyz_engine::state::SizedState;
 use mxyz_engine::state::StateQuery;
 use mxyz_engine::system::sized_system::sized_system_variant::SizedSystemVariant;
@@ -120,8 +121,8 @@ pub fn handle_response(ws: &mut WebSocket, response: Response) {
     match response {
         Response::AddedClient(client_id) => handle_added_client(ws, client_id),
         Response::AddedEngine(engine_id) => handle_added_engine(ws, engine_id),
-        Response::StateVector(engine_id, query, states) => {
-            handle_received_states(ws, engine_id, query, states)
+        Response::StateVector(engine_id, query, states, config) => {
+            handle_received_states(ws, engine_id, query, states, config)
         }
         Response::Empty => {}
     }
@@ -158,6 +159,7 @@ pub fn handle_received_states(
     engine_id: usize,
     query: StateQuery,
     states: Vec<SizedState>,
+    config: EngineConfig,
 ) {
     dom::console_log!("Received {} States for Engine {}.", states.len(), engine_id);
 
@@ -184,7 +186,7 @@ pub fn handle_received_states(
     // if states.len() > 0 && finished_with_last_render {
     if states.len() > 0 {
         // finished_with_last_render = false;
-        draw_states(states, &mut finished_with_last_render).unwrap();
+        draw_states(states, &mut finished_with_last_render, config).unwrap();
     }
 }
 
@@ -193,8 +195,10 @@ pub fn handle_received_states(
 pub fn draw_states(
     states: Vec<SizedState>,
     finished_with_last_render: &mut bool,
+    config: EngineConfig,
 ) -> Result<(), JsValue> {
     let states = Arc::new(Mutex::new(states));
+    let mut config = config.clone();
 
     let mut renderer = EngineRenderer::new(EngineRunnerVariant::ServerRust);
     let mut canvas = Canvas::new(0);
@@ -213,7 +217,7 @@ pub fn draw_states(
         }
 
         let state = states.get(idx as usize).unwrap();
-        renderer.display_state(&state.into(), None);
+        renderer.display_state(&state.into(), Some(&mut config));
 
         idx += 1;
         dom::request_animation_frame(f.borrow().as_ref().unwrap());

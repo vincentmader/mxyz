@@ -135,8 +135,10 @@ pub fn handle_request(request: Request, tx: &mpsc::Sender<MpscMessage>) -> TcpPa
             let conn = mxyz_database::establish_connection();
             let states = models::state::get_states(&conn, engine_id as i32, &state_query);
             println!("Loaded {} db-states, query {:?}", states.len(), state_query);
+            // TODO Load config from database.
+            let config = mxyz_engine::config::EngineConfig::new();
             // Return state-vector response
-            let response = Response::StateVector(engine_id, state_query, states);
+            let response = Response::StateVector(engine_id, state_query, states, config);
             TcpPackage::Response(response)
         }
 
