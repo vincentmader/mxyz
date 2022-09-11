@@ -14,8 +14,8 @@ pub enum CollisionIntegratorVariant {
 impl ToString for CollisionIntegratorVariant {
     fn to_string(&self) -> String {
         match self {
-            ElasticCollision => "Elastic Collision".into(),
-            InelasticCollision => "Inelastic Collision".into(),
+            Self::ElasticCollision => "Elastic Collision".into(),
+            Self::InelasticCollision => "Inelastic Collision".into(),
         }
     }
 }

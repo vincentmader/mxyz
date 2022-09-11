@@ -7,7 +7,7 @@ const EPSILON: f64 = 10.; // Newton Gravity
 pub fn from(
     entity: &Box<dyn Entity>,
     other: &Box<dyn Entity>,
-    entities: &Vec<Box<dyn Entity>>,
+    _entities: &Vec<Box<dyn Entity>>,
 ) -> [f64; 3] {
     let (x1, x2) = (entity.get_position(), other.get_position());
     let rel_x = [x2[0] - x1[0], x2[1] - x1[1], x2[2] - x1[2]];

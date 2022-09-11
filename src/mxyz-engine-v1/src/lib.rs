@@ -32,7 +32,7 @@ impl Engine for SimulationEngineV1 {
             .systems
             .iter()
             .enumerate()
-            .map(|(sys_id, sys)| self.forward_or_clone_system((sys_id, sys)))
+            .map(|(sys_id, sys)| self.forward_or_clone_system((sys_id, sys), neighborhoods))
             .collect();
         let state_id = state.state_id + 1;
         UnsizedState { state_id, systems }
@@ -42,13 +42,16 @@ impl Engine for SimulationEngineV1 {
         &self,
         integrator: &Integrator,
         system: (usize, &UnsizedSystem),
+        neighborhoods: &Neighborhoods,
     ) -> UnsizedSystem {
         let (system_id, system) = system;
         let entities = system
             .entities
             .iter()
             .enumerate()
-            .map(|(ent_id, ent)| self.forward_entity(integrator, ((system_id, ent_id), ent)))
+            .map(|(ent_id, ent)| {
+                self.forward_entity(integrator, ((system_id, ent_id), ent), neighborhoods)
+            })
             .collect();
         UnsizedSystem {
             entities,
@@ -58,19 +61,19 @@ impl Engine for SimulationEngineV1 {
         }
     }
 
-    fn engine_config(&self) -> &EngineConfig {
+    fn get_engine_config(&self) -> &EngineConfig {
         &self.config
     }
-    fn engine_config_mut(&mut self) -> &mut EngineConfig {
+    fn mut_engine_config(&mut self) -> &mut EngineConfig {
         &mut self.config
     }
-    fn engine_id(&self) -> &usize {
+    fn get_engine_id(&self) -> &usize {
         &self.engine_id
     }
-    fn engine_states(&self) -> &Vec<UnsizedState> {
+    fn get_engine_states(&self) -> &Vec<UnsizedState> {
         &self.states
     }
-    fn engine_states_mut(&mut self) -> &mut Vec<UnsizedState> {
+    fn mut_engine_states(&mut self) -> &mut Vec<UnsizedState> {
         &mut self.states
     }
 }

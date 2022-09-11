@@ -14,39 +14,34 @@ use crate::system::unsized_system::unsized_system_variant::UnsizedSystemVariant;
 use crate::system::unsized_system::UnsizedSystem;
 use rand::prelude::*;
 
-// const NR_OF_STEPS: u128 = usize::MAX;
-const G: f64 = 1.;
 const Q: f64 = 0.;
-const M_0: f64 = 1.;
-const m1: f64 = 0.1;
-const m2: f64 = 0.1;
-const r0: f64 = 0.7;
-const dr: f64 = 0.05;
+const M_1: f64 = 0.1;
 const N: usize = 50;
+// const R_0: f64 = 0.7;
 
 fn setup_systems(systems: &mut Vec<UnsizedSystem>) {
+    let mut rng = rand::thread_rng();
+
     // SYSTEM 0: STAR
-    let variant = UnsizedSystemVariant::EntitiesV1;
-    let mut system = UnsizedSystem::new(0, variant);
-    // Entities
+    // let variant = UnsizedSystemVariant::EntitiesV1;
+    // let mut system = UnsizedSystem::new(0, variant);
+    // // Entities
     // let central_star = EntityV1::new(M_0, [0., 0., 0.], [0., 0., 0.], Q);
     // system.entities.push(Box::new(central_star));
-    systems.push(system);
-
-    let mut rng = rand::thread_rng();
+    // systems.push(system);
 
     // SYSTEM 1: PLANETS
     let variant = UnsizedSystemVariant::EntitiesV1;
     let mut system = UnsizedSystem::new(1, variant);
     // Entities
-    let v0 = 0.; //(G * M_0 / r0).powf(0.5);
+    let v_0 = 0.; //(G * M_0 / r0).powf(0.5);
     for entity_id in 0..N {
         let r: f64 = rng.gen();
         let phi = 2. * 3.14159 * entity_id as f64 / N as f64;
-        // let r = r0;
+        // let r = R_0;
         let x = [r * phi.cos(), r * phi.sin(), 0.];
-        let v = [-v0 * phi.sin(), v0 * phi.cos(), 0.];
-        let entity = EntityV1::new(m1, x, v, Q);
+        let v = [-v_0 * phi.sin(), v_0 * phi.cos(), 0.];
+        let entity = EntityV1::new(M_1, x, v, Q);
         system.entities.push(Box::new(entity));
     }
     systems.push(system);

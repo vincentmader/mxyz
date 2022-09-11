@@ -6,7 +6,7 @@ const G: f64 = 1.; // Newton Gravity
 pub fn from(
     entity: &Box<dyn Entity>,
     other: &Box<dyn Entity>,
-    entities: &Vec<Box<dyn Entity>>,
+    _entities: &Vec<Box<dyn Entity>>,
 ) -> [f64; 3] {
     let (m1, m2) = (entity.get_mass(), other.get_mass());
     let (x1, x2) = (entity.get_position(), other.get_position());

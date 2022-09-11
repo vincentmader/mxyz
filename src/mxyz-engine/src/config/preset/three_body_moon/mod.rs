@@ -17,10 +17,10 @@ use crate::system::unsized_system::UnsizedSystem;
 const G: f64 = 1.;
 const Q: f64 = 0.;
 const M_0: f64 = 1.;
-const m1: f64 = 0.1;
-const m2: f64 = 0.00001;
-const r0: f64 = 0.7;
-const dr: f64 = 0.05;
+const M_1: f64 = 0.1;
+const M_2: f64 = 0.00001;
+const R_0: f64 = 0.7;
+const DR: f64 = 0.05;
 const N: usize = 5;
 
 fn setup_systems(systems: &mut Vec<UnsizedSystem>) {
@@ -36,12 +36,12 @@ fn setup_systems(systems: &mut Vec<UnsizedSystem>) {
     let variant = UnsizedSystemVariant::EntitiesV1;
     let mut system = UnsizedSystem::new(1, variant);
     // Entities
-    let v0 = (G * M_0 / r0).powf(0.5);
+    let v_0 = (G * M_0 / R_0).powf(0.5);
     for entity_id in 0..N {
         let phi = 2. * 3.14159 * entity_id as f64 / N as f64;
-        let x = [r0 * phi.cos(), r0 * phi.sin(), 0.];
-        let v = [-v0 * phi.sin(), v0 * phi.cos(), 0.];
-        let entity = EntityV1::new(m1, x, v, Q);
+        let x = [R_0 * phi.cos(), R_0 * phi.sin(), 0.];
+        let v = [-v_0 * phi.sin(), v_0 * phi.cos(), 0.];
+        let entity = EntityV1::new(M_1, x, v, Q);
         system.entities.push(Box::new(entity));
     }
     systems.push(system);
@@ -51,14 +51,14 @@ fn setup_systems(systems: &mut Vec<UnsizedSystem>) {
     let mut system = UnsizedSystem::new(2, variant);
     for entity_id in 0..N {
         let phi = 2. * 3.14159 * entity_id as f64 / N as f64;
-        let x = [r0 * phi.cos(), r0 * phi.sin(), 0.];
-        let v_K = (G * m1 / dr).powf(0.5);
-        let v = [-v0 * phi.sin(), v0 * phi.cos(), 0.];
+        let x = [R_0 * phi.cos(), R_0 * phi.sin(), 0.];
+        let v_K = (G * M_1 / DR).powf(0.5);
+        let v = [-v_0 * phi.sin(), v_0 * phi.cos(), 0.];
         for moon_id in 0..N {
             let theta = 2. * 3.14159 * moon_id as f64 / N as f64;
-            let x = [x[0] + dr * theta.cos(), x[1] + dr * theta.sin(), 0.];
+            let x = [x[0] + DR * theta.cos(), x[1] + DR * theta.sin(), 0.];
             let v = [v[0] - v_K * theta.sin(), v[1] + v_K * theta.cos(), 0.];
-            let entity = EntityV1::new(m2, x, v, Q);
+            let entity = EntityV1::new(M_2, x, v, Q);
             system.entities.push(Box::new(entity));
         }
     }
@@ -84,7 +84,7 @@ fn setup_config(config: &mut EngineConfig, systems: &mut Vec<UnsizedSystem>) {
     let force = Force::new(force_variant);
 
     let interaction_variant = InteractionVariant::Force(force);
-    let mut interaction = Interaction::new(interaction_variant);
+    let interaction = Interaction::new(interaction_variant);
     interactions.push(interaction);
     integrator.interactions = interactions;
     integrators.push(integrator); // TODO needs to be run for each system!

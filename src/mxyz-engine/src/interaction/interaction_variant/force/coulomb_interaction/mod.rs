@@ -6,7 +6,7 @@ const K: f64 = 1.; // 1 / (4pi eps0)
 pub fn from(
     entity: &Box<dyn Entity>,
     other: &Box<dyn Entity>,
-    entities: &Vec<Box<dyn Entity>>,
+    _entities: &Vec<Box<dyn Entity>>,
 ) -> [f64; 3] {
     let (q1, q2) = (entity.get_charge(), other.get_charge());
     let (x1, x2) = (entity.get_position(), other.get_position());

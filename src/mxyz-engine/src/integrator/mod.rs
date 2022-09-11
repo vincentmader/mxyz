@@ -2,6 +2,7 @@ pub mod integrator_variant;
 use crate::entity::Entity;
 use crate::interaction::Interaction;
 use crate::neighborhoods::NeighborhoodVariant;
+use crate::neighborhoods::Neighborhoods;
 use crate::state::UnsizedState;
 use integrator_variant::object::force::ForceIntegratorVariant;
 use integrator_variant::object::ObjectIntegratorVariant;
@@ -42,6 +43,7 @@ impl Integrator {
         entity: ((usize, usize), &Box<dyn Entity>),
         state: &UnsizedState,
         config: &crate::config::EngineConfig,
+        neighborhoods: &Neighborhoods,
     ) -> Box<dyn Entity> {
         let integrate = match &self.variant {
             IntegratorVariant::Object(integrator) => match integrator {
@@ -56,6 +58,8 @@ impl Integrator {
             _ => todo!("Match IntegratorVariant onto integrate function."),
         };
         let (interactions, neighborhood) = (&self.interactions, &self.neighborhood);
+
+        // TODO neighborhood -> neighborhoods
         integrate(entity, state, interactions, neighborhood, config)
     }
 }

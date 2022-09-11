@@ -43,7 +43,7 @@ impl Engine for SimulationEngineV2 {
             .systems
             .par_iter()
             .enumerate()
-            .map(|(sys_id, sys)| self.forward_or_clone_system((sys_id, sys)))
+            .map(|(sys_id, sys)| self.forward_or_clone_system((sys_id, sys), neighborhoods))
             .collect();
         let state_id = state.state_id + 1;
         UnsizedState { state_id, systems }
@@ -53,13 +53,16 @@ impl Engine for SimulationEngineV2 {
         &self,
         integrator: &Integrator,
         system: (usize, &UnsizedSystem),
+        neighborhoods: &Neighborhoods,
     ) -> UnsizedSystem {
         let (system_id, system) = system;
         let entities = system
             .entities
             .par_iter()
             .enumerate()
-            .map(|(ent_id, ent)| self.forward_entity(integrator, ((system_id, ent_id), ent)))
+            .map(|(ent_id, ent)| {
+                self.forward_entity(integrator, ((system_id, ent_id), ent), neighborhoods)
+            })
             .collect();
         UnsizedSystem {
             entities,
@@ -69,19 +72,19 @@ impl Engine for SimulationEngineV2 {
         }
     }
 
-    fn engine_config(&self) -> &EngineConfig {
+    fn get_engine_config(&self) -> &EngineConfig {
         &self.config
     }
-    fn engine_config_mut(&mut self) -> &mut EngineConfig {
+    fn mut_engine_config(&mut self) -> &mut EngineConfig {
         &mut self.config
     }
-    fn engine_id(&self) -> &usize {
+    fn get_engine_id(&self) -> &usize {
         &self.engine_id
     }
-    fn engine_states(&self) -> &Vec<UnsizedState> {
+    fn get_engine_states(&self) -> &Vec<UnsizedState> {
         &self.states
     }
-    fn engine_states_mut(&mut self) -> &mut Vec<UnsizedState> {
+    fn mut_engine_states(&mut self) -> &mut Vec<UnsizedState> {
         &mut self.states
     }
 }
@@ -107,11 +110,11 @@ pub fn export_to_database<T: Engine>(engine: &mut T, states_to_save: &Vec<usize>
 
     // Loop over unsaved states.
     for state_id in states_to_save.iter() {
-        let state = engine.engine_states().get(*state_id).unwrap();
+        let state = engine.get_engine_states().get(*state_id).unwrap();
         // Loops over systems.
         for system in state.systems.iter() {
             // Gets ids for engine, system, & system-variant (via conversion: enum -> usize).
-            let engine_id = engine.engine_id();
+            let engine_id = engine.get_engine_id();
             let system_id = system.system_id;
             let system_variant_id: usize = system.variant.clone().into(); // TODO remove clone
 
@@ -121,7 +124,7 @@ pub fn export_to_database<T: Engine>(engine: &mut T, states_to_save: &Vec<usize>
                     for (ent_id, ent) in system.entities.iter().enumerate() {
                         let db_entity = mxyz_database::models::entity_v1::NewEntityV1 {
                             // ids of engien, state, system & entity
-                            engine_id: &(*engine.engine_id() as i32),
+                            engine_id: &(*engine.get_engine_id() as i32),
                             state_id: &(*state_id as i32),
                             system_id: &(system_id as i32),
                             entity_id: &(ent_id as i32),
@@ -154,7 +157,7 @@ pub fn export_to_database<T: Engine>(engine: &mut T, states_to_save: &Vec<usize>
         }
         // Save state to database.
         let db_state = mxyz_database::models::state::NewState {
-            engine_id: &(*engine.engine_id() as i32),
+            engine_id: &(*engine.get_engine_id() as i32),
             state_id: &(*state_id as i32),
         };
         mxyz_database::models::state::create_state(&conn, db_state);
@@ -164,8 +167,12 @@ pub fn export_to_database<T: Engine>(engine: &mut T, states_to_save: &Vec<usize>
 /// Export Engine to File.
 pub fn export_to_file<T: Engine>(engine: &mut T, states_to_save: &Vec<usize>) {
     // Get simulation variant & state vector.
-    let simulation_variant = engine.engine_config().simulation_variant.as_ref().unwrap();
-    let states = engine.engine_states();
+    let simulation_variant = engine
+        .get_engine_config()
+        .simulation_variant
+        .as_ref()
+        .unwrap();
+    let states = engine.get_engine_states();
     // Convert simulation variant to integer representation in out-path.
     let simulation_variant: usize = simulation_variant.clone().into();
     let out_dir = format!("./mxyz-engine/output/{:?}", simulation_variant);
@@ -181,11 +188,11 @@ pub fn export_to_file<T: Engine>(engine: &mut T, states_to_save: &Vec<usize>) {
 /// Get state-ids of states not yet saved to database.
 pub fn get_unsaved_state_ids<T: Engine>(engine: &T) -> Vec<usize> {
     engine
-        .engine_states()
+        .get_engine_states()
         .iter()
         .filter(|state| {
             state.state_id
-                >= match engine.engine_config().last_export {
+                >= match engine.get_engine_config().last_export {
                     // If last-export is None, load all states since 0.
                     None => 0,
                     // If not None, load states since last-export-id + 1.
