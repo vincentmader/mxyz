@@ -23,30 +23,26 @@ pub struct Neighborhoods(pub Vec<HashMap<NeighborhoodVariant, NeighborhoodVarian
 
 impl From<&UnsizedState> for Neighborhoods {
     fn from(state: &UnsizedState) -> Self {
+        let mut neighborhoods: Vec<HashMap<NeighborhoodVariant, NeighborhoodVariant>> =
+            (0..state.systems.len()).map(|_| HashMap::new()).collect();
+
         // Loop over systems & create neighborhoods for each.
-        let neighborhoods = state
-            .systems
-            .iter()
-            .enumerate()
-            .map(|(system_id, system)| {
-                let mut neighborhoods = HashMap::new();
-                // Loop over integrators for all system-system pairs. (system-other)
-                for (_integrator_id, integrator) in system.integrators.iter().enumerate() {
-                    for (other_id, _other) in state.systems.iter().enumerate() {
-                        // Get neighborhood-variant for specific integrator.
-                        let neighborhood = &integrator.matrix.0[system_id][other_id];
-                        // Build neighborhood.
-                        let c = match neighborhood {
-                            NeighborhoodVariant::None => NeighborhoodVariant::None,
-                            NeighborhoodVariant::All => NeighborhoodVariant::All,
-                            // NeighborhoodVariant::Sectors(_) => todo!(), // TODO get neighborhood
-                        };
-                        neighborhoods.insert(neighborhood.clone(), c); // TODO remove clone
-                    }
+        for (system_id, system) in state.systems.iter().enumerate() {
+            // Loop over integrators for all system-system pairs. (system-other)
+            for (_integrator_id, integrator) in system.integrators.iter().enumerate() {
+                for (other_id, _other) in state.systems.iter().enumerate() {
+                    // Get neighborhood-variant for specific integrator.
+                    let neighborhood = &integrator.matrix.0[system_id][other_id];
+                    // Build neighborhood.
+                    let c = match neighborhood {
+                        NeighborhoodVariant::None => NeighborhoodVariant::None,
+                        NeighborhoodVariant::All => NeighborhoodVariant::All,
+                        // NeighborhoodVariant::Sectors(_) => todo!(), // TODO get neighborhood
+                    };
+                    neighborhoods[other_id].insert(neighborhood.clone(), c); // TODO remove clone
                 }
-                neighborhoods
-            })
-            .collect();
+            }
+        }
         Neighborhoods(neighborhoods)
     }
 }

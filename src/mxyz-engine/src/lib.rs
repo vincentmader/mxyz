@@ -37,6 +37,11 @@ pub trait Engine {
         self.add_engine_state(state);
         // Update step-id in engine-config.
         self.mut_engine_config().step_id.0 += 1;
+
+        let msg = format!("{:?}", neighborhoods);
+        let array = js_sys::Array::new();
+        array.push(&msg.into());
+        web_sys::console::log(&array);
     }
 
     /// Forward state to next time-step.
@@ -87,6 +92,7 @@ pub trait Engine {
     ) -> Box<dyn Entity> {
         let (config, state) = (self.get_engine_config(), self.get_current_state());
         let entity = integrator.forward_entity(entity, state, config, neighborhoods);
+
         entity
     }
 

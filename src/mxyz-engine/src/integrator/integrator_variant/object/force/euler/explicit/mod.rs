@@ -35,19 +35,19 @@ pub fn euler_explicit(
             // NeighborhoodVariant::Sectors(_) => vec![1, 2, 3], // TODO
         };
 
-        // Loop over entities in other system.
+        // Loop over entities in other system, skip self-interaction.
         for other_id in other_ids.iter() {
             let other = system.entities.get(*other_id).unwrap();
             let other_id = (system_id, *other_id);
             if entity_id == (other_id) {
                 continue;
             }
-            // Loop over interactions.
+            // Loop over interactions, skip inactive ones.
             for interaction in interactions.iter() {
-                // Skip if interaction is not set to active.
                 if !interaction.active {
                     continue;
                 }
+                // Define force-getter function.
                 let get_force = match &interaction.variant {
                     InteractionVariant::Force(force) => match force.variant {
                         ForceVariant::NewtonianGravity => force::newtonian_gravity::from,
@@ -57,6 +57,7 @@ pub fn euler_explicit(
                     },
                     _ => todo!("Interaction Variant"),
                 };
+                // Calculate force & and to total.
                 let force = get_force(entity, other, &system.entities);
                 total_force = [
                     total_force[0] + force[0],

@@ -8,7 +8,16 @@
     mxyz-utils = { path="../mxyz-utils" }
     rand = "0.8.5"
     rayon = "1.5"
+    js-sys = "0.3"
 
 [dependencies.serde]
     version = "1.0"
     features = ["derive"]
+
+[dependencies.web-sys]
+    version = "0.3.55"
+    features = [
+        "console",
+    ]
+
+
