@@ -30,7 +30,7 @@ pub fn euler_explicit(
         let other_ids = match neighborhood {
             NeighborhoodVariant::None => vec![],
             NeighborhoodVariant::All => (0..system.entities.len())
-                .filter(|x| *x != entity_id.1)
+                .filter(|x| (system_id, *x) != entity_id)
                 .collect::<Vec<usize>>(),
             // NeighborhoodVariant::Sectors(_) => vec![1, 2, 3], // TODO
         };
@@ -39,9 +39,9 @@ pub fn euler_explicit(
         for other_id in other_ids.iter() {
             let other = system.entities.get(*other_id).unwrap();
             let other_id = (system_id, *other_id);
-            if entity_id == (other_id) {
-                continue;
-            }
+            // if entity_id == (other_id) {
+            //     continue;
+            // }
             // Loop over interactions, skip inactive ones.
             for interaction in interactions.iter() {
                 if !interaction.active {

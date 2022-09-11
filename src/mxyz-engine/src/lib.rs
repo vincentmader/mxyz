@@ -38,10 +38,10 @@ pub trait Engine {
         // Update step-id in engine-config.
         self.mut_engine_config().step_id.0 += 1;
 
-        let msg = format!("{:?}", neighborhoods);
-        let array = js_sys::Array::new();
-        array.push(&msg.into());
-        web_sys::console::log(&array);
+        // let msg = format!("{:?}", neighborhoods);
+        // let array = js_sys::Array::new();
+        // array.push(&msg.into());
+        // web_sys::console::log(&array);
     }
 
     /// Forward state to next time-step.
