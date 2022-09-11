@@ -4,68 +4,42 @@ use serde::{Deserialize, Serialize};
 /// Neighboorhood Variant
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum NeighborhoodVariant {
+    None,
     All,
-    Particle(particle::ParticleNeighboorhoodVariant),
-    Field(field::FieldNeighboorhoodVariant),
+    Sectors(Option<usize>),
+    // Particle(particle::ParticleNeighboorhoodVariant),
+    // Field(field::FieldNeighboorhoodVariant),
 }
-pub mod particle {
-    use serde::{Deserialize, Serialize};
-
-    #[derive(Debug, Serialize, Deserialize, Clone)]
-    pub enum ParticleNeighboorhoodVariant {
-        Sectors,
-        OctTree,
-        QuadTree,
-    }
-}
-pub mod field {
-    use serde::{Deserialize, Serialize};
-
-    #[derive(Debug, Serialize, Deserialize, Clone)]
-    pub enum FieldNeighboorhoodVariant {
-        Sectors,
-        VonNeumann,
-        Moore,
-        Random,
-    }
-}
-
-//  Vec indexed by sys1_id
-//      Vec indexed by sys2_id
-//          -> system-system pairs. now: find entity-entity pairs!
-//
-//          Enum NeighborhoodVariant ?
-//
-//  NeighborhoodVariant
-//      All: Vec of all sys2_ids
-//      Sectors: Vec of all nodes in nearby sectors
-//      Tree: Vec of nodes (construct where?)
-//      CellAuto: nodes selected via Moore/Neumann
-//      pairs ?
-
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Neighborhoods {
-    systems: Vec<Vec<Vec<NeighborhoodVariant>>>,
+    systems: Vec<NeighborhoodVariant>,
 }
 impl From<&UnsizedState> for Neighborhoods {
     fn from(state: &UnsizedState) -> Self {
         let mut a = vec![];
         for (system_id, system) in state.systems.iter().enumerate() {
-            let mut b = vec![];
-            for (integrator_id, integrator) in system.integrators.iter().enumerate() {
-                let mut c = vec![];
-                for (other_id, other) in state.systems.iter().enumerate() {
-                    let neighborhood = NeighborhoodVariant::All;
-                    // TODO get neighborhood
-                    c.push(neighborhood);
+            // let mut b = vec![];
+            for (_integrator_id, integrator) in system.integrators.iter().enumerate() {
+                // let mut c = vec![];
+                for (other_id, _other) in state.systems.iter().enumerate() {
+                    let neighborhood = integrator
+                        .matrix
+                        .get_neighborhood_variant(system_id, other_id);
+                    let neighborhood = match neighborhood {
+                        NeighborhoodVariant::None => NeighborhoodVariant::None,
+                        NeighborhoodVariant::All => NeighborhoodVariant::All,
+                        NeighborhoodVariant::Sectors(_) => todo!(), // TODO get neighborhood
+                    };
+                    // c.push(neighborhood);
                 }
-                b.push(c);
+                // b.push(c);
             }
-            a.push(b);
+            // a.push(b);
         }
         Neighborhoods { systems: a }
     }
 }
+impl Neighborhoods {}
 
 // pub enum NeighborhoodVariant {
 //     All,
@@ -222,3 +196,38 @@ impl From<&UnsizedState> for Neighborhoods {
 //         Neighborhood { entities }
 //     }
 // }
+
+// pub mod particle {
+//     use serde::{Deserialize, Serialize};
+
+//     #[derive(Debug, Serialize, Deserialize, Clone)]
+//     pub enum ParticleNeighboorhoodVariant {
+//         Sectors,
+//         OctTree,
+//         QuadTree,
+//     }
+// }
+// pub mod field {
+//     use serde::{Deserialize, Serialize};
+
+//     #[derive(Debug, Serialize, Deserialize, Clone)]
+//     pub enum FieldNeighboorhoodVariant {
+//         Sectors,
+//         VonNeumann,
+//         Moore,
+//         Random,
+//     }
+// }
+
+//  Vec indexed by sys1_id
+//      Vec indexed by sys2_id
+//          -> system-system pairs. now: find entity-entity pairs!
+//
+//          Enum NeighborhoodVariant ?
+//
+//  NeighborhoodVariant
+//      All: Vec of all sys2_ids
+//      Sectors: Vec of all nodes in nearby sectors
+//      Tree: Vec of nodes (construct where?)
+//      CellAuto: nodes selected via Moore/Neumann
+//      pairs ?
