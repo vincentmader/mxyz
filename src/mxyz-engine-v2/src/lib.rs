@@ -98,7 +98,7 @@ impl SimulationEngineV2 {
         }
         // Update step-id of last export.
         let state_id = Some(self.config.step_id.0);
-        self.config.last_export_step_id = state_id;
+        self.config.last_export = state_id;
     }
 }
 
@@ -185,8 +185,8 @@ pub fn get_unsaved_state_ids<T: Engine>(engine: &T) -> Vec<usize> {
         .iter()
         .filter(|state| {
             state.state_id
-                >= match engine.engine_config().last_export_step_id {
-                    // If last-export-id is None, load all states since 0.
+                >= match engine.engine_config().last_export {
+                    // If last-export is None, load all states since 0.
                     None => 0,
                     // If not None, load states since last-export-id + 1.
                     Some(e) => e + 1,

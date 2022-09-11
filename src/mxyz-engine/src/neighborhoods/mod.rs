@@ -1,55 +1,77 @@
 use crate::state::UnsizedState;
+use crate::system::unsized_system::UnsizedSystem;
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
+//  Vec indexed by sys1_id
+//      Vec indexed by sys2_id
+//          -> system-system pairs. now: find entity-entity pairs!
+//
+//          Enum NeighborhoodVariant ?
+//
+//  NeighborhoodVariant
+//      All: Vec of all sys2_ids
+//      Sectors: Vec of all nodes in nearby sectors
+//      Tree: Vec of nodes (construct where?)
+//      CellAuto: nodes selected via Moore/Neumann
+//      pairs ?
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Neighborhoods {
-    // TODO ...
+    systems: Vec<Vec<Vec<NeighborhoodVariant>>>,
 }
 impl From<&UnsizedState> for Neighborhoods {
     fn from(state: &UnsizedState) -> Self {
-        // TODO ...
-        Neighborhoods {}
+        let mut a = vec![];
+        for (system_id, system) in state.systems.iter().enumerate() {
+            let mut b = vec![];
+            for (integrator_id, integrator) in system.integrators.iter().enumerate() {
+                let mut c = vec![];
+                for (other_id, other) in state.systems.iter().enumerate() {
+                    let neighborhood = NeighborhoodVariant::All;
+                    // TODO get neighborhood
+                    c.push(neighborhood);
+                }
+                b.push(c);
+            }
+            a.push(b);
+        }
+        Neighborhoods { systems: a }
     }
 }
 
-// pub struct _Neighboorhood {
-//     _variant: _NeighborhoodVariant,
-// }
+/// Neighboorhood Variant (not used at all a.t.m.)
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub enum NeighborhoodVariant {
+    All,
+    // OctTree(oct_tree::OctTree),
+    // Sectors(sectors::Sectors),
+    // Random(random::Random),
+    // Moore(moore::Moore),
+    // VonNeumann(von_neumann::VonNeumann),
+}
 
-// /// Neighboorhood Variant (not used at all a.t.m.)
-// pub enum _NeighborhoodVariant {
-//     World(world::World),
-//     OctTree(oct_tree::OctTree),
-//     Sectors(sectors::Sectors),
-//     Random(random::Random),
-//     Moore(moore::Moore),
-//     VonNeumann(von_neumann::VonNeumann),
-// }
-
-// /// Neighbordhood Trait
-// pub trait Neighboorhood {
-//     fn for_entity(&self, entity: (usize, usize), system: System) -> Vec<usize>;
-// }
-
-// mod world {
-//     use super::Neighboorhood;
-//     use mxyz_universe::system::System;
+// mod all {
+//     // use super::Neighboorhoods;
+//     use crate::system::unsized_system::UnsizedSystem;
 //     // use mxyz_universe::system::SystemVariant;
 //     /// World Neighboorhood (all entities)
-//     pub struct World {}
-//     impl Neighboorhood for World {
-//         fn for_entity(&self, _entity: (usize, usize), system: System) -> Vec<usize> {
-//             // match system.variant {
-//             // SystemVariant::Planets(system) => (0..system.entities.len()).collect(),
-//             // SystemVariant::PhysicalObjects(_system) => (0..10).collect(), // TODO
-//             // _ => todo!(),
-//             // }
-//             todo!()
-//         }
-//     }
-//     impl World {
-//         pub fn new() -> Self {
-//             World {}
-//         }
-//     }
+//     pub struct All {}
+//     // impl Neighboorhood for World {
+//     //     fn for_entity(&self, _entity: (usize, usize), system: System) -> Vec<usize> {
+//     //         // match system.variant {
+//     //         // SystemVariant::Planets(system) => (0..system.entities.len()).collect(),
+//     //         // SystemVariant::PhysicalObjects(_system) => (0..10).collect(), // TODO
+//     //         // _ => todo!(),
+//     //         // }
+//     //         todo!()
+//     //     }
+//     // }
+//     // impl World {
+//     //     pub fn new() -> Self {
+//     //         World {}
+//     //     }
+//     // }
 // }
 
 // mod oct_tree {
@@ -162,5 +184,16 @@ impl From<&UnsizedState> for Neighborhoods {
 //         pub fn new() -> Self {
 //             VonNeumann {}
 //         }
+//     }
+// }
+
+// pub struct Neighborhood {
+//     entities: Vec<Vec<usize>>,
+// }
+// impl From<&UnsizedSystem> for Neighborhood {
+//     fn from(system: &UnsizedSystem) -> Self {
+//         let entities = Vec::new();
+//         todo!("get neighborhood from UnsizedSystem");
+//         Neighborhood { entities }
 //     }
 // }

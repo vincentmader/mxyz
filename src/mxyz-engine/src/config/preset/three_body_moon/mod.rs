@@ -13,7 +13,7 @@ use crate::interaction::Interaction;
 use crate::system::unsized_system::unsized_system_variant::UnsizedSystemVariant;
 use crate::system::unsized_system::UnsizedSystem;
 
-const NR_OF_STEPS: usize = usize::MAX;
+// const NR_OF_STEPS: u128 = usize::MAX;
 const G: f64 = 1.;
 const Q: f64 = 0.;
 const M_0: f64 = 1.;
@@ -66,7 +66,7 @@ fn setup_systems(systems: &mut Vec<UnsizedSystem>) {
 }
 
 fn setup_config(config: &mut EngineConfig, systems: &mut Vec<UnsizedSystem>) {
-    config.step_id.1 = NR_OF_STEPS;
+    // config.step_id.1 = NR_OF_STEPS;
 
     // SYSTEM 0: STAR
 

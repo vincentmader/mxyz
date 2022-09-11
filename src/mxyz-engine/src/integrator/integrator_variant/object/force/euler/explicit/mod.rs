@@ -3,6 +3,7 @@ use crate::entity::Entity;
 use crate::interaction::interaction_variant::force::ForceVariant;
 use crate::interaction::interaction_variant::InteractionVariant;
 use crate::interaction::Interaction;
+use crate::neighborhoods::NeighborhoodVariant;
 use crate::state::UnsizedState;
 use serde::{Deserialize, Serialize};
 
@@ -15,6 +16,7 @@ pub fn euler_explicit(
     entity: ((usize, usize), &Box<dyn Entity>),
     state: &UnsizedState,
     interactions: &Vec<Interaction>,
+    neighborhood: &NeighborhoodVariant,
     _config: &EngineConfig,
 ) -> Box<dyn Entity> {
     use crate::interaction::interaction_variant::force;

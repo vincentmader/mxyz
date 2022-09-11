@@ -138,7 +138,7 @@ pub fn handle_request(request: Request, tx: &mpsc::Sender<MpscMessage>) -> TcpPa
             // TODO Load config from database.
             let config = mxyz_engine::config::EngineConfig::new();
             // Return state-vector response
-            let response = Response::StateVector(engine_id, state_query, states, config);
+            let response = Response::StateVector(engine_id, state_query, config, states);
             TcpPackage::Response(response)
         }
 

@@ -121,8 +121,9 @@ pub fn handle_response(ws: &mut WebSocket, response: Response) {
     match response {
         Response::AddedClient(client_id) => handle_added_client(ws, client_id),
         Response::AddedEngine(engine_id) => handle_added_engine(ws, engine_id),
-        Response::StateVector(engine_id, query, states, config) => {
-            handle_received_states(ws, engine_id, query, states, config)
+        Response::StateVector(engine_id, state_query, config, states) => {
+            // let config = mxyz_engine::config::EngineConfig::new();
+            handle_received_states(ws, engine_id, state_query, states, config)
         }
         Response::Empty => {}
     }

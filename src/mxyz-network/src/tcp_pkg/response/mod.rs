@@ -16,8 +16,9 @@ pub enum Response {
     /// Response: State Vector.
     /// - engine-id
     /// - state-query
+    /// - engine-config
     /// - state-vector
-    StateVector(usize, StateQuery, Vec<SizedState>, EngineConfig),
+    StateVector(usize, StateQuery, EngineConfig, Vec<SizedState>),
 
     Empty,
 }

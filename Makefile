@@ -22,6 +22,7 @@ build_server:
 		cargo build -p mxyz-server # --release
 # -----------------------------------------------------------------------------
 run:
+	make db
 	make build_client
 	# make build_engine
 	make run_server
