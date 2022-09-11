@@ -24,16 +24,15 @@ pub fn euler_explicit(
     // Loop over systems, calculate over-all force acting on entity.
     let mut total_force = [0., 0., 0.];
     for (system_id, system) in state.systems.iter().enumerate() {
-        // Skip system if interaction-matrix entry for integrator is equal to NeighboorhoodVariant::None (TODO)
+        // Get list of relevant entity-ids.
         let neighborhood_variant = &matrix.0[entity_id.0][system_id];
         let neighborhood = neighborhoods.get_neighborhood(system_id, neighborhood_variant);
-        // Get list of relevant entity-ids.
         let other_ids = match neighborhood {
             NeighborhoodVariant::None => vec![],
             NeighborhoodVariant::All => (0..system.entities.len())
                 .filter(|x| *x != entity_id.1)
                 .collect::<Vec<usize>>(),
-            NeighborhoodVariant::Sectors(_) => vec![1, 2, 3], // TODO
+            // NeighborhoodVariant::Sectors(_) => vec![1, 2, 3], // TODO
         };
 
         // Loop over entities in other system.

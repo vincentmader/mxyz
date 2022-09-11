@@ -7,7 +7,7 @@ use std::collections::HashMap;
 pub enum NeighborhoodVariant {
     None,
     All,
-    Sectors(Option<usize>),
+    // Sectors(Option<usize>),
     // OctTree(oct_tree::OctTree),
     // Random(random::Random),
     // Moore(moore::Moore),
@@ -39,7 +39,7 @@ impl From<&UnsizedState> for Neighborhoods {
                         let c = match neighborhood {
                             NeighborhoodVariant::None => NeighborhoodVariant::None,
                             NeighborhoodVariant::All => NeighborhoodVariant::All,
-                            NeighborhoodVariant::Sectors(_) => todo!(), // TODO get neighborhood
+                            // NeighborhoodVariant::Sectors(_) => todo!(), // TODO get neighborhood
                         };
                         neighborhoods.insert(neighborhood.clone(), c); // TODO remove clone
                     }
