@@ -6,8 +6,8 @@ use crate::integrator::integrator_variant::object::force::ForceIntegratorVariant
 use crate::integrator::integrator_variant::object::ObjectIntegratorVariant;
 use crate::integrator::integrator_variant::IntegratorVariant;
 use crate::integrator::Integrator;
-use crate::interaction::force::Force;
-use crate::interaction::force::ForceVariant;
+use crate::interaction::interaction_variant::force::Force;
+use crate::interaction::interaction_variant::force::ForceVariant;
 use crate::interaction::interaction_variant::InteractionVariant;
 use crate::interaction::Interaction;
 use crate::system::unsized_system::unsized_system_variant::UnsizedSystemVariant;

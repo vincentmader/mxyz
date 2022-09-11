@@ -1,18 +1,73 @@
-// use crate::entity::entity_v1::EntityV1;
-// use crate::entity::Entity;
-// use crate::interaction::force::ForceVariant;
-// use crate::interaction::Interaction;
-// use crate::interaction::InteractionVariant;
-// use crate::state::UnsizedState;
-// use crate::system::unsized_system::{unsized_system_variant::UnsizedSystemVariant, UnsizedSystem};
-// use rayon::prelude::*;
+use crate::config::EngineConfig;
+use crate::entity::Entity;
+use crate::interaction::interaction_variant::force::ForceVariant;
+use crate::interaction::interaction_variant::InteractionVariant;
+use crate::interaction::Interaction;
+use crate::state::UnsizedState;
 use serde::{Deserialize, Serialize};
-// use std::sync::{Arc, Mutex};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct EulerExplicitObjectForceIntegrator {}
 
 const DT: f64 = 0.01;
+
+pub fn euler_explicit(
+    entity: ((usize, usize), &Box<dyn Entity>),
+    state: &UnsizedState,
+    interactions: &Vec<Interaction>,
+    _config: &EngineConfig,
+) -> Box<dyn Entity> {
+    use crate::interaction::interaction_variant::force;
+    let (entity_id, entity) = entity;
+
+    // Loop over systems, calculate over-all force acting on entity.
+    let mut total_force = [0., 0., 0.];
+    for (system_id, system) in state.systems.iter().enumerate() {
+        // Define neighborhood.
+        // - TODO
+
+        // Loop over entities in other system.
+        for (other_id, other) in system.entities.iter().enumerate() {
+            let other_id = (system_id, other_id);
+            if entity_id == (other_id) {
+                continue;
+            }
+            for interaction in interactions.iter() {
+                // if !interaction.matrix.entries[system_id].unwrap() {
+                //     continue;
+                // }
+                let get_force = match &interaction.variant {
+                    InteractionVariant::Force(force) => match force.variant {
+                        ForceVariant::NewtonianGravity => force::newtonian_gravity::from,
+                        ForceVariant::Coulomb => force::coulomb_interaction::from,
+                        ForceVariant::LennardJones => force::lennard_jones_interaction::from,
+                        _ => todo!("Force Interaction Variant"),
+                    },
+                    _ => todo!("Interaction Variant"),
+                };
+                let force = get_force(entity, other, &system.entities);
+                total_force = [
+                    total_force[0] + force[0],
+                    total_force[1] + force[1],
+                    total_force[2] + force[2],
+                ];
+            }
+        }
+    }
+    let (m, pos, vel, q) = (
+        entity.get_mass(),
+        entity.get_position(),
+        entity.get_velocity(),
+        entity.get_charge(),
+    );
+    let acc: Vec<f64> = (0..3).map(|i| total_force[i] / m).collect();
+    let vel: Vec<f64> = (0..3).map(|i| vel[i] + acc[i] * DT).collect();
+    let pos: Vec<f64> = (0..3).map(|i| pos[i] + vel[i] * DT).collect();
+    let pos = [pos[0], pos[1], pos[2]];
+    let vel = [vel[0], vel[1], vel[2]];
+    let entity = crate::entity::entity_v1::EntityV1::new(m, pos, vel, q);
+    Box::new(entity)
+}
 
 // pub fn apply(
 //     system: &UnsizedSystem,

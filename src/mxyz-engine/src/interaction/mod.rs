@@ -1,10 +1,4 @@
-pub mod collision;
-pub mod composed;
-pub mod diffusion_v1;
-pub mod force;
-pub mod game_of_life;
 pub mod interaction_variant;
-pub mod ising_v1;
 use interaction_variant::InteractionVariant;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
