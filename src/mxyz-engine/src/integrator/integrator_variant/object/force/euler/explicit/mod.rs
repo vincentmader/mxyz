@@ -4,8 +4,10 @@ use crate::interaction::interaction_variant::force::ForceVariant;
 use crate::interaction::interaction_variant::InteractionVariant;
 use crate::interaction::Interaction;
 use crate::neighborhoods::NeighborhoodVariant;
+use crate::neighborhoods::Neighborhoods;
 use crate::state::UnsizedState;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct EulerExplicitObjectForceIntegrator {}
@@ -16,7 +18,8 @@ pub fn euler_explicit(
     entity: ((usize, usize), &Box<dyn Entity>),
     state: &UnsizedState,
     interactions: &Vec<Interaction>,
-    neighborhood: &NeighborhoodVariant,
+    neighborhoods: &Neighborhoods,
+    matrix: &HashMap<usize, HashMap<usize, bool>>,
     _config: &EngineConfig,
 ) -> Box<dyn Entity> {
     use crate::interaction::interaction_variant::force;
@@ -25,6 +28,19 @@ pub fn euler_explicit(
     // Loop over systems, calculate over-all force acting on entity.
     let mut total_force = [0., 0., 0.];
     for (system_id, system) in state.systems.iter().enumerate() {
+        // Skip system if interaction-matrix entry for integrator
+        // is equal to NeighboorhoodVariant::None (TODO)
+        let integrator_active = match matrix.get(&entity_id.0) {
+            Some(e) => match e.get(&system_id) {
+                Some(e) => e,
+                None => continue,
+            },
+            None => continue,
+        };
+        match integrator_active {
+            false => continue,
+            _ => {}
+        };
         // Define neighborhood.
         // - TODO
 

@@ -1,7 +1,34 @@
 use crate::state::UnsizedState;
-use crate::system::unsized_system::UnsizedSystem;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+
+/// Neighboorhood Variant
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub enum NeighborhoodVariant {
+    All,
+    Particle(particle::ParticleNeighboorhoodVariant),
+    Field(field::FieldNeighboorhoodVariant),
+}
+pub mod particle {
+    use serde::{Deserialize, Serialize};
+
+    #[derive(Debug, Serialize, Deserialize, Clone)]
+    pub enum ParticleNeighboorhoodVariant {
+        Sectors,
+        OctTree,
+        QuadTree,
+    }
+}
+pub mod field {
+    use serde::{Deserialize, Serialize};
+
+    #[derive(Debug, Serialize, Deserialize, Clone)]
+    pub enum FieldNeighboorhoodVariant {
+        Sectors,
+        VonNeumann,
+        Moore,
+        Random,
+    }
+}
 
 //  Vec indexed by sys1_id
 //      Vec indexed by sys2_id
@@ -40,16 +67,14 @@ impl From<&UnsizedState> for Neighborhoods {
     }
 }
 
-/// Neighboorhood Variant (not used at all a.t.m.)
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub enum NeighborhoodVariant {
-    All,
-    // OctTree(oct_tree::OctTree),
-    // Sectors(sectors::Sectors),
-    // Random(random::Random),
-    // Moore(moore::Moore),
-    // VonNeumann(von_neumann::VonNeumann),
-}
+// pub enum NeighborhoodVariant {
+//     All,
+// OctTree(oct_tree::OctTree),
+// Sectors(sectors::Sectors),
+// Random(random::Random),
+// Moore(moore::Moore),
+// VonNeumann(von_neumann::VonNeumann),
+// }
 
 // mod all {
 //     // use super::Neighboorhoods;

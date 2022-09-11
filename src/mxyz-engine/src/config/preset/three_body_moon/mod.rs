@@ -12,6 +12,7 @@ use crate::interaction::interaction_variant::InteractionVariant;
 use crate::interaction::Interaction;
 use crate::system::unsized_system::unsized_system_variant::UnsizedSystemVariant;
 use crate::system::unsized_system::UnsizedSystem;
+use std::collections::HashMap;
 
 // const NR_OF_STEPS: u128 = usize::MAX;
 const G: f64 = 1.;
@@ -21,7 +22,7 @@ const M_1: f64 = 0.1;
 const M_2: f64 = 0.00001;
 const R_0: f64 = 0.7;
 const DR: f64 = 0.05;
-const N: usize = 5;
+const N: usize = 7;
 
 fn setup_systems(systems: &mut Vec<UnsizedSystem>) {
     // SYSTEM 0: STAR
@@ -87,6 +88,7 @@ fn setup_config(config: &mut EngineConfig, systems: &mut Vec<UnsizedSystem>) {
     let interaction = Interaction::new(interaction_variant);
     interactions.push(interaction);
     integrator.interactions = interactions;
+    integrator.matrix.insert(1, HashMap::from([(0, true)]));
     integrators.push(integrator); // TODO needs to be run for each system!
     systems[1].integrators = integrators;
 
@@ -104,6 +106,9 @@ fn setup_config(config: &mut EngineConfig, systems: &mut Vec<UnsizedSystem>) {
     let interaction_variant = InteractionVariant::Force(force);
     let interaction = Interaction::new(interaction_variant);
     interactions.push(interaction);
+    integrator
+        .matrix
+        .insert(2, HashMap::from([(0, true), (1, true)]));
     integrator.interactions = interactions;
     integrators.push(integrator);
     systems[2].integrators = integrators;
