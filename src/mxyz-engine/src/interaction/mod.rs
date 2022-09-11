@@ -1,3 +1,4 @@
+pub mod interaction_matrix;
 pub mod interaction_variant;
 use interaction_variant::InteractionVariant;
 use serde::{Deserialize, Serialize};

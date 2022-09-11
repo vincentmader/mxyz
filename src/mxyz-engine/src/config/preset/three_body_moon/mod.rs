@@ -69,6 +69,7 @@ fn setup_systems(systems: &mut Vec<UnsizedSystem>) {
 
 fn setup_config(config: &mut EngineConfig, systems: &mut Vec<UnsizedSystem>) {
     // config.step_id.1 = NR_OF_STEPS;
+    let nr_of_systems = systems.len();
 
     // SYSTEM 0: STAR
 
@@ -78,8 +79,32 @@ fn setup_config(config: &mut EngineConfig, systems: &mut Vec<UnsizedSystem>) {
     let integrator_variant = ForceIntegratorVariant::EulerExplicit;
     let integrator_variant = ObjectIntegratorVariant::Force(integrator_variant);
     let integrator_variant = IntegratorVariant::Object(integrator_variant);
-    let mut integrator = Integrator::new(integrator_variant);
 
+    let mut integrator = Integrator::new(integrator_variant, nr_of_systems);
+    let mut interactions = vec![];
+
+    let force_variant = ForceVariant::NewtonianGravity;
+    let force = Force::new(force_variant);
+    let interaction_variant = InteractionVariant::Force(force);
+    let interaction = Interaction::new(interaction_variant);
+    interactions.push(interaction);
+
+    integrator.interactions = interactions;
+
+    let neighborhood = NeighborhoodVariant::All;
+    integrator
+        .matrix
+        .set_neighborhood_variant(1, 0, neighborhood.clone());
+
+    integrators.push(integrator); // NOTE needs to be run for each system!
+    systems[1].integrators = integrators;
+
+    // SYSTEM 2: MOONS
+    let mut integrators = vec![];
+    let integrator_variant = ForceIntegratorVariant::EulerExplicit;
+    let integrator_variant = ObjectIntegratorVariant::Force(integrator_variant);
+    let integrator_variant = IntegratorVariant::Object(integrator_variant);
+    let mut integrator = Integrator::new(integrator_variant, nr_of_systems);
     let mut interactions = vec![];
 
     let force_variant = ForceVariant::NewtonianGravity;
@@ -89,28 +114,6 @@ fn setup_config(config: &mut EngineConfig, systems: &mut Vec<UnsizedSystem>) {
     let interaction = Interaction::new(interaction_variant);
     interactions.push(interaction);
     integrator.interactions = interactions;
-
-    let neighborhood = NeighborhoodVariant::All;
-    integrator
-        .matrix
-        .set_neighborhood_variant(1, 0, neighborhood);
-    integrators.push(integrator); // TODO needs to be run for each system!
-    systems[1].integrators = integrators;
-
-    // SYSTEM 2: MOONS
-    let mut integrators = vec![];
-    let integrator_variant = ForceIntegratorVariant::EulerExplicit;
-    let integrator_variant = ObjectIntegratorVariant::Force(integrator_variant);
-    let integrator_variant = IntegratorVariant::Object(integrator_variant);
-    let mut integrator = Integrator::new(integrator_variant);
-    let mut interactions = vec![];
-
-    let force_variant = ForceVariant::NewtonianGravity;
-    let force = Force::new(force_variant);
-
-    let interaction_variant = InteractionVariant::Force(force);
-    let interaction = Interaction::new(interaction_variant);
-    interactions.push(interaction);
 
     let neighborhood = NeighborhoodVariant::All;
     integrator
@@ -119,7 +122,7 @@ fn setup_config(config: &mut EngineConfig, systems: &mut Vec<UnsizedSystem>) {
     integrator
         .matrix
         .set_neighborhood_variant(2, 1, neighborhood);
-    integrator.interactions = interactions;
+
     integrators.push(integrator);
     systems[2].integrators = integrators;
 }

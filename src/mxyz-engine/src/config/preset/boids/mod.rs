@@ -31,20 +31,20 @@ fn setup_systems(systems: &mut Vec<UnsizedSystem>) {
     // systems.push(system);
 
     // SYSTEM 1: PLANETS
-    let variant = UnsizedSystemVariant::EntitiesV1;
-    let mut system = UnsizedSystem::new(1, variant);
-    // Entities
-    let v_0 = 0.; //(G * M_0 / r0).powf(0.5);
-    for entity_id in 0..N {
-        let r: f64 = rng.gen();
-        let phi = 2. * 3.14159 * entity_id as f64 / N as f64;
-        // let r = R_0;
-        let x = [r * phi.cos(), r * phi.sin(), 0.];
-        let v = [-v_0 * phi.sin(), v_0 * phi.cos(), 0.];
-        let entity = EntityV1::new(M_1, x, v, Q);
-        system.entities.push(Box::new(entity));
-    }
-    systems.push(system);
+    // let variant = UnsizedSystemVariant::EntitiesV1;
+    // let mut system = UnsizedSystem::new(1, variant);
+    // // Entities
+    // let v_0 = 0.; //(G * M_0 / r0).powf(0.5);
+    // for entity_id in 0..N {
+    //     let r: f64 = rng.gen();
+    //     let phi = 2. * 3.14159 * entity_id as f64 / N as f64;
+    //     // let r = R_0;
+    //     let x = [r * phi.cos(), r * phi.sin(), 0.];
+    //     let v = [-v_0 * phi.sin(), v_0 * phi.cos(), 0.];
+    //     let entity = EntityV1::new(M_1, x, v, Q);
+    //     system.entities.push(Box::new(entity));
+    // }
+    // systems.push(system);
 }
 
 fn setup_config(config: &mut EngineConfig, systems: &mut Vec<UnsizedSystem>) {
@@ -53,7 +53,7 @@ fn setup_config(config: &mut EngineConfig, systems: &mut Vec<UnsizedSystem>) {
     // SYSTEM 0: STAR
 
     // SYSTEM 1: PLANETS
-    let mut integrators = vec![];
+    // let mut integrators = vec![];
 
     // GRAVITY
     // let integrator_variant = ForceIntegratorVariant::EulerExplicit;
@@ -69,11 +69,11 @@ fn setup_config(config: &mut EngineConfig, systems: &mut Vec<UnsizedSystem>) {
     // integrators.push(integrator); // TODO needs to be run for each system!
 
     // BOID
-    let integrator_variant = ForceIntegratorVariant::EulerExplicit;
-    let integrator_variant = ObjectIntegratorVariant::Force(integrator_variant);
-    let integrator_variant = IntegratorVariant::Object(integrator_variant);
-    let mut integrator = Integrator::new(integrator_variant);
-    let mut interactions = vec![];
+    // let integrator_variant = ForceIntegratorVariant::EulerExplicit;
+    // let integrator_variant = ObjectIntegratorVariant::Force(integrator_variant);
+    // let integrator_variant = IntegratorVariant::Object(integrator_variant);
+    // let mut integrator = Integrator::new(integrator_variant);
+    // let mut interactions = vec![];
 
     // let force = Force::new(ForceVariant::BoidAttraction);
     // let force = InteractionVariant::Force(force);
@@ -90,15 +90,15 @@ fn setup_config(config: &mut EngineConfig, systems: &mut Vec<UnsizedSystem>) {
     // let force = Interaction::new(force);
     // interactions.push(force);
 
-    let force = Force::new(ForceVariant::LennardJones);
-    let force = InteractionVariant::Force(force);
-    let force = Interaction::new(force);
-    interactions.push(force);
+    // let force = Force::new(ForceVariant::LennardJones);
+    // let force = InteractionVariant::Force(force);
+    // let force = Interaction::new(force);
+    // interactions.push(force);
 
-    integrator.interactions = interactions;
-    integrators.push(integrator); // TODO needs to be run for each system!
+    // integrator.interactions = interactions;
+    // integrators.push(integrator); // TODO needs to be run for each system!
 
-    systems[1].integrators = integrators;
+    // systems[1].integrators = integrators;
 }
 
 pub fn preset(systems: &mut Vec<UnsizedSystem>, config: &mut EngineConfig) {

@@ -1,5 +1,6 @@
 pub mod integrator_variant;
 use crate::entity::Entity;
+use crate::interaction::interaction_matrix::InteractionMatrix;
 use crate::interaction::Interaction;
 use crate::neighborhoods::NeighborhoodVariant;
 use crate::neighborhoods::Neighborhoods;
@@ -8,46 +9,6 @@ use integrator_variant::object::force::ForceIntegratorVariant;
 use integrator_variant::object::ObjectIntegratorVariant;
 use integrator_variant::IntegratorVariant;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct InteractionMatrix(HashMap<usize, HashMap<usize, NeighborhoodVariant>>); // todo: move to vec-vec?;
-
-impl InteractionMatrix {
-    pub fn new() -> Self {
-        InteractionMatrix(HashMap::new())
-    }
-
-    pub fn set_neighborhood_variant(
-        &mut self,
-        system_id: usize,
-        other_id: usize,
-        neighborhood: NeighborhoodVariant,
-    ) {
-        let interaction_matrix = &mut self.0;
-        let _ = interaction_matrix
-            .entry(system_id)
-            .or_insert(HashMap::new());
-        interaction_matrix
-            .get_mut(&system_id)
-            .unwrap()
-            .insert(other_id, neighborhood);
-    }
-
-    pub fn get_neighborhood_variant(
-        &self,
-        system_id: usize,
-        other_id: usize,
-    ) -> NeighborhoodVariant {
-        match self.0.get(&system_id) {
-            Some(x) => match x.get(&other_id) {
-                Some(x) => x.clone(), // TODO remove clone
-                None => NeighborhoodVariant::None,
-            },
-            None => NeighborhoodVariant::None,
-        }
-    }
-}
 
 /// Integrator
 /// - Integrator Variant
@@ -73,13 +34,13 @@ pub struct Integrator {
 impl Integrator {
     /// Create new Integrator.
     /// - Default neighborhood-variant to All, i.e. O(N^2) nested loop over all.
-    pub fn new(variant: IntegratorVariant) -> Self {
+    pub fn new(variant: IntegratorVariant, nr_of_systems: usize) -> Self {
         let neighborhood = NeighborhoodVariant::All; // TODO move to new() args?
         Integrator {
             variant,
             // neighborhood,
             interactions: vec![],
-            matrix: InteractionMatrix::new(),
+            matrix: InteractionMatrix::new(nr_of_systems),
         }
     }
 

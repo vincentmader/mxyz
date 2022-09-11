@@ -8,7 +8,6 @@ use crate::neighborhoods::NeighborhoodVariant;
 use crate::neighborhoods::Neighborhoods;
 use crate::state::UnsizedState;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct EulerExplicitObjectForceIntegrator {}
@@ -30,16 +29,16 @@ pub fn euler_explicit(
     let mut total_force = [0., 0., 0.];
     for (system_id, system) in state.systems.iter().enumerate() {
         // Skip system if interaction-matrix entry for integrator is equal to NeighboorhoodVariant::None (TODO)
-        let neighborhood = matrix.get_neighborhood_variant(entity_id.0, system_id);
-        let neighborhood = neighborhoods.get_neighborhood(system_id, neighborhood);
-        let neighborhood = match neighborhood {
+        let neighborhood_variant = matrix.get_neighborhood_variant(entity_id.0, system_id);
+        let neighborhood = neighborhoods.get_neighborhood(system_id, neighborhood_variant);
+        let other_ids = match neighborhood {
             NeighborhoodVariant::All => (0..system.entities.len()).collect::<Vec<usize>>(),
             NeighborhoodVariant::Sectors(_) => vec![1, 2, 3], // TODO
             NeighborhoodVariant::None => continue,
         };
 
         // Loop over entities in other system.
-        for other_id in neighborhood.iter() {
+        for other_id in other_ids.iter() {
             let other = system.entities.get(*other_id).unwrap();
             let other_id = (system_id, *other_id);
             if entity_id == (other_id) {
