@@ -10,6 +10,7 @@ use crate::interaction::interaction_variant::force::Force;
 use crate::interaction::interaction_variant::force::ForceVariant;
 use crate::interaction::interaction_variant::InteractionVariant;
 use crate::interaction::Interaction;
+use crate::neighborhoods::NeighborhoodVariant;
 use crate::system::unsized_system::unsized_system_variant::UnsizedSystemVariant;
 use crate::system::unsized_system::UnsizedSystem;
 use std::collections::HashMap;
@@ -88,7 +89,11 @@ fn setup_config(config: &mut EngineConfig, systems: &mut Vec<UnsizedSystem>) {
     let interaction = Interaction::new(interaction_variant);
     interactions.push(interaction);
     integrator.interactions = interactions;
-    integrator.matrix.insert(1, HashMap::from([(0, true)]));
+
+    let neighborhood = NeighborhoodVariant::All;
+    integrator
+        .matrix
+        .set_neighborhood_variant(1, 0, neighborhood);
     integrators.push(integrator); // TODO needs to be run for each system!
     systems[1].integrators = integrators;
 
@@ -106,9 +111,14 @@ fn setup_config(config: &mut EngineConfig, systems: &mut Vec<UnsizedSystem>) {
     let interaction_variant = InteractionVariant::Force(force);
     let interaction = Interaction::new(interaction_variant);
     interactions.push(interaction);
+
+    let neighborhood = NeighborhoodVariant::All;
     integrator
         .matrix
-        .insert(2, HashMap::from([(0, true), (1, true)]));
+        .set_neighborhood_variant(2, 0, neighborhood.clone());
+    integrator
+        .matrix
+        .set_neighborhood_variant(2, 1, neighborhood);
     integrator.interactions = interactions;
     integrators.push(integrator);
     systems[2].integrators = integrators;

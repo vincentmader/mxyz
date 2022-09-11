@@ -10,7 +10,6 @@ use integrator_variant::IntegratorVariant;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-<<<<<<< HEAD
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct InteractionMatrix(HashMap<usize, HashMap<usize, NeighborhoodVariant>>); // todo: move to vec-vec?;
 
@@ -50,8 +49,6 @@ impl InteractionMatrix {
     }
 }
 
-=======
->>>>>>> parent of f327976 (continued on integrators)
 /// Integrator
 /// - Integrator Variant
 /// - Interaction Matrix
@@ -69,10 +66,10 @@ impl InteractionMatrix {
 pub struct Integrator {
     pub variant: IntegratorVariant,
     pub interactions: Vec<Interaction>,
-    pub matrix: HashMap<usize, HashMap<usize, bool>>, // todo: move to vec-vec?
-
-                                                      // pub neighborhood: NeighborhoodVariant,
+    pub matrix: InteractionMatrix,
+    // pub neighborhood: NeighborhoodVariant,
 }
+
 impl Integrator {
     /// Create new Integrator.
     /// - Default neighborhood-variant to All, i.e. O(N^2) nested loop over all.
@@ -82,9 +79,10 @@ impl Integrator {
             variant,
             // neighborhood,
             interactions: vec![],
-            matrix: HashMap::new(),
+            matrix: InteractionMatrix::new(),
         }
     }
+
     pub fn forward_entity(
         &self,
         entity: ((usize, usize), &Box<dyn Entity>),
