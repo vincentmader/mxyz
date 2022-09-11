@@ -5,13 +5,56 @@ use std::collections::HashMap;
 /// Neighboorhood Variant
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, Hash)]
 pub enum NeighborhoodVariant {
-    None,
     All,
+<<<<<<< HEAD
     Sectors(Option<usize>),
     // OctTree(oct_tree::OctTree),
     // Random(random::Random),
     // Moore(moore::Moore),
     // VonNeumann(von_neumann::VonNeumann),
+=======
+    Particle(particle::ParticleNeighboorhoodVariant),
+    Field(field::FieldNeighboorhoodVariant),
+}
+pub mod particle {
+    use serde::{Deserialize, Serialize};
+
+    #[derive(Debug, Serialize, Deserialize, Clone)]
+    pub enum ParticleNeighboorhoodVariant {
+        Sectors,
+        OctTree,
+        QuadTree,
+    }
+}
+pub mod field {
+    use serde::{Deserialize, Serialize};
+
+    #[derive(Debug, Serialize, Deserialize, Clone)]
+    pub enum FieldNeighboorhoodVariant {
+        Sectors,
+        VonNeumann,
+        Moore,
+        Random,
+    }
+}
+
+//  Vec indexed by sys1_id
+//      Vec indexed by sys2_id
+//          -> system-system pairs. now: find entity-entity pairs!
+//
+//          Enum NeighborhoodVariant ?
+//
+//  NeighborhoodVariant
+//      All: Vec of all sys2_ids
+//      Sectors: Vec of all nodes in nearby sectors
+//      Tree: Vec of nodes (construct where?)
+//      CellAuto: nodes selected via Moore/Neumann
+//      pairs ?
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Neighborhoods {
+    systems: Vec<Vec<Vec<NeighborhoodVariant>>>,
+>>>>>>> parent of f327976 (continued on integrators)
 }
 
 // =============================================================================
@@ -23,6 +66,7 @@ pub struct Neighborhoods(pub Vec<HashMap<NeighborhoodVariant, NeighborhoodVarian
 
 impl From<&UnsizedState> for Neighborhoods {
     fn from(state: &UnsizedState) -> Self {
+<<<<<<< HEAD
         // Loop over systems & create neighborhoods for each.
         let neighborhoods = state
             .systems
@@ -62,14 +106,40 @@ impl Neighborhoods {
         match self.0.get(system_id).unwrap().get(&neighborhood) {
             Some(x) => x.clone(),
             None => NeighborhoodVariant::None,
+=======
+        let mut a = vec![];
+        for (system_id, system) in state.systems.iter().enumerate() {
+            let mut b = vec![];
+            for (integrator_id, integrator) in system.integrators.iter().enumerate() {
+                let mut c = vec![];
+                for (other_id, other) in state.systems.iter().enumerate() {
+                    let neighborhood = NeighborhoodVariant::All;
+                    // TODO get neighborhood
+                    c.push(neighborhood);
+                }
+                b.push(c);
+            }
+            a.push(b);
+>>>>>>> parent of f327976 (continued on integrators)
         }
     }
 }
 
+<<<<<<< HEAD
 // =============================================================================
 
 // let mut a: HashMap<NeighborhoodVariant, usize> = HashMap::new();
 // a.insert(NeighborhoodVariant::All, 1);
+=======
+// pub enum NeighborhoodVariant {
+//     All,
+// OctTree(oct_tree::OctTree),
+// Sectors(sectors::Sectors),
+// Random(random::Random),
+// Moore(moore::Moore),
+// VonNeumann(von_neumann::VonNeumann),
+// }
+>>>>>>> parent of f327976 (continued on integrators)
 
 // mod all {
 //     // use super::Neighboorhoods;
@@ -217,38 +287,3 @@ impl Neighborhoods {
 //         Neighborhood { entities }
 //     }
 // }
-
-// pub mod particle {
-//     use serde::{Deserialize, Serialize};
-
-//     #[derive(Debug, Serialize, Deserialize, Clone)]
-//     pub enum ParticleNeighboorhoodVariant {
-//         Sectors,
-//         OctTree,
-//         QuadTree,
-//     }
-// }
-// pub mod field {
-//     use serde::{Deserialize, Serialize};
-
-//     #[derive(Debug, Serialize, Deserialize, Clone)]
-//     pub enum FieldNeighboorhoodVariant {
-//         Sectors,
-//         VonNeumann,
-//         Moore,
-//         Random,
-//     }
-// }
-
-//  Vec indexed by sys1_id
-//      Vec indexed by sys2_id
-//          -> system-system pairs. now: find entity-entity pairs!
-//
-//          Enum NeighborhoodVariant ?
-//
-//  NeighborhoodVariant
-//      All: Vec of all sys2_ids
-//      Sectors: Vec of all nodes in nearby sectors
-//      Tree: Vec of nodes (construct where?)
-//      CellAuto: nodes selected via Moore/Neumann
-//      pairs ?
