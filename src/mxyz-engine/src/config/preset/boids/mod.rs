@@ -75,7 +75,7 @@ fn setup_config(config: &mut EngineConfig, systems: &mut Vec<UnsizedSystem>) {
 
     // BOID
     let integrator_variant = ForceIntegratorVariant::EulerExplicit;
-    let integrator_variant = ObjectIntegratorVariant::ForceIntegrator(integrator_variant);
+    let integrator_variant = ObjectIntegratorVariant::Force(integrator_variant);
     let integrator_variant = IntegratorVariant::Object(integrator_variant);
     let mut integrator = Integrator::new(integrator_variant);
     let mut interactions = vec![];

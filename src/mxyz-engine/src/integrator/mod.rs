@@ -36,7 +36,7 @@ impl Integrator {
     ) -> Box<dyn Entity> {
         let integrate = match &self.variant {
             IntegratorVariant::Object(integrator) => match integrator {
-                ObjectIntegratorVariant::ForceIntegrator(integrator) => match integrator {
+                ObjectIntegratorVariant::Force(integrator) => match integrator {
                     ForceIntegratorVariant::EulerExplicit => {
                         integrator_variant::object::force::euler::explicit::euler_explicit
                     }
