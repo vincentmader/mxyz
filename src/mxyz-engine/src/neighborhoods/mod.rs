@@ -1,54 +1,75 @@
 use crate::state::UnsizedState;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 /// Neighboorhood Variant
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, Hash)]
 pub enum NeighborhoodVariant {
     None,
     All,
     Sectors(Option<usize>),
-    // Particle(particle::ParticleNeighboorhoodVariant),
-    // Field(field::FieldNeighboorhoodVariant),
+    // OctTree(oct_tree::OctTree),
+    // Random(random::Random),
+    // Moore(moore::Moore),
+    // VonNeumann(von_neumann::VonNeumann),
 }
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct Neighborhoods {
-    systems: Vec<NeighborhoodVariant>,
-}
+
+// =============================================================================
+
+/// Neighborhoods
+/// - sorted by system-id & neighborhood-variant
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct Neighborhoods(pub Vec<HashMap<NeighborhoodVariant, NeighborhoodVariant>>);
+
 impl From<&UnsizedState> for Neighborhoods {
     fn from(state: &UnsizedState) -> Self {
-        let mut a = vec![];
-        for (system_id, system) in state.systems.iter().enumerate() {
-            // let mut b = vec![];
-            for (_integrator_id, integrator) in system.integrators.iter().enumerate() {
-                // let mut c = vec![];
-                for (other_id, _other) in state.systems.iter().enumerate() {
-                    let neighborhood = integrator
-                        .matrix
-                        .get_neighborhood_variant(system_id, other_id);
-                    let neighborhood = match neighborhood {
-                        NeighborhoodVariant::None => NeighborhoodVariant::None,
-                        NeighborhoodVariant::All => NeighborhoodVariant::All,
-                        NeighborhoodVariant::Sectors(_) => todo!(), // TODO get neighborhood
-                    };
-                    // c.push(neighborhood);
+        // Loop over systems & create neighborhoods for each.
+        let neighborhoods = state
+            .systems
+            .iter()
+            .enumerate()
+            .map(|(system_id, system)| {
+                let mut neighborhoods = HashMap::new();
+                // Loop over integrators for all system-system pairs. (system-other)
+                for (_integrator_id, integrator) in system.integrators.iter().enumerate() {
+                    for (other_id, _other) in state.systems.iter().enumerate() {
+                        // Get neighborhood-variant for specific integrator.
+                        let neighborhood = integrator
+                            .matrix
+                            .get_neighborhood_variant(system_id, other_id);
+                        // Build neighborhood.
+                        let c = match neighborhood {
+                            NeighborhoodVariant::None => NeighborhoodVariant::None,
+                            NeighborhoodVariant::All => NeighborhoodVariant::All,
+                            NeighborhoodVariant::Sectors(_) => todo!(), // TODO get neighborhood
+                        };
+                        neighborhoods.insert(neighborhood.clone(), c); // TODO remove clone
+                    }
                 }
-                // b.push(c);
-            }
-            // a.push(b);
-        }
-        Neighborhoods { systems: a }
+                neighborhoods
+            })
+            .collect();
+        Neighborhoods(neighborhoods)
     }
 }
-impl Neighborhoods {}
 
-// pub enum NeighborhoodVariant {
-//     All,
-// OctTree(oct_tree::OctTree),
-// Sectors(sectors::Sectors),
-// Random(random::Random),
-// Moore(moore::Moore),
-// VonNeumann(von_neumann::VonNeumann),
-// }
+impl Neighborhoods {
+    pub fn get_neighborhood(
+        &self,
+        system_id: usize,
+        neighborhood: NeighborhoodVariant,
+    ) -> NeighborhoodVariant {
+        match self.0.get(system_id).unwrap().get(&neighborhood) {
+            Some(x) => x.clone(),
+            None => NeighborhoodVariant::None,
+        }
+    }
+}
+
+// =============================================================================
+
+// let mut a: HashMap<NeighborhoodVariant, usize> = HashMap::new();
+// a.insert(NeighborhoodVariant::All, 1);
 
 // mod all {
 //     // use super::Neighboorhoods;

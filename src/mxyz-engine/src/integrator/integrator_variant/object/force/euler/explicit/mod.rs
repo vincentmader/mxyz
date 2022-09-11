@@ -31,6 +31,7 @@ pub fn euler_explicit(
     for (system_id, system) in state.systems.iter().enumerate() {
         // Skip system if interaction-matrix entry for integrator is equal to NeighboorhoodVariant::None (TODO)
         let neighborhood = matrix.get_neighborhood_variant(entity_id.0, system_id);
+        let neighborhood = neighborhoods.get_neighborhood(system_id, neighborhood);
         let neighborhood = match neighborhood {
             NeighborhoodVariant::All => (0..system.entities.len()).collect::<Vec<usize>>(),
             NeighborhoodVariant::Sectors(_) => vec![1, 2, 3], // TODO

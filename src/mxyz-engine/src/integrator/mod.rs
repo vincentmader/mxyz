@@ -25,14 +25,13 @@ impl InteractionMatrix {
         neighborhood: NeighborhoodVariant,
     ) {
         let interaction_matrix = &mut self.0;
-        // interaction_matrix.insert(system_id);
-        // interaction_matrix
-        //     .entry(system_id)
-        //     .or_insert(HashMap::new());
-        // interaction_matrix
-        //     .get(&system_id)
-        //     .unwrap()
-        //     .insert(other_id, neighborhood);
+        let _ = interaction_matrix
+            .entry(system_id)
+            .or_insert(HashMap::new());
+        interaction_matrix
+            .get_mut(&system_id)
+            .unwrap()
+            .insert(other_id, neighborhood);
     }
 
     pub fn get_neighborhood_variant(
@@ -40,17 +39,13 @@ impl InteractionMatrix {
         system_id: usize,
         other_id: usize,
     ) -> NeighborhoodVariant {
-        let interaction_matrix = &self.0;
-        match interaction_matrix.get(&system_id) {
+        match self.0.get(&system_id) {
             Some(x) => match x.get(&other_id) {
-                Some(x) => x,
-                None => &NeighborhoodVariant::None,
+                Some(x) => x.clone(), // TODO remove clone
+                None => NeighborhoodVariant::None,
             },
-            None => &NeighborhoodVariant::None,
-        };
-
-        // let neighborhood = self.0
-        NeighborhoodVariant::None
+            None => NeighborhoodVariant::None,
+        }
     }
 }
 
