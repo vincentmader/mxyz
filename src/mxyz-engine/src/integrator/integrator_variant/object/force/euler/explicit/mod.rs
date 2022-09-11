@@ -1,16 +1,13 @@
 use crate::config::EngineConfig;
 use crate::entity::Entity;
 use crate::integrator::InteractionMatrix;
+use crate::interaction::interaction_variant::force;
 use crate::interaction::interaction_variant::force::ForceVariant;
 use crate::interaction::interaction_variant::InteractionVariant;
 use crate::interaction::Interaction;
 use crate::neighborhoods::NeighborhoodVariant;
 use crate::neighborhoods::Neighborhoods;
 use crate::state::UnsizedState;
-use serde::{Deserialize, Serialize};
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct EulerExplicitObjectForceIntegrator {}
 
 const DT: f64 = 0.01;
 
@@ -22,19 +19,21 @@ pub fn euler_explicit(
     matrix: &InteractionMatrix,
     _config: &EngineConfig,
 ) -> Box<dyn Entity> {
-    use crate::interaction::interaction_variant::force;
     let (entity_id, entity) = entity;
 
     // Loop over systems, calculate over-all force acting on entity.
     let mut total_force = [0., 0., 0.];
     for (system_id, system) in state.systems.iter().enumerate() {
         // Skip system if interaction-matrix entry for integrator is equal to NeighboorhoodVariant::None (TODO)
-        let neighborhood_variant = matrix.get_neighborhood_variant(entity_id.0, system_id);
+        let neighborhood_variant = &matrix.0[entity_id.0][system_id];
         let neighborhood = neighborhoods.get_neighborhood(system_id, neighborhood_variant);
+        // Get list of relevant entity-ids.
         let other_ids = match neighborhood {
-            NeighborhoodVariant::All => (0..system.entities.len()).collect::<Vec<usize>>(),
+            NeighborhoodVariant::None => vec![],
+            NeighborhoodVariant::All => (0..system.entities.len())
+                .filter(|x| *x != entity_id.1)
+                .collect::<Vec<usize>>(),
             NeighborhoodVariant::Sectors(_) => vec![1, 2, 3], // TODO
-            NeighborhoodVariant::None => continue,
         };
 
         // Loop over entities in other system.
@@ -44,10 +43,12 @@ pub fn euler_explicit(
             if entity_id == (other_id) {
                 continue;
             }
+            // Loop over interactions.
             for interaction in interactions.iter() {
-                // if !interaction.matrix.entries[system_id].unwrap() {
-                //     continue;
-                // }
+                // Skip if interaction is not set to active.
+                if !interaction.active {
+                    continue;
+                }
                 let get_force = match &interaction.variant {
                     InteractionVariant::Force(force) => match force.variant {
                         ForceVariant::NewtonianGravity => force::newtonian_gravity::from,

@@ -34,9 +34,7 @@ impl From<&UnsizedState> for Neighborhoods {
                 for (_integrator_id, integrator) in system.integrators.iter().enumerate() {
                     for (other_id, _other) in state.systems.iter().enumerate() {
                         // Get neighborhood-variant for specific integrator.
-                        let neighborhood = integrator
-                            .matrix
-                            .get_neighborhood_variant(system_id, other_id);
+                        let neighborhood = &integrator.matrix.0[system_id][other_id];
                         // Build neighborhood.
                         let c = match neighborhood {
                             NeighborhoodVariant::None => NeighborhoodVariant::None,
@@ -57,7 +55,7 @@ impl Neighborhoods {
     pub fn get_neighborhood(
         &self,
         system_id: usize,
-        neighborhood: NeighborhoodVariant,
+        neighborhood: &NeighborhoodVariant,
     ) -> NeighborhoodVariant {
         match self.0.get(system_id).unwrap().get(&neighborhood) {
             Some(x) => x.clone(),

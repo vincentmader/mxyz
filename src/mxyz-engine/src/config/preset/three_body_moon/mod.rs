@@ -13,7 +13,6 @@ use crate::interaction::Interaction;
 use crate::neighborhoods::NeighborhoodVariant;
 use crate::system::unsized_system::unsized_system_variant::UnsizedSystemVariant;
 use crate::system::unsized_system::UnsizedSystem;
-use std::collections::HashMap;
 
 // const NR_OF_STEPS: u128 = usize::MAX;
 const G: f64 = 1.;
@@ -92,9 +91,7 @@ fn setup_config(config: &mut EngineConfig, systems: &mut Vec<UnsizedSystem>) {
     integrator.interactions = interactions;
 
     let neighborhood = NeighborhoodVariant::All;
-    integrator
-        .matrix
-        .set_neighborhood_variant(1, 0, neighborhood.clone());
+    integrator.matrix.0[1][0] = neighborhood;
 
     integrators.push(integrator); // NOTE needs to be run for each system!
     systems[1].integrators = integrators;
@@ -116,12 +113,8 @@ fn setup_config(config: &mut EngineConfig, systems: &mut Vec<UnsizedSystem>) {
     integrator.interactions = interactions;
 
     let neighborhood = NeighborhoodVariant::All;
-    integrator
-        .matrix
-        .set_neighborhood_variant(2, 0, neighborhood.clone());
-    integrator
-        .matrix
-        .set_neighborhood_variant(2, 1, neighborhood);
+    integrator.matrix.0[2][0] = neighborhood.clone();
+    integrator.matrix.0[2][1] = neighborhood.clone();
 
     integrators.push(integrator);
     systems[2].integrators = integrators;
