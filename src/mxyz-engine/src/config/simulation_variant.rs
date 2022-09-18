@@ -1,7 +1,21 @@
 #![allow(unreachable_patterns)]
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+pub enum SimulationCategory {
+    PhysicalField(PhysicalField),
+    // ...?
+}
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+pub enum PhysicalField {
+    ElectroMagnetism(Vec<SimulationVariant>),
+    QuantumMechanics(Vec<SimulationVariant>),
+    ClassicalMechanics(Vec<SimulationVariant>),
+    ThermoDynamics(Vec<SimulationVariant>),
+    FluidDynamics(Vec<SimulationVariant>),
+    EmergentBehavior(Vec<SimulationVariant>),
+}
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub enum SimulationVariant {
     ThreeBodyFigureEight,
     ThreeBodyMoon,
@@ -9,6 +23,24 @@ pub enum SimulationVariant {
     ChargeInteraction,
     IsingModel,
     Boids,
+}
+impl SimulationVariant {
+    pub fn get_by_physical_field(field: PhysicalField) -> Vec<SimulationVariant> {
+        match field {
+            PhysicalField::ElectroMagnetism(_) => vec![Self::ChargeInteraction, Self::IsingModel],
+            PhysicalField::QuantumMechanics(_) => vec![],
+            PhysicalField::ClassicalMechanics(_) => {
+                vec![
+                    Self::ThreeBodyMoon,
+                    Self::ThreeBodyFigureEight,
+                    Self::SymmetricSatellites,
+                ]
+            }
+            PhysicalField::ThermoDynamics(_) => vec![],
+            PhysicalField::FluidDynamics(_) => vec![],
+            PhysicalField::EmergentBehavior(_) => vec![Self::Boids],
+        }
+    }
 }
 impl std::convert::Into<usize> for SimulationVariant {
     // NOTE: This is only used for to-file engine exports (directory names) at the moment.
