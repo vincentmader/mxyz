@@ -16,15 +16,15 @@
     <body style="background-color: #111111">
     {% block body %}
 
-        <div class="page_header">
+        <div id="page_header">
         {% block page_header %}
-            <div class="home-button-container">
-                <a href="/" class="home-button">mader.xyz</a>
+            <div id="home-button-container">
+                <a href="/" id="home-button">mader.xyz</a>
             </div>
         {% endblock page_header %}            
         </div>
 
-        <div class="page_content">
+        <div id="page_content">
         {% block page_content %}
         {% endblock page_content %}
         </div>

@@ -1,12 +1,13 @@
 .navgrid_thumbnail {
+  width: calc(
+    var(--thumbnail_initial_width) * 100%
+  ); /* make square (with :after) */
   border: var(--main-border);
   border-radius: var(--main-border-radius);
   box-shadow: inset 0px 0px 0px 0px black;
   box-sizing: border-box;
   cursor: pointer;
 
-  /* make square (with :after) */
-  width: calc(var(--thumbnail_initial_width) * 100%);
   /* center */
   display: block;
   margin-left: auto;

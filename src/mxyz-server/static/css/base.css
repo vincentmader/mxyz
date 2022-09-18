@@ -1,14 +1,13 @@
 /* @import url("canvas.css"); */
 /* @import url("section.css"); */
 
-div,
 body {
   --main-bg-color: #111111;
   --main-section-color: #222222;
   --main-border-color: #333333;
   --main-text-color: #bbbbbb;
   --main-font-family: Arial, Verdana, Trebuchet MS, Helvetica, sans-serif; /* TODO choose font */
-  --main-border-width: 2px;
+  --main-border-width: 3px;
   --main-border: var(--main-border-width) solid var(--main-border-color);
   --main-border-radius: 25px;
   --debug-border: 1px solid #333333;
@@ -18,12 +17,11 @@ body {
   --font-size-title: calc(var(--font-size-main));
   --font-size-navgrid-section: var(--font-size-main);
   --font-size-navgrid-thumbnail: var(--font-size-main);
-  --main-header-height: calc(2 * var(--font-size-main));
+  --main-header-height: 2em;
   --page_column_pad: 25px;
   /* TODO rename? -> atm only used for simulation */
   /* TODO why canvas-fitting not working when changing --page_column_pad ? */
-}
-body {
+
   width: 100%;
   margin: 0px;
   padding: 0px;
@@ -35,33 +33,31 @@ body {
 
 /* PAGE HEADER ====================================== */
 
-.page_header {
+#page_header {
   width: calc(100% - 2 * var(--page_column_pad));
+  /* text-align: right; */
   background-color: var(--main-bg-color);
   outline: var(--main-border);
   position: fixed;
+  /* height: var(--main-header-height); */
   z-index: 1000;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   padding-right: var(--page_column_pad);
   padding-left: var(--page_column_pad);
-  /* padding-top: calc(var(--page_column_pad) / 2); */
-  /* padding-bottom: calc(var(--page_column_pad) / 2); */
-  padding-top: calc(var(--font-size-title) / 2);
-  padding-bottom: calc(var(--font-size-title) / 2);
+  padding-top: calc(var(--page_column_pad) / 4);
+  padding-bottom: calc(var(--page_column_pad) / 4);
   /* padding: auto; */
   /* padding-top: calc(var(--main-header-height) - var(--font-size-main)) / 2; */
   /* padding-bottom: calc(var(--main-header-height) - var(--font-size-main)); */
-  /* height: var(--main-header-height); */
   /* padding-bottom: 100px; */
-  /* text-align: right; */
 }
 
-.home-button-container {
+#home-button-container {
   text-align: left;
   padding-left: calc(var(--main-border-radius));
 }
-.home-button {
+#home-button {
   cursor: pointer;
   color: var(--main-text-color);
   font-size: var(--font-size-title);
@@ -72,15 +68,15 @@ body {
 
 /* PAGE CONTENT ====================================== */
 
-.page_content {
+#page_content {
   position: absolute;
-  width: 100%;
+  margin-top: 3em;
+  padding-bottom: 1em;
+  --width: calc(100% - 2 * var(--main-x-pad));
+  width: var(--width);
   --pad: var(var(--main-x-pad));
   padding-left: var(--pad);
   padding-right: var(--pad);
-  margin-top: var(--main-header-height);
-  /* margin-top: calc(2 * var(--font-size-title)); */
-  /* padding-bottom: 2em; */
 }
 
 /* VARIOUS =========================================== */

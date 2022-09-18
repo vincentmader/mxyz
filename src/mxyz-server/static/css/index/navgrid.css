@@ -1,18 +1,18 @@
-.navgrid_container {
+#navgrid_container {
 }
-.navgrid {
+#navgrid {
   --thumbnail_initial_width: 0.9;
   --thumbnail_max_width: 0.97;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
 }
 @media only screen and (max-width: 1201px) {
-  .navgrid {
+  #navgrid {
     grid-template-columns: repeat(4, 1fr);
   }
 }
 @media only screen and (max-width: 751px) {
-  .navgrid {
+  #navgrid {
     grid-template-columns: repeat(3, 1fr);
   }
 }

@@ -1,7 +1,6 @@
 .navgrid_section_title {
   width: 100%;
   text-align: center;
-  color: var(--main-text-color);
   font-weight: bold;
   /* border: var(--debug-border); */
   padding-top: 1em;
@@ -11,7 +10,7 @@
   /* font-weight: 690; */
 }
 
-.navgrid_section {
+#navgrid_section {
   width: 100%;
   margin-bottom: 1em;
   /* border: 1px solid #333333; */
