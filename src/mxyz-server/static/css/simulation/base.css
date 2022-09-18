@@ -23,7 +23,7 @@
 #page-columns {
 }
 #page-column-left {
-  margin-top: var(--main-header-height);
+  /* margin-top: var(--main-header-height); */
   width: calc(var(--canvas-width) - 2 * var(--page_column_pad));
   padding: var(--page_column_pad);
 }
@@ -80,7 +80,7 @@
     float: right;
     width: calc(100% - var(--canvas-width) - 1 * var(--page_column_pad));
     height: calc(100vh - var(--main-header-height));
-    margin-top: var(--main-header-height);
+    /* margin-top: var(--main-header-height); */
     padding-left: calc(0.5 * var(--page_column_pad));
     padding-right: var(--page_column_pad);
   }

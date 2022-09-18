@@ -4,7 +4,7 @@
   border: var(--main-border);
   text-align: center;
   padding: var(--page_column_pad);
-
+  width: calc(100% - 2 * var(--page_column_pad));
   /* box-shadow: inset 0px 0px 0px 0px black; */
   /* box-shadow: inset 10px 1px 1px 1px red; */
   /* box-sizing: border-box; */

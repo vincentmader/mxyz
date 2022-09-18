@@ -1,0 +1,34 @@
+[package]
+    name = "mxyz-client2"
+    version = "0.1.0"
+    authors = ["Vincent C. Mader <vincent@mader.xyz>"]
+    edition = "2021"
+
+[dependencies]
+    yew = "0.19"
+    gloo = "0.8.0"
+    serde = "1.0.144"
+    serde_json = "1.0.85"
+    wasm-bindgen =  "^0.2"
+    mxyz-engine = { path = "../mxyz-engine" }
+    mxyz-client = { path = "../mxyz-client" }
+    getrandom = { version = "0.2", features = ["js"] }
+    # wasm-bindgen = { version = "^0.2", features = ["nightly", "serde-serialize"] }
+    # wasm-bindgen-futures = "0.4"
+
+[dependencies.stylist]
+version = "0.10.1"
+features = [
+    "yew",
+]
+
+[dependencies.web-sys]
+version = "0.3"
+features = [
+    "console",
+    "HtmlElement",
+    "HtmlInputElement",
+    "MouseEvent",
+    "DomRect",  # for `get_bounding_client_rect` method.
+]
+

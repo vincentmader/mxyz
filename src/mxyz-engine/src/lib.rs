@@ -17,10 +17,11 @@ use system::unsized_system::UnsizedSystem;
 pub trait Engine {
     /// Initialize state & engine-config.
     fn init(&mut self, sim_variant: Option<SimulationVariant>) {
-        // Initialize state.
-        let initial_state = preset::get_initial_state(sim_variant, self.mut_engine_config());
+        // Initialize state & engine-config.
+        let mut config = self.mut_engine_config();
+        let state = preset::get_initial_state(sim_variant, &mut config);
         // Add state to engine state-vector.
-        self.add_engine_state(initial_state);
+        self.add_engine_state(state);
     }
 
     fn run(&mut self);
@@ -92,7 +93,6 @@ pub trait Engine {
     ) -> Box<dyn Entity> {
         let (config, state) = (self.get_engine_config(), self.get_current_state());
         let entity = integrator.forward_entity(entity, state, config, neighborhoods);
-
         entity
     }
 

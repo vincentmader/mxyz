@@ -1,8 +1,8 @@
-<div id="navgrid_container">
+<div class="navgrid_container">
 {% for section in navgrid.sections %}
     <div class="navgrid_section_title">{{ section.title }}</div>
-    <div id="navgrid_section">
-        <div id="navgrid">
+    <div class="navgrid_section">
+        <div class="navgrid">
             {% for item in section.items %}
                 <a href="./simulations/{{ section.section_id }}/{{ item.item_id }}" 
                   class="navgrid_cell"
