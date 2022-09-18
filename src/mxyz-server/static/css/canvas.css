@@ -1,6 +1,7 @@
 .canvas_container {
   /* border: var(--main-border) */
   border-radius: var(--main-border-radius);
+  outline: var(--main-border);
   /* width: 100%; */
   /* height: 100%; */
   /* width: 94%; */
@@ -10,9 +11,8 @@
   /* margin-right: 3%; */
 }
 canvas {
-  outline: var(--main-border);
   background-color: black;
-  border-radius: var(--main-border-radius);
+  /* border-radius: var(--main-border-radius); */
   width: 100%;
   /* height: 100vh; */
   /* overflow: hidden; */
