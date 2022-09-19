@@ -12,6 +12,10 @@ build_client:
 		cargo build --target wasm32-unknown-unknown # --release
 	cd ./src && \
 		wasm-bindgen --target web --out-dir "./mxyz-server/static/pkg" "./target/wasm32-unknown-unknown/debug/mxyz_client.wasm"
+	cd ./src/mxyz-client2 && \
+		trunk build --release
+	cd ./src/mxyz-server/static/dist && mv index.html index.html.tera
+	cd ./bin/build2 && ./fix_yew_index.py
 build_engine:
 	# ./bin/rebuild_db
 	cd ./src && \
@@ -34,6 +38,8 @@ run_server:
 	# ./bin/rebuild_db
 	cd ./src && \
 		cargo run -p mxyz-server # --release
+yew:
+	cd ./src/mxyz-client2 && trunk serve
 # -----------------------------------------------------------------------------
 dc:
 	cd ./src/ && \

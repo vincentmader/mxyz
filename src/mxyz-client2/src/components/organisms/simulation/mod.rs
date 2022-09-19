@@ -1,6 +1,6 @@
 use yew::prelude::*;
 
-const STYLE_FILE: &str = include_str!("../../../../../mxyz-server/static/css/canvas.css");
+const STYLE_FILE: &str = include_str!("../../../../../mxyz-server/static/css/simulation/base.css");
 
 #[derive(PartialEq, yew::Properties, std::default::Default)]
 pub struct Props {}
@@ -14,7 +14,7 @@ pub fn fn_name(_props: &Props) -> Html {
             <div id="page-columns">
                 <div id="page-column-left">
                     <div class="canvas_container">
-                        <canvas id="canvas_0" width="1000px"> </canvas>
+                        <canvas id="canvas_0" width="1000px" height="1000px"> </canvas>
                         // <script>
                         //     let cnv = document.getElementById("canvas_0");
                         //     cnv.height = cnv.width;  // TODO make changeable

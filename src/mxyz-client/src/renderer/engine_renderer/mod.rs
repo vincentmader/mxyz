@@ -3,7 +3,6 @@ use crate::utils::dom;
 use mxyz_engine::config::engine_runner_variant::EngineRunnerVariant;
 use mxyz_engine::config::EngineConfig;
 use mxyz_engine::state::UnsizedState;
-use mxyz_engine::system::unsized_system::unsized_system_variant::UnsizedSystemVariant;
 use mxyz_engine::system::unsized_system::UnsizedSystem;
 
 const CANVAS_ID: u8 = 0; // TODO move?
@@ -72,7 +71,7 @@ impl EngineRenderer {
 
         //
         let integrators_id = format!("system-section-{}-integrators", system_id);
-        let integrators = get_or_create_element(&section_element_id, "ul", &integrators_id);
+        let _integrators = get_or_create_element(&section_element_id, "ul", &integrators_id);
 
         for (integrator_idx, integrator) in system.integrators.iter().enumerate() {
             //
@@ -87,7 +86,7 @@ impl EngineRenderer {
                 "system-section-{}-integrator-{}-interactions",
                 system_id, integrator_idx
             );
-            let interactions_el = get_or_create_element(&integrator_id, "ul", &interactions_id);
+            let _interactions_el = get_or_create_element(&integrator_id, "ul", &interactions_id);
             // let integrator_title: String = (&integrator.variant).to_string();
             // integrator_el.set_inner_html(&format!("<p>{}</p><ul></ul>", integrator_title));
 
@@ -135,8 +134,8 @@ impl EngineRenderer {
     }
     /// Draw System.
     pub fn draw_system(&mut self, system: &(usize, &UnsizedSystem)) {
-        let (system_id, system) = system;
-        for (entity_id, entity) in system.entities.iter().enumerate() {
+        let (_system_id, system) = system;
+        for (_entity_id, entity) in system.entities.iter().enumerate() {
             match system.variant {
                 // SystemVariant::EntitiesV1 => {}
                 _ => {

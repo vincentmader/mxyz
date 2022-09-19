@@ -3,15 +3,20 @@ use crate::components::atoms::text_input::TextInput;
 use std::ops::Deref;
 use yew::prelude::*;
 
+#[derive(Properties, PartialEq)]
+pub struct Props {
+    pub onsubmit: Callback<Data>,
+}
+
 #[derive(Default, Clone)]
-struct Data {
+pub struct Data {
     pub username: String,
     pub password: String,
     pub count: u32,
 }
 
 #[function_component(LoginForm)]
-pub fn login_form() -> Html {
+pub fn login_form(props: &Props) -> Html {
     let state = use_state(|| Data::default());
 
     let cloned_state = state.clone();
@@ -37,14 +42,22 @@ pub fn login_form() -> Html {
         cloned_state.set(data);
     });
 
+    let cloned_state = state.clone();
+    let form_onsubmit = props.onsubmit.clone();
+    let form_onsubmit = Callback::from(move |event: FocusEvent| {
+        event.prevent_default();
+        let data = cloned_state.deref().clone();
+        form_onsubmit.emit(data)
+    });
+
     html! {
-        <div>
+        <form onsubmit={form_onsubmit}>
             <TextInput label="username" onchange={username_changed}/>
             <TextInput label="password" onchange={password_changed}/>
             <Button label="Submit" onclick={submit_onclick}/>
             <p>{"Username: "}{&state.username}</p>
             <p>{"Password: "}{&state.password}</p>
             <p>{"Button clicked: "}{state.count}</p>
-        </div>
+        </form>
     }
 }

@@ -1,4 +1,4 @@
-mod app;
+pub mod app;
 pub mod atoms;
 pub mod molecules;
 pub mod organisms;

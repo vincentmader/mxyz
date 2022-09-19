@@ -1,4 +1,5 @@
 /.git
+/output
 /target
 Cargo.lock
-/output
+dist/
