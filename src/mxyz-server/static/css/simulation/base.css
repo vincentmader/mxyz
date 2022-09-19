@@ -32,8 +32,18 @@
 #page-column-left canvas {
   border: none;
   border-radius: var(--main-border-radius);
-  box-shadow: 0 0 0 var(--main-border-width) var(--main-border-color);
+  /* box-shadow: 0 0 0 var(--main-border-width) var(--main-border-color); */
   outline: none;
+  background-color: black;
+  /* border: none; */
+  /* outline: none; */
+  /* border-radius: var(--main-border-radius); */
+  width: 100%;
+  /* height: 100vh; */
+  /* overflow: hidden; */
+  /* --x: var(--main-border-width); */
+  /* box-shadow: inset var(--x) var(--x) var(--x) var(--x) red; */
+  box-sizing: border-box;
 }
 #page-column-right {
   padding-right: var(--page_column_pad);
@@ -100,4 +110,21 @@ h4 {
 ul {
   margin-top: 0;
   margin-bottom: 0;
+}
+
+/* CANVAS */
+.canvas_container {
+  /* border: var(--main-border) */
+  border-radius: var(--main-border-radius);
+  outline: var(--main-border);
+  /* width: 100%; */
+  /* height: 94%; */
+  /* width: 94%; */
+  /* margin-top: 3%; */
+  /* margin-bottom: 3%; */
+  /* margin-left: 3%; */
+  /* margin-right: 3%; */
+  overflow: hidden;
+}
+canvas {
 }

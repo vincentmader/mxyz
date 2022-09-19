@@ -1,8 +1,11 @@
 .navgrid_cell {
   text-decoration: none;
   color: var(--main-text-color);
+  background-color: var(--main-bg-color);
   text-align: center;
-  cursor: default;
+  /* cursor: default; */
+  border: none;
+  outline: none;
 }
 
 .navgrid_cell_title {
