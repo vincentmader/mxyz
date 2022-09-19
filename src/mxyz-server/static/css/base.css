@@ -7,7 +7,7 @@ body {
   --font-size-main: 1em;
   --font-size-title: calc(var(--font-size-main));
   --font-size-navgrid-section: var(--font-size-main);
-  --font-size-navgrid-thumbnail: var(--font-size-main);
+  --font-size-navgrid-thumbnail: calc(3 / 4 * var(--font-size-main));
   --main-bg-color: #111111;
   --main-border-color: #333333;
   --main-border-radius: 25px;
@@ -61,7 +61,8 @@ body {
 }
 
 .home-button-container {
-  padding-left: calc(var(--main-border-radius));
+  width: 100%;
+  padding-left: calc(0 * var(--main-border-radius));
   text-align: left;
 }
 .home-button {

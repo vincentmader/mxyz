@@ -21,7 +21,7 @@
 }
 @media only screen and (min-width: 1201px) {
   .page_content {
-    --width: 70%;
+    --width: 80%;
     width: var(--width);
     --pad: calc((100% - var(--width)) / 2);
     padding-left: var(--pad);

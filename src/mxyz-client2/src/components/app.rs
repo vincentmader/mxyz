@@ -1,6 +1,8 @@
 use crate::components::molecules::navbar_top::NavbarTop;
 use crate::components::organisms::index::Index;
 use crate::components::organisms::simulation::Simulation;
+use mxyz_client::client::EngineClient;
+use mxyz_engine::config::engine_runner_variant::EngineRunnerVariant;
 use mxyz_engine::config::simulation_variant::SimulationVariant;
 use std::ops::Deref;
 use yew::prelude::*;
@@ -15,6 +17,11 @@ pub struct AppState {
 #[function_component(App)]
 pub fn fn_name() -> Html {
     let style = stylist::Style::new(STYLE_FILE).unwrap();
+
+    let engine_runner_variant = EngineRunnerVariant::ClientWASM;
+    // let a: Box<dyn EngineClient> = Box::from(&engine_runner_variant);
+    let mut engine_runner: Box<dyn EngineClient> = (&engine_runner_variant).into();
+    // engine_runner.init("nbody-gravity", "3body-moon");
 
     let app_state = use_state(AppState::default);
 

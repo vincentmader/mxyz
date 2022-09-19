@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub enum PhysicalField {
     ElectroMagnetism(Vec<SimulationVariant>),
+    ClassicalMechanics(Vec<SimulationVariant>),
     QuantumMechanics(Vec<SimulationVariant>),
     NewtonianGravity(Vec<SimulationVariant>),
     Oscillators(Vec<SimulationVariant>),
@@ -13,11 +14,14 @@ pub enum PhysicalField {
     FluidDynamics(Vec<SimulationVariant>),
     EmergentBehavior(Vec<SimulationVariant>),
     MachineLearning(Vec<SimulationVariant>),
+    Mathematics(Vec<SimulationVariant>),
+    Biology(Vec<SimulationVariant>),
 }
 impl PhysicalField {
     pub fn get_all() -> Vec<PhysicalField> {
         vec![
             Self::NewtonianGravity(vec![]),
+            Self::ClassicalMechanics(vec![]),
             Self::Oscillators(vec![]),
             Self::ElectroMagnetism(vec![]),
             Self::FluidDynamics(vec![]),
@@ -25,6 +29,8 @@ impl PhysicalField {
             Self::QuantumMechanics(vec![]),
             Self::EmergentBehavior(vec![]),
             Self::MachineLearning(vec![]),
+            Self::Mathematics(vec![]),
+            Self::Biology(vec![]),
             // NOTE keep updated with above enum definition
         ]
     }
@@ -33,6 +39,7 @@ impl PhysicalField {
     pub fn to_string(&self) -> String {
         match self {
             Self::EmergentBehavior(_) => "emergent behavior",
+            Self::ClassicalMechanics(_) => "classical mechanics",
             Self::FluidDynamics(_) => "fluid dynamics",
             Self::ElectroMagnetism(_) => "electro-magnetism",
             Self::QuantumMechanics(_) => "quantum mechanics",
@@ -40,6 +47,8 @@ impl PhysicalField {
             Self::Oscillators(_) => "oscillators",
             Self::ThermoDynamics(_) => "thermo-dynamics",
             Self::MachineLearning(_) => "machine learning",
+            Self::Biology(_) => "biology",
+            Self::Mathematics(_) => "mathematics",
         }
         .to_owned()
     }
@@ -57,6 +66,7 @@ pub enum SimulationVariant {
     IsingModel,
     Boids,
     Ants,
+    PlanetoidCoagulation,
     BrownianMotion,
     ThermalMotion,
     QuantumMechanicalHarmonicOscillator,
@@ -77,36 +87,84 @@ pub enum SimulationVariant {
     DrawnDigitClassifier,
     DrawnObjectClassifier,
     MonteCarloPiCalculation,
+    CannonBallTrajectories,
+    LunarTides,
+    MultiPendulum,
+    BilliardBallCollision,
+    GalileanCannon,
+    ElectricFieldLines,
+    ElectroMagneticWave,
+    LorentzForce,
+    SuborbitalTrajectories,
+    StellarCluster,
+    MilkyWay,
+    HeatDiffusion,
+    QMParticleInABox,
+    WavepacketScattering,
+    PipeFluidFlow,
+    RocketEngineFluidFlow,
+    RandomWalk,
+    NuclearFission,
+    BernoulliProcess,
+    EpidemicSpread,
+    PopulationDynamics,
+    Evolution,
+    OctTree,
 }
 impl SimulationVariant {
     pub fn get_by_physical_field(field: PhysicalField) -> Vec<SimulationVariant> {
         match field {
+            PhysicalField::ClassicalMechanics(_) => vec![
+                Self::BilliardBallCollision,
+                Self::CannonBallTrajectories,
+                Self::GalileanCannon,
+            ],
             PhysicalField::ElectroMagnetism(_) => vec![
-                Self::ChargeInteraction,
                 Self::IsingModel,
+                Self::ChargeInteraction,
                 Self::WienFilter,
                 Self::Magnet,
+                Self::ElectricFieldLines,
+                Self::LorentzForce,
+                Self::ElectroMagneticWave,
             ],
             PhysicalField::QuantumMechanics(_) => vec![
                 Self::QuantumMechanicalHarmonicOscillator,
                 Self::HydrogenEnergyLevels,
+                Self::QMParticleInABox,
+                Self::WavepacketScattering,
+                Self::NuclearFission,
             ],
             PhysicalField::Oscillators(_) => vec![
-                Self::DoublePendulum,
                 Self::SinglePendulum,
+                Self::DoublePendulum,
+                Self::LissajousFigures,
                 Self::HarmonicOscillator,
                 Self::FourierTransform,
-                Self::LissajousFigures,
+                Self::MultiPendulum,
             ],
             PhysicalField::NewtonianGravity(_) => vec![
                 Self::ThreeBodyMoon,
-                Self::ThreeBodyFigureEight,
                 Self::SymmetricSatellites,
+                Self::ThreeBodyFigureEight,
                 Self::SolarSystem,
                 Self::AsteroidsAroundBinary,
+                Self::PlanetoidCoagulation,
+                Self::LunarTides,
+                Self::SuborbitalTrajectories,
+                Self::StellarCluster,
+                Self::MilkyWay,
             ],
-            PhysicalField::ThermoDynamics(_) => vec![Self::BrownianMotion, Self::ThermalMotion],
-            PhysicalField::FluidDynamics(_) => vec![Self::Diffusion],
+            PhysicalField::ThermoDynamics(_) => vec![
+                Self::ThermalMotion,
+                Self::BrownianMotion,
+                Self::HeatDiffusion,
+            ],
+            PhysicalField::FluidDynamics(_) => vec![
+                Self::Diffusion,
+                Self::PipeFluidFlow,
+                Self::RocketEngineFluidFlow,
+            ],
             PhysicalField::EmergentBehavior(_) => vec![
                 Self::Boids,
                 Self::Ants,
@@ -114,9 +172,20 @@ impl SimulationVariant {
                 Self::RockPaperScissors,
             ],
             PhysicalField::MachineLearning(_) => vec![
-                Self::ChessBot,
                 Self::DrawnDigitClassifier,
                 Self::DrawnObjectClassifier,
+                Self::ChessBot,
+            ],
+            PhysicalField::Mathematics(_) => vec![
+                Self::BernoulliProcess,
+                Self::MonteCarloPiCalculation,
+                Self::RandomWalk,
+                Self::OctTree,
+            ],
+            PhysicalField::Biology(_) => vec![
+                Self::PopulationDynamics,
+                Self::EpidemicSpread,
+                Self::Evolution,
             ],
         }
     }
@@ -124,9 +193,34 @@ impl SimulationVariant {
 impl SimulationVariant {
     pub fn into_short_description_string(&self) -> String {
         match self {
+            Self::BernoulliProcess => "Bernoulli process",
+            Self::RandomWalk => "random walk",
+            Self::PopulationDynamics => "population dynamics",
+            Self::OctTree => "quad-/oct-tree",
+            Self::EpidemicSpread => "spread of epidemic",
+            Self::NuclearFission => "nuclear fission",
+            Self::Evolution => "evolution",
+            Self::MilkyWay => "milky way",
+            Self::RocketEngineFluidFlow => "flow through rocket engine",
+            Self::SuborbitalTrajectories => "suborbital trajectories",
+            Self::PipeFluidFlow => "flow through pipe",
+            Self::WavepacketScattering => "wave-packet scattering",
+            Self::StellarCluster => "stellar cluster",
+            Self::QMParticleInABox => "particle in a box",
+            Self::HeatDiffusion => "heat diffusion",
+            Self::LorentzForce => "Lorentz force",
+            Self::LunarTides => "lunar tides",
+            Self::ElectroMagneticWave => "electro-magnetic wave",
+            Self::BilliardBallCollision => "billiard ball collision",
+            Self::ElectricFieldLines => "electric field lines",
+            Self::GalileanCannon => "Galilean cannon",
+            Self::MultiPendulum => "multi-pendulum",
+            Self::PlanetoidCoagulation => "planetoid coagulation",
+            Self::CannonBallTrajectories => "cannon-ball trajectories",
             Self::ThreeBodyFigureEight => "figure-8 orbit",
+            Self::LunarTides => "lunar tides",
             Self::ThreeBodyMoon => "sun-moon-earth",
-            Self::SymmetricSatellites => "symmetric sattelites",
+            Self::SymmetricSatellites => "symmetric satellites",
             Self::ChargeInteraction => "charge interaction",
             Self::IsingModel => "Ising model",
             Self::Boids => "boids",
