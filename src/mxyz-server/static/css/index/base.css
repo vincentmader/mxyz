@@ -1,9 +1,9 @@
-@import url("navgrid_section.css");
-@import url("navgrid.css");
-@import url("navgrid_cell.css");
-@import url("navgrid_thumbnail.css");
+/* @import url("navgrid_section.css"); */
+/* @import url("navgrid.css"); */
+/* @import url("navgrid_cell.css"); */
+/* @import url("navgrid_thumbnail.css"); */
 
-#page_content {
+.page_content {
   --width: calc(100% - var(--page_column_pad));
   width: var(--width);
   --pad: calc((100% - var(--width)) / 2);
@@ -11,7 +11,7 @@
   padding-right: var(--pad);
 }
 @media only screen and (min-width: 751px) {
-  #page_content {
+  .page_content {
     --width: 90%;
     width: var(--width);
     --pad: calc((100% - var(--width)) / 2);
@@ -20,7 +20,7 @@
   }
 }
 @media only screen and (min-width: 1201px) {
-  #page_content {
+  .page_content {
     --width: 70%;
     width: var(--width);
     --pad: calc((100% - var(--width)) / 2);

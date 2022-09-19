@@ -3,6 +3,10 @@
 {% block head %}
     {{ super() }}
     <link rel="stylesheet" type="text/css" href="/static/css/index/base.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/index/navgrid_section.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/index/navgrid.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/index/navgrid_cell.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/index/navgrid_thumbnail.css">
 {% endblock head %}
 
 {% block page_content %}

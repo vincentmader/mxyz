@@ -44,9 +44,7 @@ pub fn fn_name() -> Html {
     html! {
         <div class={style}>
             <NavbarTop />
-            <div class="page_content">
-                {page}
-            </div>
+            {page}
         </div>
     }
 }
