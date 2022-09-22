@@ -12,7 +12,7 @@ const STYLE_FILE: &str = include_str!("../../../mxyz-server/static/css/base.css"
 #[derive(Clone, std::default::Default)]
 pub struct AppState {
     current_page: AppPage,
-    engine_runner_variant: EngineRunnerVariant,
+    engine_runner_variant: EngineRunnerVariant, // TODO move
 }
 #[function_component(App)]
 pub fn get_component() -> Html {
@@ -31,19 +31,16 @@ pub fn get_component() -> Html {
     let mut engine_runner: Box<dyn EngineClient> = (&app_state.engine_runner_variant).into();
     // engine_runner.init("nbody-gravity", "3body-moon");
 
-    let page = match &app_state.current_page {
-        AppPage::Index => html! {<Index on_page_change={on_page_change} />},
-        AppPage::Simulation(_simulation_variant) => html! {<Simulation />},
-        // _ => html! {<Simulation />},
-    };
+    // let page = match &app_state.current_page {
+    // AppPage::Index => html! {<Index on_page_change={on_page_change} />},
+    // AppPage::Simulation(_simulation_variant) => html! {<Simulation />},
+    // _ => html! {<Simulation />},
+    // };
     html! {
         <div class={style}>
-            // <test::Model />
-            // <NavbarTop />
             <BrowserRouter>
                 <Switch<Route> render={Switch::render(switch)} />
             </BrowserRouter>
-            // {page}
         </div>
     }
 }
@@ -57,21 +54,38 @@ pub enum AppPage {
 
 use yew::functional::*;
 use yew_router::prelude::*;
-#[derive(Debug, Clone, Copy, PartialEq, Routable)]
+#[derive(Debug, Clone, PartialEq, Routable)]
 enum Route {
-    #[at("/")]
-    Index,
-    #[at("/simulation")]
-    Simulation,
+    #[not_found]
     #[at("/404")]
     NotFound,
+    #[at("/")]
+    Index,
+    #[at("/simulation/:simulation_variant")]
+    Simulation { simulation_variant: String },
+    #[at("/test01")]
+    Test01,
 }
 
 fn switch(routes: &Route) -> Html {
     match routes {
-        Route::Index => html! { <h1>{ "Home" }</h1> },
-        Route::Simulation => html! { <h1>{ "Simulation" }</h1> },
-        Route::NotFound => html! { <h1>{ "404" }</h1> },
+        Route::Index => html! { <Index /> },
+        Route::Simulation { simulation_variant } => {
+            gloo::console::log!("{:?}", simulation_variant);
+            let simulation_variant: SimulationVariant =
+                SimulationVariant::from(simulation_variant as &str);
+            html! {  <Simulation simulation_variant={simulation_variant} /> }
+        }
+        Route::NotFound => {
+            gloo::console::log!(format!("Not found: {:?}", routes));
+            html! {
+                <div style="width: 100%; text-align: center;">
+                    <h2 style="color: var(--main-text-color);">{ "Error 404" }</h2>
+                </div>
+            }
+        }
+        Route::Test01 => html! {             <test::Model />
+        },
     }
 }
 

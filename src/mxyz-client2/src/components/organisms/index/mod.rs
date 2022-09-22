@@ -6,14 +6,10 @@ use yew::prelude::*;
 const STYLE_FILE: &str = include_str!("../../../../../mxyz-server/static/css/index/base.css");
 
 #[derive(PartialEq, yew::Properties, Clone)]
-pub struct Props {
-    pub on_page_change: Callback<AppPage>,
-}
+pub struct Props {}
 
 #[function_component(Index)]
 pub fn fn_name(props: &Props) -> Html {
-    let on_page_change = props.on_page_change.clone();
-
     let style = stylist::Style::new(STYLE_FILE).unwrap();
 
     // let custom_form_submit =
@@ -26,7 +22,7 @@ pub fn fn_name(props: &Props) -> Html {
         <div class={style}>
             // <LoginForm onsubmit={custom_form_submit} />
             <div class="page_content">
-                <Navgrid on_page_change={on_page_change} />
+                <Navgrid  />
             </div>
         </div>
     }

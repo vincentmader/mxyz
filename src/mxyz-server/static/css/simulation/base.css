@@ -30,10 +30,10 @@
 #page-column-left .canvas_container {
 }
 #page-column-left canvas {
-  border: none;
+  /* border: none; */
   border-radius: var(--main-border-radius);
+  border: var(--main-border);
   /* box-shadow: 0 0 0 var(--main-border-width) var(--main-border-color); */
-  outline: none;
   background-color: black;
   /* border: none; */
   /* outline: none; */
@@ -114,9 +114,9 @@ ul {
 
 /* CANVAS */
 .canvas_container {
-  /* border: var(--main-border) */
-  border-radius: var(--main-border-radius);
-  outline: var(--main-border);
+  /* border: var(--main-border); */
+  /* outline: var(--main-border); */
+  /* border-radius: var(--main-border-radius); */
   /* width: 100%; */
   /* height: 94%; */
   /* width: 94%; */
@@ -124,7 +124,8 @@ ul {
   /* margin-bottom: 3%; */
   /* margin-left: 3%; */
   /* margin-right: 3%; */
-  overflow: hidden;
+  /* overflow: hidden; */
 }
-canvas {
-}
+/* canvas { */
+/*   /1* overflow: hidden; *1/ */
+/* } */

@@ -57,8 +57,9 @@ impl PhysicalField {
 /// Simulation Variant
 /// - basically an ID for each different simulation setup/preset
 ///
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Default)]
 pub enum SimulationVariant {
+    #[default]
     ThreeBodyFigureEight,
     ThreeBodyMoon,
     SymmetricSatellites,
@@ -249,28 +250,7 @@ impl SimulationVariant {
         .to_owned()
     }
     pub fn into_thumbnail_filename(&self) -> String {
-        let filename = match self {
-            Self::ChargeInteraction => "nbody-charge-interaction",
-            Self::IsingModel => "ising-model",
-            Self::WienFilter => "wien-filter",
-            Self::Diffusion => "diffusion",
-            Self::DoublePendulum => "double-pendulum",
-            Self::LissajousFigures => "lissajous-figures",
-            Self::ThermalMotion => "thermal-motion",
-            Self::BrownianMotion => "brownian-motion",
-            Self::RockPaperScissors => "rock-paper-scissors",
-            Self::SolarSystem => "solar-system",
-            Self::SinglePendulum => "single-pendulum",
-            Self::GameOfLife => "game-of-life",
-            Self::ThreeBodyMoon => "3body-moon",
-            Self::ThreeBodyFigureEight => "3body-fig8",
-            Self::AsteroidsAroundBinary => "nbody-binary",
-            Self::SymmetricSatellites => "nbody-satellites",
-            Self::MonteCarloPiCalculation => "pi-calculation",
-            Self::Boids => "boids",
-            Self::Ants => "ants",
-            _ => "default",
-        };
+        let filename: String = self.into();
         let path = format!("img/simulations/{}/{}.png", filename, filename);
         path
     }
@@ -301,6 +281,8 @@ impl From<usize> for SimulationVariant {
         }
     }
 }
+// =============================================================================
+// TODO rename functions, e.g. from/into_url_str (?)
 impl From<&str> for SimulationVariant {
     fn from(simulation_variant: &str) -> Self {
         match simulation_variant {
@@ -310,7 +292,55 @@ impl From<&str> for SimulationVariant {
             "ising-model" => Self::IsingModel,
             "symmetric-satellites" => Self::SymmetricSatellites,
             "nbody-boids" => Self::Boids,
-            _ => todo!(),
+            "nbody-satellites" => Self::SymmetricSatellites,
+            "ants" => Self::Ants,
+            "nbody-charge-interaction" => Self::ChargeInteraction,
+            "ising-model" => Self::IsingModel,
+            "wien-filter" => Self::WienFilter,
+            "diffusion" => Self::Diffusion,
+            "double-pendulum" => Self::DoublePendulum,
+            "lissajous-figures" => Self::LissajousFigures,
+            "thermal-motion" => Self::ThermalMotion,
+            "brownian-motion" => Self::BrownianMotion,
+            "rock-paper-scissors" => Self::RockPaperScissors,
+            "solar-system" => Self::SolarSystem,
+            "single-pendulum" => Self::SinglePendulum,
+            "game-of-life" => Self::GameOfLife,
+            "nbody-binary" => Self::AsteroidsAroundBinary,
+            "nbody-satellites" => Self::SymmetricSatellites,
+            "pi-calculation" => Self::MonteCarloPiCalculation,
+            _ => todo!("From<&str> for SimulationVariant: {}", simulation_variant),
         }
+    }
+}
+impl From<&SimulationVariant> for String {
+    fn from(simulation_variant: &SimulationVariant) -> String {
+        match simulation_variant {
+            SimulationVariant::Boids => "nbody-boids",
+            SimulationVariant::ThreeBodyFigureEight => "3body-fig8",
+            SimulationVariant::ThreeBodyMoon => "3body-moon",
+            SimulationVariant::ChargeInteraction => "nbody-charge-interaction",
+            SimulationVariant::IsingModel => "ising-model",
+            SimulationVariant::WienFilter => "wien-filter",
+            SimulationVariant::Diffusion => "diffusion",
+            SimulationVariant::DoublePendulum => "double-pendulum",
+            SimulationVariant::LissajousFigures => "lissajous-figures",
+            SimulationVariant::ThermalMotion => "thermal-motion",
+            SimulationVariant::BrownianMotion => "brownian-motion",
+            SimulationVariant::RockPaperScissors => "rock-paper-scissors",
+            SimulationVariant::SolarSystem => "solar-system",
+            SimulationVariant::SinglePendulum => "single-pendulum",
+            SimulationVariant::GameOfLife => "game-of-life",
+            SimulationVariant::AsteroidsAroundBinary => "nbody-binary",
+            SimulationVariant::SymmetricSatellites => "nbody-satellites",
+            SimulationVariant::MonteCarloPiCalculation => "pi-calculation",
+            SimulationVariant::Ants => "ants",
+            _ => "default"
+            // _ => todo!(
+            //     "Into<String> for SimulationVariant: {:?}",
+            //     simulation_variant
+            // ),
+        }
+        .to_owned()
     }
 }

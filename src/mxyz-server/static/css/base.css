@@ -24,15 +24,18 @@ body {
   --page_column_pad: 25px;
   /* TODO rename? -> atm only used for simulation */
   /* TODO why canvas-fitting not working when changing --page_column_pad ? */
+  color: var(--main-text-color);
 }
 body {
   background-color: var(--main-bg-color);
-  color: var(--main-text-color);
   font-family: var(--main-font-family);
   margin: 0px;
   overflow-x: hidden;
   padding: 0px;
   width: 100%;
+}
+p {
+  color: var(--main-text-color);
 }
 
 /* PAGE HEADER ====================================== */
