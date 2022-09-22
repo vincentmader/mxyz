@@ -5,7 +5,7 @@ use yew::prelude::*;
 
 const STYLE_FILE: &str = include_str!("../../../../../mxyz-server/static/css/index/base.css");
 
-#[derive(PartialEq, yew::Properties)]
+#[derive(PartialEq, yew::Properties, Clone)]
 pub struct Props {
     pub on_page_change: Callback<AppPage>,
 }

@@ -3,7 +3,7 @@ use crate::components::atoms::text_input::TextInput;
 use std::ops::Deref;
 use yew::prelude::*;
 
-#[derive(Properties, PartialEq)]
+#[derive(Properties, PartialEq, Clone)]
 pub struct Props {
     pub onsubmit: Callback<Data>,
 }

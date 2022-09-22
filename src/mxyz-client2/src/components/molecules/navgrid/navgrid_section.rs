@@ -7,7 +7,7 @@ use yew::prelude::*;
 const STYLE_FILE: &str =
     include_str!("../../../../../mxyz-server/static/css/index/navgrid_section.css");
 
-#[derive(Properties, PartialEq)]
+#[derive(Properties, PartialEq, Clone)]
 pub struct Props {
     pub field: PhysicalField,
     pub on_page_change: Callback<AppPage>,

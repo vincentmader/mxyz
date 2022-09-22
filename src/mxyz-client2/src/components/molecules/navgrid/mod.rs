@@ -8,7 +8,7 @@ use yew::prelude::*;
 
 const STYLE_FILE: &str = include_str!("../../../../../mxyz-server/static/css/index/navgrid.css");
 
-#[derive(PartialEq, yew::Properties, std::default::Default)]
+#[derive(PartialEq, yew::Properties, std::default::Default, Clone)]
 pub struct Props {
     pub on_page_change: Callback<AppPage>,
 }

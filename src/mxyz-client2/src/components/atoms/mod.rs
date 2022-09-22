@@ -43,7 +43,7 @@ pub mod link {
     use yew::virtual_dom::AttrValue;
     use yew::{html, Context, Html};
 
-    #[derive(PartialEq, yew::Properties)]
+    #[derive(PartialEq, yew::Properties, Clone)]
     pub struct LinkProps {
         href: AttrValue,
         text: AttrValue,

@@ -1,6 +1,6 @@
 use yew::prelude::*;
 
-#[derive(PartialEq, yew::Properties, std::default::Default)]
+#[derive(PartialEq, yew::Properties, Default, Clone)]
 pub struct Props {}
 
 #[function_component(NavbarTop)]

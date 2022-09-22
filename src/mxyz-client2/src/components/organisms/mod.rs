@@ -163,7 +163,7 @@ impl Component for Index {
 use web_sys::HtmlInputElement;
 use yew::{html, Component, Context, Html, NodeRef};
 
-#[derive(Properties, PartialEq)]
+#[derive(Properties, PartialEq, Clone)]
 pub struct Props {}
 
 pub enum Msg2 {
