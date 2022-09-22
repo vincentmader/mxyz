@@ -12,16 +12,11 @@ const STYLE_FILE: &str = include_str!("../../../mxyz-server/static/css/base.css"
 #[derive(Clone, std::default::Default)]
 pub struct AppState {
     current_page: AppPage,
+    engine_runner_variant: EngineRunnerVariant,
 }
-
 #[function_component(App)]
 pub fn get_component() -> Html {
     let style = stylist::Style::new(STYLE_FILE).unwrap();
-
-    let engine_runner_variant = EngineRunnerVariant::ClientWASM;
-    // let a: Box<dyn EngineClient> = Box::from(&engine_runner_variant);
-    let mut engine_runner: Box<dyn EngineClient> = (&engine_runner_variant).into();
-    // engine_runner.init("nbody-gravity", "3body-moon");
 
     let app_state = use_state(AppState::default);
 
@@ -33,6 +28,9 @@ pub fn get_component() -> Html {
         });
     });
 
+    let mut engine_runner: Box<dyn EngineClient> = (&app_state.engine_runner_variant).into();
+    // engine_runner.init("nbody-gravity", "3body-moon");
+
     let page = match &app_state.current_page {
         AppPage::Index => html! {<Index on_page_change={on_page_change} />},
         AppPage::Simulation(_simulation_variant) => html! {<Simulation />},
@@ -40,9 +38,12 @@ pub fn get_component() -> Html {
     };
     html! {
         <div class={style}>
-            <test::Model />
-            <NavbarTop />
-            {page}
+            // <test::Model />
+            // <NavbarTop />
+            <BrowserRouter>
+                <Switch<Route> render={Switch::render(switch)} />
+            </BrowserRouter>
+            // {page}
         </div>
     }
 }
@@ -52,6 +53,26 @@ pub enum AppPage {
     #[default]
     Index,
     Simulation(SimulationVariant),
+}
+
+use yew::functional::*;
+use yew_router::prelude::*;
+#[derive(Debug, Clone, Copy, PartialEq, Routable)]
+enum Route {
+    #[at("/")]
+    Index,
+    #[at("/simulation")]
+    Simulation,
+    #[at("/404")]
+    NotFound,
+}
+
+fn switch(routes: &Route) -> Html {
+    match routes {
+        Route::Index => html! { <h1>{ "Home" }</h1> },
+        Route::Simulation => html! { <h1>{ "Simulation" }</h1> },
+        Route::NotFound => html! { <h1>{ "404" }</h1> },
+    }
 }
 
 pub mod test {
