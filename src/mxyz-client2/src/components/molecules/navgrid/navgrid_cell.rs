@@ -15,13 +15,15 @@ pub struct Props {
 pub fn fn_name(props: &Props) -> Html {
     let style = stylist::Style::new(STYLE_FILE).unwrap();
 
+    let foo: String = (&props.simulation_variant.clone()).into();
+    let foo = format!("/simulation/{}", foo);
     html! {
         <div class={style}>
             <div class="navgrid_cell">
                 <NavgridThumbnail simulation_variant={props.simulation_variant.clone()} />
-                <span class="navgrid_cell_title" >
+                <a class="navgrid_cell_title" href={foo}>
                     {props.simulation_variant.into_short_description_string()}
-                </span>
+                </a>
             </div>
         </div>
     }

@@ -6,13 +6,17 @@
   /* cursor: default; */
   border: none;
   outline: none;
+  /* outline: 1px solid green; */
 }
 
 .navgrid_cell_title {
   text-align: center;
   font-size: var(--font-size-navgrid-thumbnail);
   cursor: pointer;
+  text-decoration: none;
+  color: var(--main-text-color);
   /* transition: all 500ms; */
+  /* outline: 1px solid red; */
 }
 .navgrid_cell_title:hover {
   /* border: 2px solid #555555; */
