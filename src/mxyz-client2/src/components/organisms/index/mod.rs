@@ -1,4 +1,5 @@
-use crate::components::app::AppPage;
+// use crate::components::app::AppPage;
+use crate::components::molecules::navbar_top::NavbarTop;
 // use crate::components::molecules::login_form::LoginForm;
 use crate::components::molecules::navgrid::Navgrid;
 use yew::prelude::*;
@@ -21,6 +22,7 @@ pub fn fn_name(props: &Props) -> Html {
     html! {
         <div class={style}>
             // <LoginForm onsubmit={custom_form_submit} />
+            <NavbarTop />
             <div class="page_content">
                 <Navgrid  />
             </div>

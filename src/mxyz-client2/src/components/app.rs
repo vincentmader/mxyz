@@ -1,11 +1,12 @@
-use crate::components::molecules::navbar_top::NavbarTop;
 use crate::components::organisms::index::Index;
 use crate::components::organisms::simulation::Simulation;
 use mxyz_client::client::EngineClient;
 use mxyz_engine::config::engine_runner_variant::EngineRunnerVariant;
 use mxyz_engine::config::simulation_variant::SimulationVariant;
-use std::ops::Deref;
 use yew::prelude::*;
+// use crate::components::molecules::navbar_top::NavbarTop;
+// use yew::functional::*;
+// use std::ops::Deref;
 
 const STYLE_FILE: &str = include_str!("../../../mxyz-server/static/css/base.css");
 
@@ -19,23 +20,17 @@ pub fn get_component() -> Html {
     let style = stylist::Style::new(STYLE_FILE).unwrap();
 
     let app_state = use_state(AppState::default);
-
-    let cloned_state = app_state.clone();
-    let on_page_change = Callback::from(move |page: AppPage| {
-        cloned_state.set(AppState {
-            current_page: page,
-            ..cloned_state.deref().clone()
-        });
-    });
+    // let cloned_state = app_state.clone();
+    // let on_page_change = Callback::from(move |page: AppPage| {
+    //     cloned_state.set(AppState {
+    //         current_page: page,
+    //         ..cloned_state.deref().clone()
+    //     });
+    // });
 
     let mut engine_runner: Box<dyn EngineClient> = (&app_state.engine_runner_variant).into();
     // engine_runner.init("nbody-gravity", "3body-moon");
 
-    // let page = match &app_state.current_page {
-    // AppPage::Index => html! {<Index on_page_change={on_page_change} />},
-    // AppPage::Simulation(_simulation_variant) => html! {<Simulation />},
-    // _ => html! {<Simulation />},
-    // };
     html! {
         <div class={style}>
             <BrowserRouter>
@@ -52,7 +47,6 @@ pub enum AppPage {
     Simulation(SimulationVariant),
 }
 
-use yew::functional::*;
 use yew_router::prelude::*;
 #[derive(Debug, Clone, PartialEq, Routable)]
 enum Route {
@@ -88,6 +82,8 @@ fn switch(routes: &Route) -> Html {
         },
     }
 }
+
+// =============================================================================
 
 pub mod test {
     use super::producer::Producer;
