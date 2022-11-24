@@ -8,8 +8,8 @@
 /* SIMULATION TITLE */
 /* ============================================================================= */
 #simulation-title-container {
-  padding-right: calc(var(--main-border-radius));
   text-align: right;
+  /* padding-right: calc(var(--main-border-radius)); */
 }
 #simulation-title {
   text-align: center;

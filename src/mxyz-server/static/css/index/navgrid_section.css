@@ -3,14 +3,13 @@
   text-align: center;
   color: var(--main-text-color);
   font-weight: bold;
-  /* border: var(--debug-border); */
   padding-top: 1em;
+  font-size: var(--font-size-navgrid-section);
+  /* font-weight: 690; */
   /* text-decoration: underline; */
   /* padding-bottom: 0.5em; */
   /* outline: 1px solid red; */
   /* text-decoration: underline; */
-  font-size: var(--font-size-navgrid-section);
-  /* font-weight: 690; */
 }
 
 .navgrid_section {

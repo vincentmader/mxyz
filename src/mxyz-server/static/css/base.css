@@ -50,6 +50,7 @@ p {
   padding-top: calc(var(--font-size-title) / 2);
   padding-bottom: calc(var(--font-size-title) / 2);
   position: fixed;
+  top: 0;
   outline: var(--main-border);
   width: calc(100% - 2 * var(--page_column_pad));
   z-index: 1000;
@@ -76,6 +77,10 @@ p {
   outline: none;
   text-decoration: none;
 }
+.navbar_top_text {
+  /* text-align: right; */
+  /* margin: 0; */
+}
 
 /* PAGE CONTENT ====================================== */
 
@@ -85,7 +90,6 @@ p {
   --pad: var(var(--main-x-pad));
   padding-left: var(--pad);
   padding-right: var(--pad);
-  position: absolute;
   /* width: 100%; */
   /* margin-top: calc(2 * var(--font-size-title)); */
   /* padding-bottom: 2em; */
